@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+
+Disallow: /admin/
+Disallow: /login/
+Disallow: /register/
+Disallow: /password/
+Disallow: /storage/
+Disallow: /vendor/
+
+Sitemap: https://summit8000.com/sitemap.xml
