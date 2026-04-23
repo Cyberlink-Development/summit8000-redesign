@@ -18,10 +18,10 @@ class ActivityController extends Controller
      */
     public function index()
     {
-        $expedition = ActivityModel::where('activity_parent', 'expedition')->orderBy('id', 'desc')->get();
-        $activity = ActivityModel::where('activity_parent', 'activity')->orderBy('id', 'desc')->get();
-        $trekking = ActivityModel::where('activity_parent', 'trekking')->orderBy('id', 'desc')->get();
-        $packages = ActivityModel::where('activity_parent', 'package')->orderBy('id', 'desc')->get();
+        $expedition = ActivityModel::with('seo')->where('activity_parent', 'expedition')->orderBy('id', 'desc')->get();
+        $activity = ActivityModel::with('seo')->where('activity_parent', 'activity')->orderBy('id', 'desc')->get();
+        $trekking = ActivityModel::with('seo')->where('activity_parent', 'trekking')->orderBy('id', 'desc')->get();
+        $packages = ActivityModel::with('seo')->where('activity_parent', 'package')->orderBy('id', 'desc')->get();
         // dd($packages);
         return view('admin.activities.index', compact('expedition', 'trekking', 'activity', 'packages'));
     }
@@ -115,6 +115,45 @@ class ActivityController extends Controller
         $result->isdefault = $request->isdefault;
         $result->save();
         $last_id = $result->id;
+
+        // Save SEO Data
+        if ($result && $request->has('seo')) {
+
+            $seoData = $request->seo ?? [];
+
+            $index = isset($seoData['index']) && $seoData['index'] == 1;
+            $follow = isset($seoData['follow']) && $seoData['follow'] == 1;
+
+            $seoData['robots'] =
+                ($index ? 'index' : 'noindex') . ',' .
+                ($follow ? 'follow' : 'nofollow');
+
+            unset($seoData['index'], $seoData['follow']);
+
+            // Handle OG Image upload separately
+            if ($request->hasFile('seo_og_image')) {
+                $ogFile = $request->file('seo_og_image');
+                $ogName = Str::slug(pathinfo($ogFile->getClientOriginalName(), PATHINFO_FILENAME))
+                    . '-' . Str::random(5) . '.webp';
+
+                $destination = public_path('uploads/seo');
+
+                Image::make($ogFile->getRealPath())
+                    ->encode('webp', 85)
+                    ->save($destination . '/' . $ogName);
+
+                $seoData['og_image'] = $ogName;
+            }
+
+            // Convert schema JSON string → array
+            if (!empty($seoData['schema_data'])) {
+
+                $seoData['schema_data'] = cleanSchemaJson($seoData['schema_data']);
+            }
+
+            // Save using polymorphic relation
+            $result->seo()->create($seoData);
+        }
         /************/
         $_data = ActivityModel::find($last_id);
         /************/
@@ -160,7 +199,7 @@ class ActivityController extends Controller
 
         /*********/
 
-        $data = ActivityModel::find($id);
+        $data = ActivityModel::with('seo')->find($id);
 
         return view('admin.activities.edit', compact('data', 'templates', 'relatedActivities'));
     }
@@ -179,11 +218,11 @@ class ActivityController extends Controller
             'uri' => 'required|unique:cl_trip_activities,uri,' . $id,
         ]);
 
-        $data = ActivityModel::find($id);
+        $data = ActivityModel::with('seo')->find($id);
         $file = $request->file('banner');
         $banner_name = [];
         if ($request->hasfile('banner')) {
-            $data = ActivityModel::find($id);
+            // $data = ActivityModel::with('seo')->find($id);
             if ($data->banner) {
                 if (file_exists(env('PUBLIC_PATH') . 'uploads/banners/' . $data->banner)) {
                     unlink(env('PUBLIC_PATH') . 'uploads/banners/' . $data->banner);
@@ -201,7 +240,7 @@ class ActivityController extends Controller
         $i_file = $request->file('thumbnail');
         $icon_name = '';
         if ($request->hasFile('thumbnail')) {
-            $data = ActivityModel::find($id);
+            // $data = ActivityModel::with('seo')->find($id);
             if ($data->page_banner) {
                 if (file_exists(env('PUBLIC_PATH') . 'uploads/icon/' . $data->thumbnail)) {
                     unlink(env('PUBLIC_PATH') . 'uploads/icon/' . $data->thumbnail);
@@ -238,11 +277,56 @@ class ActivityController extends Controller
         // $_data->relatedActivities()->detach();
         // $_data->relatedActivities()->attach($request->related_activity);
 
-        /************/
+        $data->save();
 
-        if ($data->save()) {
-            return redirect()->back()->with('success', 'Update Sucessfully.');
+        /************/
+        if ($request->has('seo')) {
+            $seoData = $request->seo ?? [];
+
+            $index = isset($seoData['index']) && $seoData['index'] == 1;
+            $follow = isset($seoData['follow']) && $seoData['follow'] == 1;
+
+            $seoData['robots'] =
+                ($index ? 'index' : 'noindex') . ',' .
+                ($follow ? 'follow' : 'nofollow');
+
+            unset($seoData['index'], $seoData['follow']);
+
+            if ($request->hasFile('seo_og_image')) {
+                $ogFile = $request->file('seo_og_image');
+
+                $ogName = Str::slug(pathinfo($ogFile->getClientOriginalName(), PATHINFO_FILENAME))
+                    . '-' . Str::random(5) . '.webp';
+
+                $destination = public_path('uploads/seo');
+
+                Image::make($ogFile->getRealPath())
+                    ->encode('webp', 85)
+                    ->save($destination . '/' . $ogName);
+
+                $seoData['og_image'] = $ogName;
+            }
+
+            if (!empty($seoData['schema_data'])) {
+
+                $cleaned = cleanSchemaJson($seoData['schema_data']);
+
+                if ($cleaned !== null) {
+                    $seoData['schema_data'] = $cleaned;
+                } else {
+                    unset($seoData['schema_data']);
+                    session()->flash('warning', 'Invalid schema JSON. Not saved.');
+                }
+            }
+
+            $data->seo()->updateOrCreate(
+                [],
+                $seoData
+            );
         }
+
+        return redirect()->back()->with('success', 'Update Sucessfully.');
+
     }
 
     /**
@@ -254,6 +338,19 @@ class ActivityController extends Controller
     public function destroy($id)
     {
         $data = ActivityModel::find($id);
+        if ($data->seo) {
+            // Delete OG Image if exists
+            if ($data->seo->og_image) {
+
+                $ogPath = public_path('uploads/seo/' . $data->seo->og_image);
+                if (file_exists($ogPath)) {
+                    unlink($ogPath);
+                }
+            }
+
+            $data->seo()->delete();
+        }
+
         if ($data->banner != NULL) {
             if (file_exists(env('PUBLIC_PATH') . 'uploads/banners/' . $data->banner)) {
                 unlink(env('PUBLIC_PATH') . 'uploads/banners/' . $data->banner);

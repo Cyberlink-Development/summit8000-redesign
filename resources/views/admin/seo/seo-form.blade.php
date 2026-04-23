@@ -196,16 +196,29 @@
             </div>
         </div>
 
+        @php
+            $changeFrequency = old('seo.change_frequency', $seo->change_frequency ?? '');
+        @endphp
+
         <div class="form-group">
             <label class="col-lg-3 control-label">Change Frequency</label>
+
             <div class="col-lg-8">
                 <select name="seo[change_frequency]" class="form-control">
-                    <option value="daily">Daily</option>
-                    <option value="weekly">Weekly</option>
-                    <option value="monthly">Monthly</option>
+                    <option value="" disabled {{ empty($changeFrequency) ? 'selected' : '' }}>
+                        Select
+                    </option>
+                    <option value="daily" {{ $changeFrequency === 'daily' ? 'selected' : '' }}>
+                        Daily
+                    </option>
+                    <option value="weekly" {{ $changeFrequency === 'weekly' ? 'selected' : '' }}>
+                        Weekly
+                    </option>
+                    <option value="monthly" {{ $changeFrequency === 'monthly' ? 'selected' : '' }}>
+                        Monthly
+                    </option>
                 </select>
             </div>
         </div>
-
     </div>
 </div>
