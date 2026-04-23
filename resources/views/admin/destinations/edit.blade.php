@@ -24,7 +24,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="inputStandard" class="col-lg-2 control-label"> Sub Title</label>
                         <div class="col-lg-9">
@@ -42,7 +42,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                      <div class="form-group">
                         <label for="inputStandard" class="col-lg-2 control-label"> Banner</label>
                         <div class="col-lg-9">
@@ -59,7 +59,10 @@
 
                 </div>
             </div>
-            
+            @include('admin.seo.seo-form', [
+                'seo' => $data->seo ?? null
+            ])
+
                 {{-- <div class="panel">
                     <div class="panel-heading">
                         <span class="panel-title">Related Activity</span>
@@ -69,9 +72,9 @@
                             <div class="col-lg-12">
                                 <div class="bs-component">
                                     <select class="form-control related-activity" name="activity_id[]" multiple="multiple">
-                                        
+
                                         @foreach ($relatedActivities as $row)
-                                        
+
                                         @if(selected($row->id, $data->id) != null)
                                         <option value="{{ $row->id }}" selected>{{ $row->title }}</option>
                                         @else
@@ -134,7 +137,7 @@
                       <a href="#{{$data->id}}" class="delete_thumbnail">X</a>
                                 <br>
                                 <img src="{{ asset('uploads/original/' . $data->thumbnail) }}" width="100%" />
-                               
+
                             </span>
                         @endif
                     </div>
@@ -210,13 +213,13 @@
         document.addEventListener("DOMContentLoaded", function () {
             const toggleBtn = document.getElementById('statusToggle');
             const hiddenInput = document.getElementById('statusInput');
-    
+
             toggleBtn.addEventListener('click', function () {
                 const isActive = toggleBtn.textContent.trim() === 'Active';
-    
+
                 const newText = isActive ? 'Inactive' : 'Active';
                 const newValue = isActive ? '0' : '1';
-    
+
                 toggleBtn.textContent = newText;
                 hiddenInput.value = newValue;
             });

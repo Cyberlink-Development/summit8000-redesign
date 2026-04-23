@@ -3,6 +3,7 @@
 namespace App\Models\Travels;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\SeoMeta;
 
 class RegionModel extends Model
 {
@@ -13,6 +14,10 @@ class RegionModel extends Model
     {
         return $this->belongsToMany('App\Models\Travels\TripModel', 'cl_trip_region_rel', 'region_id', 'trip_id');
     }
+    public function seo()
+    {
+        return $this->morphOne(SeoMeta::class, 'seoable');
+    }
 
-   
+
 }

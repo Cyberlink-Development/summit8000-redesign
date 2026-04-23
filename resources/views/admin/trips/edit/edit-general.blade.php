@@ -271,19 +271,10 @@
             </div>
         </div>
         <div class="panel">
-            <div class="panel-heading">
-                <span class="panel-title"> Meta data </span>
-            </div>
-            <div class="panel-body">
-
-                {{-- <div class="form-group">
-                <div class="col-lg-12">
-                    <div class="bs-component">
-                        <input type="text" name="meta_title" class="form-control" value="{{ $data->meta_title }}"
-                            placeholder="Meta Title" />
-                    </div>
-                </div>
-            </div> --}}
+            @include('admin.seo.seo-form', [
+                'seo' => $data->seo ?? null
+            ])
+            <!-- <div class="panel-body">
 
                 <div class="form-group">
                     <div class="col-lg-12">
@@ -300,7 +291,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> -->
         </div>
     </div>
 

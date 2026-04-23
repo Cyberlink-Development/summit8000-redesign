@@ -230,37 +230,10 @@
         </div>
 
         <div class="panel">
-            <div class="panel-heading">
-                <span class="panel-title"> Meta data </span>
-            </div>
-            <div class="panel-body">
-                {{-- <div class="form-group">
-                    <div class="col-lg-12">
-                        <div class="bs-component">
-                            <input type="text" name="meta_title" class="form-control" placeholder="Meta Title"
-                                value="{{ old('meta_title') }}" />
-                        </div>
-                    </div>
-                </div> --}}
 
-                <div class="form-group">
-                    <div class="col-lg-12">
-                        <div class="bs-component">
-                            <input type="text" name="meta_key" class="form-control" placeholder="Meta Key"
-                                value="{{ old('meta_key') }}" />
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <div class="col-lg-12">
-                        <div class="bs-component">
-                            <textarea class="form-control" id="textArea3" name="meta_description" rows="3"
-                                placeholder="Meta Description">{{ old('meta_description') }}</textarea>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            @include('admin.seo.seo-form', [
+                'seo' => $data->seo ?? null
+            ])
         </div>
     </div>
     <div class="col-md-4">

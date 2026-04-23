@@ -3,6 +3,7 @@
 namespace App\Models\Travels;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\SeoMeta;
 
 class TripModel extends Model
 {
@@ -73,6 +74,10 @@ class TripModel extends Model
         public function faqs()
     {
         return $this->hasMany('App\Models\Faqs\FaqModel', 'trip_detail_id');
+    }
+    public function seo()
+    {
+        return $this->morphOne(SeoMeta::class, 'seoable');
     }
 
 

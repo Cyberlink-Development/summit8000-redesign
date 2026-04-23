@@ -3,7 +3,7 @@
 namespace App\Models\Destinations;
 
 use Illuminate\Database\Eloquent\Model;
-
+use App\Models\SeoMeta;
 class DestinationModel extends Model
 {
     protected $table = 'cl_trip_destinations';
@@ -15,6 +15,10 @@ class DestinationModel extends Model
     }
     public function activities(){
         return $this->belongsToMany('App\Models\Travels\ActivityModel','destination_activity_rel','destination_id', 'activity_id');
+    }
+    public function seo()
+    {
+        return $this->morphOne(SeoMeta::class, 'seoable');
     }
 
 }

@@ -30,7 +30,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="inputStandard" class="col-lg-2 control-label"> Content</label>
                         <div class="col-lg-9">
@@ -47,7 +47,7 @@
                             </div>
                         </div>
                     </div>
-        
+
                 </div>
                 <!--<div class="panel">-->
                 <!--    <div class="panel-heading">-->
@@ -57,7 +57,7 @@
                 <!--        <div class="form-group">-->
                 <!--            <div class="col-lg-12">-->
                 <!--                <div class="bs-component">-->
-            
+
                 <!--                    <select class="form-control related-activity" name="activity_id[]" multiple="multiple">-->
                 <!--                        @if ($relatedActivities->count() > 0)-->
                 <!--                            @foreach ($relatedActivities as $row)-->
@@ -78,6 +78,9 @@
                 <!--    </div>-->
                 <!--</div>-->
             </div>
+            @include('admin.seo.seo-form', [
+                'seo' => $data->seo ?? null
+            ])
         </div>
 
         <div class="col-md-3">
