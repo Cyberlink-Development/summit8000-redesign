@@ -39,12 +39,13 @@ class TripController extends Controller
     public function index($training = null)
     {
 
-        $category = ActivityModel::where('activity_parent', '!=', 'package')->get();
+        $category = ActivityModel::with('trips.seo')->where('activity_parent', '!=', 'package')->get();
 
         $data = $category->flatMap(function ($cat) {
-            return $cat->trips; // Ensure that 'trips' is being returned
+            return $cat->trips;
         })->sortByDesc('ordering')->values();
         // dd($data);
+
         return view('admin.trips.index', compact('data'));
 
     }
@@ -246,6 +247,45 @@ class TripController extends Controller
             $result = TripModel::create($data);
             $last_id = $result->id;
 
+            // Seo
+            if ($result && $request->has('seo')) {
+
+                $seoData = $request->seo ?? [];
+
+                $index = isset($seoData['index']) && $seoData['index'] == 1;
+                $follow = isset($seoData['follow']) && $seoData['follow'] == 1;
+
+                $seoData['robots'] =
+                    ($index ? 'index' : 'noindex') . ',' .
+                    ($follow ? 'follow' : 'nofollow');
+
+                unset($seoData['index'], $seoData['follow']);
+
+                // Handle OG Image upload separately
+                if ($request->hasFile('seo_og_image')) {
+                    $ogFile = $request->file('seo_og_image');
+                    $ogName = Str::slug(pathinfo($ogFile->getClientOriginalName(), PATHINFO_FILENAME))
+                        . '-' . Str::random(5) . '.webp';
+
+                    $destination = public_path('uploads/seo');
+
+                    Image::make($ogFile->getRealPath())
+                        ->encode('webp', 85)
+                        ->save($destination . '/' . $ogName);
+
+                    $seoData['og_image'] = $ogName;
+                }
+
+                // Convert schema JSON string → array
+                if (!empty($seoData['schema_data'])) {
+
+                    $seoData['schema_data'] = cleanSchemaJson($seoData['schema_data']);
+                }
+
+                // Save using polymorphic relation
+                $result->seo()->create($seoData);
+            }
+
 
             // Insert into schedule
             if (isset($request->schedule_ordering)) {
@@ -431,7 +471,7 @@ class TripController extends Controller
      */
     public function edit($id, $training = null)
     {
-        $data = TripModel::find($id);
+        $data = TripModel::with('seo')->find($id);
         $checked_destinations = array();
         $checked_regions = array();
         $checked_activities = array();
@@ -577,7 +617,7 @@ class TripController extends Controller
                 $is_draft = 1;
             }
 
-            $data = TripModel::find($id);
+            $data = TripModel::with('seo')->find($id);
 
             $file = $request->file('banner');
             $thumbnail_file = $request->file('thumbnail');
@@ -876,7 +916,6 @@ class TripController extends Controller
                 }
             }
 
-
             if (isset($request->banner_id)) {
                 $banner_keys = array_keys($request->banner_id);
                 $sn_banner = 1;
@@ -986,8 +1025,52 @@ class TripController extends Controller
                 }
             }
 
-
             $data->save();
+
+            if ($request->has('seo')) {
+                $seoData = $request->seo ?? [];
+
+                $index = isset($seoData['index']) && $seoData['index'] == 1;
+                $follow = isset($seoData['follow']) && $seoData['follow'] == 1;
+
+                $seoData['robots'] =
+                    ($index ? 'index' : 'noindex') . ',' .
+                    ($follow ? 'follow' : 'nofollow');
+
+                unset($seoData['index'], $seoData['follow']);
+
+                if ($request->hasFile('seo_og_image')) {
+                    $ogFile = $request->file('seo_og_image');
+
+                    $ogName = Str::slug(pathinfo($ogFile->getClientOriginalName(), PATHINFO_FILENAME))
+                        . '-' . Str::random(5) . '.webp';
+
+                    $destination = public_path('uploads/seo');
+
+                    Image::make($ogFile->getRealPath())
+                        ->encode('webp', 85)
+                        ->save($destination . '/' . $ogName);
+
+                    $seoData['og_image'] = $ogName;
+                }
+
+                if (!empty($seoData['schema_data'])) {
+
+                    $cleaned = cleanSchemaJson($seoData['schema_data']);
+
+                    if ($cleaned !== null) {
+                        $seoData['schema_data'] = $cleaned;
+                    } else {
+                        unset($seoData['schema_data']);
+                        session()->flash('warning', 'Invalid schema JSON. Not saved.');
+                    }
+                }
+
+                $data->seo()->updateOrCreate(
+                    [],
+                    $seoData
+                );
+            }
             return response()->json(['status' => 'success', 'message' => 'Trip Update Successful!']);
         }
         return false;
@@ -1004,6 +1087,18 @@ class TripController extends Controller
     public function destroy($id)
     {
         $data = TripModel::find($id);
+        if ($data->seo) {
+            // Delete OG Image if exists
+            if ($data->seo->og_image) {
+
+                $ogPath = public_path('uploads/seo/' . $data->seo->og_image);
+                if (file_exists($ogPath)) {
+                    unlink($ogPath);
+                }
+            }
+
+            $data->seo()->delete();
+        }
         if ($data->banner != null) {
             if (file_exists(env('PUBLIC_PATH') . 'uploads/banners/' . $data->banner)) {
                 unlink(env('PUBLIC_PATH') . 'uploads/banners/' . $data->banner);

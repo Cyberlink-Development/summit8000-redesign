@@ -26,11 +26,7 @@
                                 <ul class="nav nav-pills ml-auto p4 mb10 mt10 nav-custom">
                                     <li class="nav-item active"><a class="nav-link active" href="#tab_1" data-toggle="tab">Contact Information</a></li>
                                     <li class="nav-item"><a class="nav-link" href="#tab_2" data-toggle="tab"> Social Media Links </a></li>
-                                    <!-- <li class="nav-item"><a class="nav-link" href="#tab_3" data-toggle="tab"> Logo and
-                                            Affiliated Logos </a></li> -->
-                                    <!--<li class="nav-item"><a class="nav-link" href="#tab_4" data-toggle="tab"> Flight Information </a></li>-->
-                                    <!-- <li class="nav-item"><a class="nav-link" href="#tab_5" data-toggle="tab"> Images</a></li> -->
-                                    <!-- <li class="nav-item"><a class="nav-link" href="#tab_6" data-toggle="tab"> Home Text</a></li> -->
+                                    <li class="nav-item"><a class="nav-link" href="#tab_3" data-toggle="tab"> SEO</a></li>
                                 </ul>
                             </div><!-- /.card-header -->
                             <div class="card-body">
@@ -42,7 +38,9 @@
                                         @include('admin.settings.socialMedia')
                                     </div>
                                     <div class="tab-pane" id="tab_3">
-                                        @include('admin.settings.logo')
+                                        @include('admin.seo.seo-form', [
+                                            'seo' => $data->seo ?? null
+                                        ])
                                     </div>
                                     <div class="tab-pane" id="tab_4">
                                         @include('admin.settings.flight')

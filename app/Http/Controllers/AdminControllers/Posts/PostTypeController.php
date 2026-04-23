@@ -100,19 +100,15 @@ class PostTypeController extends Controller
         // Save SEO Data
         if ($result && $request->has('seo')) {
 
-            $seoData = $request->seo;
+            $seoData = $request->seo ?? [];
 
             $index = isset($seoData['index']) && $seoData['index'] == 1;
             $follow = isset($seoData['follow']) && $seoData['follow'] == 1;
 
-            // Default if nothing selected
-            if (!isset($seoData['index']) && !isset($seoData['follow'])) {
-                $seoData['robots'] = 'index,follow'; // ✅ default
-            } else {
-                $seoData['robots'] = ($index ? 'index' : 'noindex') . ',' . ($follow ? 'follow' : 'nofollow');
-            }
+            $seoData['robots'] =
+                ($index ? 'index' : 'noindex') . ',' .
+                ($follow ? 'follow' : 'nofollow');
 
-            // Remove checkbox fields (important)
             unset($seoData['index'], $seoData['follow']);
 
             // Handle OG Image upload separately
@@ -254,18 +250,15 @@ class PostTypeController extends Controller
         $data->save();
 
         if ($request->has('seo')) {
-            $seoData = $request->seo;
+            $seoData = $request->seo ?? [];
 
             $index = isset($seoData['index']) && $seoData['index'] == 1;
             $follow = isset($seoData['follow']) && $seoData['follow'] == 1;
 
-            if (!isset($seoData['index']) && !isset($seoData['follow'])) {
-                $seoData['robots'] = 'index,follow';
-            } else {
-                $seoData['robots'] =
-                    ($index ? 'index' : 'noindex') . ',' .
-                    ($follow ? 'follow' : 'nofollow');
-            }
+            $seoData['robots'] =
+                ($index ? 'index' : 'noindex') . ',' .
+                ($follow ? 'follow' : 'nofollow');
+
             unset($seoData['index'], $seoData['follow']);
 
             if ($request->hasFile('seo_og_image')) {

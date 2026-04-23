@@ -105,7 +105,7 @@
                             </div>
                         </div>
                     </div> -->
-                    <div class="form-group">
+                    <!-- <div class="form-group">
                         <label for="inputStandard" class="col-lg-2 control-label">Meta Key</label>
                         <div class="col-lg-8">
                             <div class="bs-component">
@@ -121,7 +121,7 @@
                             <div class="bs-component"> <textarea class="form-control" id="contentEditor5" name="meta_description" rows="3">{{$data->meta_description}}</textarea>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
             </div>
         </div>
