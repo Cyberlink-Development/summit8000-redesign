@@ -130,6 +130,9 @@
 
                 </div>
             </div>
+            @include('admin.seo.seo-form', [
+                'seo' => $data->seo ?? null
+            ])
         </div>
 
         <div class="col-md-3">

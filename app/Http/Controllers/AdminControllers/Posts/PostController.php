@@ -22,7 +22,7 @@ class PostController extends Controller
         $posttype = PostTypeModel::where('uri', $uri)->first();
         if ($posttype) {
             $posttypeId = $posttype->id;
-            $data = PostModel::where(['post_type' => $posttypeId, 'post_parent' => 0])->orderBy('post_order', 'asc')->get();
+            $data = PostModel::with('seo')->where(['post_type' => $posttypeId, 'post_parent' => 0])->orderBy('post_order', 'asc')->get();
             return view('admin.posts.index', compact('data'));
         }
         return redirect('/dashboard');
@@ -132,7 +132,7 @@ class PostController extends Controller
         $page_banner = "";
 
 
-        if($request->hasFile('page_banner')){
+        if ($request->hasFile('page_banner')) {
             $user_img_name = $request->file('page_banner');
             // $user_name = time().'.'.$user_img_name->getClientOriginalExtension();
             // $user_name = time().'.webp';
@@ -140,7 +140,7 @@ class PostController extends Controller
             $name = pathinfo($user_img_name->getClientOriginalName(), PATHINFO_FILENAME);
 
             // Keep same name, just change extension to webp
-            $user_name = $name .'-' . Str::random(5) . '.webp';
+            $user_name = $name . '-' . Str::random(5) . '.webp';
             $image = Image::make($user_img_name->getRealPath());
             $destinationPath = public_path('uploads/banners');
             $image->encode('webp', 85)->save($destinationPath . '/' . $user_name);
@@ -162,7 +162,7 @@ class PostController extends Controller
             $width = Image::make($file->getRealPath())->width();
             $height = Image::make($file->getRealPath())->height();
 
-             /*Upload Original Image*/
+            /*Upload Original Image*/
             // $product_picture->save($destinationOriginal . '/' . $page_thumbnail);
             $product_picture->encode('webp', 85)->save($destinationOriginal . '/' . $page_thumbnail);
 
@@ -179,12 +179,56 @@ class PostController extends Controller
         $posttypeId = $this->getPostTypeId($request->post_type);
         $data['post_type'] = $posttypeId->id;
         // $data['uri'] = Str::slug($request->uri);
-        $data['uri'] = generate_unique_uri('App\Models\Posts\PostModel',Str::slug($request->uri));
+        $data['uri'] = generate_unique_uri('App\Models\Posts\PostModel', Str::slug($request->uri));
         $data['page_thumbnail'] = $page_thumbnail;
         $isChecked = $request->has('show_in_home');
         $data['show_in_home'] = ($isChecked) ? '1' : '0';
         $result = PostModel::create($data);
         $last_id = $result->id;
+
+        // Save SEO Data
+        if ($result && $request->has('seo')) {
+
+            $seoData = $request->seo;
+
+            $index = isset($seoData['index']) && $seoData['index'] == 1;
+            $follow = isset($seoData['follow']) && $seoData['follow'] == 1;
+
+            // Default if nothing selected
+            if (!isset($seoData['index']) && !isset($seoData['follow'])) {
+                $seoData['robots'] = 'index,follow'; // ✅ default
+            } else {
+                $seoData['robots'] = ($index ? 'index' : 'noindex') . ',' . ($follow ? 'follow' : 'nofollow');
+            }
+
+            // Remove checkbox fields (important)
+            unset($seoData['index'], $seoData['follow']);
+
+            // Handle OG Image upload separately
+            if ($request->hasFile('seo_og_image')) {
+                $ogFile = $request->file('seo_og_image');
+                $ogName = Str::slug(pathinfo($ogFile->getClientOriginalName(), PATHINFO_FILENAME))
+                    . '-' . Str::random(5) . '.webp';
+
+                $destination = public_path('uploads/seo');
+
+                Image::make($ogFile->getRealPath())
+                    ->encode('webp', 85)
+                    ->save($destination . '/' . $ogName);
+
+                $seoData['og_image'] = $ogName;
+            }
+
+            // Convert schema JSON string → array
+            if (!empty($seoData['schema_data'])) {
+
+                $seoData['schema_data'] = cleanSchemaJson($seoData['schema_data']);
+            }
+
+            // Save using polymorphic relation
+            $result->seo()->create($seoData);
+        }
+
         if ($result) {
             return redirect('admin/' . $post_type . '/' . $last_id . '/edit')->with('success', 'Successfully added.');
         } else {
@@ -244,7 +288,7 @@ class PostController extends Controller
         $posttype_id = $posttype->id;
         $parent_post = PostModel::where(['post_type' => $posttype_id, 'post_parent' => 0])->get();
         $category = PostCategoryModel::where('post_type', $posttype_id)->get();
-        $data = PostModel::find($id);
+        $data = PostModel::with('seo')->find($id);
         return view('admin.posts.edit', compact('data', 'parent_post', 'templates', 'templates_child', 'category'));
     }
 
@@ -259,7 +303,7 @@ class PostController extends Controller
     {
         $request->validate([
             'post_title' => 'required',
-            'uri'=>'required|unique:cl_posts,uri,'.$id,
+            'uri' => 'required|unique:cl_posts,uri,' . $id,
         ]);
 
         $banner_width = env('BANNER_WIDTH');
@@ -274,7 +318,7 @@ class PostController extends Controller
         $page_thumbnail = '';
         $page_banner = '';
 
-        if($request->hasFile('page_banner')){
+        if ($request->hasFile('page_banner')) {
             $data = PostModel::find($id);
             if ($data->page_banner) {
                 if (file_exists(env('PUBLIC_PATH') . 'uploads/banners/' . $data->page_banner)) {
@@ -285,7 +329,7 @@ class PostController extends Controller
             // $user_name = time().'.'.$user_img_name->getClientOriginalExtension();
             // $user_name = time().'.webp';
             $name = pathinfo($user_img_name->getClientOriginalName(), PATHINFO_FILENAME);
-            $user_name = $name .'-' . Str::random(5) . '.webp';
+            $user_name = $name . '-' . Str::random(5) . '.webp';
 
             $image = Image::make($user_img_name->getRealPath());
             $destinationPath = public_path('uploads/banners');
@@ -317,7 +361,7 @@ class PostController extends Controller
             $width = Image::make($file->getRealPath())->width();
             $height = Image::make($file->getRealPath())->height();
 
-             /*Upload Original Image*/
+            /*Upload Original Image*/
             // $product_picture->save($destinationOriginal . '/' . $product_name);
             $data->page_thumbnail = $product_name;
 
@@ -355,9 +399,58 @@ class PostController extends Controller
         $isChecked = $request->has('show_in_home');
         $data->show_in_home = ($isChecked) ? '1' : '0';
         $data['uri'] = Str::slug($request->uri);
-        if ($data->save()) {
-            return redirect()->back()->with('success', 'Update Sucessfully.');
+        $data->save();
+
+        if ($request->has('seo')) {
+            $seoData = $request->seo;
+
+            $index = isset($seoData['index']) && $seoData['index'] == 1;
+            $follow = isset($seoData['follow']) && $seoData['follow'] == 1;
+
+            if (!isset($seoData['index']) && !isset($seoData['follow'])) {
+                $seoData['robots'] = 'index,follow';
+            } else {
+                $seoData['robots'] =
+                    ($index ? 'index' : 'noindex') . ',' .
+                    ($follow ? 'follow' : 'nofollow');
+            }
+            unset($seoData['index'], $seoData['follow']);
+
+            if ($request->hasFile('seo_og_image')) {
+                $ogFile = $request->file('seo_og_image');
+
+                $ogName = Str::slug(pathinfo($ogFile->getClientOriginalName(), PATHINFO_FILENAME))
+                    . '-' . Str::random(5) . '.webp';
+
+                $destination = public_path('uploads/seo');
+
+                Image::make($ogFile->getRealPath())
+                    ->encode('webp', 85)
+                    ->save($destination . '/' . $ogName);
+
+                $seoData['og_image'] = $ogName;
+            }
+
+            if (!empty($seoData['schema_data'])) {
+
+                $cleaned = cleanSchemaJson($seoData['schema_data']);
+
+                if ($cleaned !== null) {
+                    $seoData['schema_data'] = $cleaned;
+                } else {
+                    unset($seoData['schema_data']);
+                    session()->flash('warning', 'Invalid schema JSON. Not saved.');
+                }
+            }
+
+            $data->seo()->updateOrCreate(
+                [],
+                $seoData
+            );
         }
+
+        return redirect()->back()->with('success', 'Update Sucessfully.');
+
     }
 
     /**
@@ -369,6 +462,18 @@ class PostController extends Controller
     public function destroy(PostModel $postModel, $posttype, $id)
     {
         $data = PostModel::find($id);
+        if ($data->seo) {
+            // Delete OG Image if exists
+            if ($data->seo->og_image) {
+
+                $ogPath = public_path('uploads/seo/' . $data->seo->og_image);
+                if (file_exists($ogPath)) {
+                    unlink($ogPath);
+                }
+            }
+
+            $data->seo()->delete();
+        }
         if ($data->page_thumbnail != null) {
             if (file_exists(env('PUBLIC_PATH') . 'uploads/medium/' . $data->page_thumbnail)) {
                 unlink(env('PUBLIC_PATH') . 'uploads/medium/' . $data->page_thumbnail);
@@ -377,7 +482,7 @@ class PostController extends Controller
                 unlink(env('PUBLIC_PATH') . 'uploads/original/' . $data->page_thumbnail);
             }
         }
-         if ($data->page_banner != null) {
+        if ($data->page_banner != null) {
             if (file_exists(env('PUBLIC_PATH') . 'uploads/banners/' . $data->page_banner)) {
                 unlink(env('PUBLIC_PATH') . 'uploads/banners/' . $data->page_banner);
             }

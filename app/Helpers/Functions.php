@@ -32,6 +32,49 @@ function is_empty_posttype($id)
     return false;
 }
 
+if (!function_exists('cleanSchemaJson')) {
+
+    function cleanSchemaJson($input)
+    {
+        if (empty($input)) {
+            return null;
+        }
+
+        $json = trim($input);
+
+        // 1. Remove invalid placeholder keys like "..."
+        $json = preg_replace('/"\.\.\."\s*:\s*".*?",?/', '', $json);
+
+        // 2. Remove trailing commas (very common user mistake)
+        $json = preg_replace('/,\s*([}\]])/', '$1', $json);
+
+        // 3. Normalize quotes (optional safety)
+        $json = str_replace(["\r", "\n", "\t"], '', $json);
+
+        // 4. Ensure wrapped in {}
+        if (!str_starts_with($json, '{')) {
+            $json = '{' . $json;
+        }
+        if (!str_ends_with($json, '}')) {
+            $json .= '}';
+        }
+
+        // 5. Attempt decode
+        $decoded = json_decode($json, true);
+
+        if (json_last_error() === JSON_ERROR_NONE) {
+            return $decoded; // ✅ correct structured JSON
+        }
+
+        // ❗ DO NOT FLATTEN OR GUESS STRUCTURE
+        // Return null instead of corrupting nested schema
+        return null;
+    }
+}
+function has_seo_data($model)
+{
+    return $model->seo()->exists();
+}
 // Check whether this category has post or not.
 function is_empty_category($id)
 {

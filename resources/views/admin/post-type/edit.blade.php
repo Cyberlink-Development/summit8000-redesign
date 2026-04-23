@@ -86,7 +86,7 @@
                         </div>
                     </div>
 
-                    <div class="form-group">
+                    <!-- <div class="form-group">
                         <label class="col-lg-3 control-label" for="">Meta Keywords</label>
                         <div class="col-lg-8">
                             <div class="bs-component">
@@ -104,10 +104,13 @@
                                 <textarea class="form-control" name="meta_description" rows="3">{{ old('meta_description',$data->meta_description) }}</textarea>
                             </div>
                         </div>
-                    </div>
-                    
+                    </div> -->
+
                 </div>
             </div>
+            @include('admin.seo.seo-form', [
+                'seo' => $data->seo ?? null
+            ])
         </div>
 
         <div class="col-md-3">

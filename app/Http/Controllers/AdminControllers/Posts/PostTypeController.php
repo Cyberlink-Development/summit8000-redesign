@@ -16,7 +16,7 @@ class PostTypeController extends Controller
      */
     public function index()
     {
-        $data = PostTypeModel::orderBy('ordering', 'asc')->get();
+        $data = PostTypeModel::with('seo')->orderBy('ordering', 'asc')->get();
         return view('admin.post-type.index', compact('data'));
     }
 
@@ -53,7 +53,7 @@ class PostTypeController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request->all());
+        // dd($request->all(),$request->seo,cleanSchemaJson($request->seo['schema_data']));
         $request->validate([
             'post_type' => 'required',
             'uri' => 'required|unique:cl_post_type'
@@ -96,6 +96,50 @@ class PostTypeController extends Controller
         $data['banner'] = $product_name;
         $data['uri'] = Str::slug($request->uri);
         $result = PostTypeModel::create($data);
+
+        // Save SEO Data
+        if ($result && $request->has('seo')) {
+
+            $seoData = $request->seo;
+
+            $index = isset($seoData['index']) && $seoData['index'] == 1;
+            $follow = isset($seoData['follow']) && $seoData['follow'] == 1;
+
+            // Default if nothing selected
+            if (!isset($seoData['index']) && !isset($seoData['follow'])) {
+                $seoData['robots'] = 'index,follow'; // ✅ default
+            } else {
+                $seoData['robots'] = ($index ? 'index' : 'noindex') . ',' . ($follow ? 'follow' : 'nofollow');
+            }
+
+            // Remove checkbox fields (important)
+            unset($seoData['index'], $seoData['follow']);
+
+            // Handle OG Image upload separately
+            if ($request->hasFile('seo_og_image')) {
+                $ogFile = $request->file('seo_og_image');
+                $ogName = Str::slug(pathinfo($ogFile->getClientOriginalName(), PATHINFO_FILENAME))
+                    . '-' . Str::random(5) . '.webp';
+
+                $destination = public_path('uploads/seo');
+
+                Image::make($ogFile->getRealPath())
+                    ->encode('webp', 85)
+                    ->save($destination . '/' . $ogName);
+
+                $seoData['og_image'] = $ogName;
+            }
+
+            // Convert schema JSON string → array
+            if (!empty($seoData['schema_data'])) {
+
+                $seoData['schema_data'] = cleanSchemaJson($seoData['schema_data']);
+            }
+
+            // Save using polymorphic relation
+            $result->seo()->create($seoData);
+        }
+
         if ($result) {
             return redirect()->back()->with('success', 'Stored Successfully.');
         }
@@ -134,7 +178,8 @@ class PostTypeController extends Controller
         }
         $templates = $file1;
 
-        $data = PostTypeModel::find($id);
+        $data = PostTypeModel::with('seo')->find($id);
+        // dd($data);
         return view('admin.post-type.edit', compact('data', 'templates'));
     }
 
@@ -204,9 +249,57 @@ class PostTypeController extends Controller
         $data->is_footer = $request->is_footer;
         $data->content = $request->content;
         $data->associated_title = $request->associated_title;
-        $data->meta_keyword = $request->meta_keyword;
-        $data->meta_description = $request->meta_description;
+        // $data->meta_keyword = $request->meta_keyword;
+        // $data->meta_description = $request->meta_description;
         $data->save();
+
+        if ($request->has('seo')) {
+            $seoData = $request->seo;
+
+            $index = isset($seoData['index']) && $seoData['index'] == 1;
+            $follow = isset($seoData['follow']) && $seoData['follow'] == 1;
+
+            if (!isset($seoData['index']) && !isset($seoData['follow'])) {
+                $seoData['robots'] = 'index,follow';
+            } else {
+                $seoData['robots'] =
+                    ($index ? 'index' : 'noindex') . ',' .
+                    ($follow ? 'follow' : 'nofollow');
+            }
+            unset($seoData['index'], $seoData['follow']);
+
+            if ($request->hasFile('seo_og_image')) {
+                $ogFile = $request->file('seo_og_image');
+
+                $ogName = Str::slug(pathinfo($ogFile->getClientOriginalName(), PATHINFO_FILENAME))
+                    . '-' . Str::random(5) . '.webp';
+
+                $destination = public_path('uploads/seo');
+
+                Image::make($ogFile->getRealPath())
+                    ->encode('webp', 85)
+                    ->save($destination . '/' . $ogName);
+
+                $seoData['og_image'] = $ogName;
+            }
+
+            if (!empty($seoData['schema_data'])) {
+
+                $cleaned = cleanSchemaJson($seoData['schema_data']);
+
+                if ($cleaned !== null) {
+                    $seoData['schema_data'] = $cleaned;
+                } else {
+                    unset($seoData['schema_data']);
+                    session()->flash('warning', 'Invalid schema JSON. Not saved.');
+                }
+            }
+
+            $data->seo()->updateOrCreate(
+                [],
+                $seoData
+            );
+        }
         return redirect()->back()->with('success', 'Update Successful.');
     }
 
@@ -219,6 +312,19 @@ class PostTypeController extends Controller
     public function destroy(PostTypeModel $postTypeModel, $posttype, $id)
     {
         $data = PostTypeModel::find($id);
+        if ($data->seo) {
+            // Delete OG Image if exists
+            if ($data->seo->og_image) {
+
+                $ogPath = public_path('uploads/seo/' . $data->seo->og_image);
+                if (file_exists($ogPath)) {
+                    unlink($ogPath);
+                }
+            }
+
+            $data->seo()->delete();
+        }
+
         if ($data->banner) {
             if (file_exists(env('PUBLIC_PATH') . 'uploads/medium/' . $data->banner)) {
                 unlink(env('PUBLIC_PATH') . 'uploads/medium/' . $data->banner);

@@ -3,6 +3,7 @@
 namespace App\Models\Posts;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\SeoMeta;
 
 class PostModel extends Model
 {
@@ -18,5 +19,9 @@ class PostModel extends Model
     {
       return $this->hasMany('App\Models\Posts\AssociatedPostModel','post_id');
     }
-    
+    public function seo()
+    {
+        return $this->morphOne(SeoMeta::class, 'seoable');
+    }
+
 }
