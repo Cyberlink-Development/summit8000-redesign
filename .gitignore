@@ -1,6 +1,5 @@
 /.phpunit.cache
 /node_modules
-/public/build
 /public/build_old2
 /public/uploads
 /public/hot
