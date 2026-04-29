@@ -2,6 +2,8 @@
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Api\FooterController;
+use App\Http\Controllers\Api\HeaderController;
+use App\Http\Controllers\Api\SettingsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,4 +20,4 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::middleware('throttle:60,1')->get('/footer', [FooterController::class, 'index']);
+Route::middleware('throttle:60,1')->get('/settings', [SettingsController::class, 'index']);
