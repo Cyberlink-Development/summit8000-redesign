@@ -2,20 +2,20 @@
 
 namespace App\DTO\Footer;
 
-class ContactDTO
+class FooterLinkDTO
 {
     public function __construct(
         public string $label,
-        public string $href,
-        public string $link_type
+        public ?string $href,
+        public ?string $type
     ) {}
 
-    public function toArray(): array
+    public function toArray()
     {
         return [
             'label' => $this->label,
             'href' => $this->href,
-            'link_type' => $this->link_type,
+            'type' => $this->type,
         ];
     }
 }

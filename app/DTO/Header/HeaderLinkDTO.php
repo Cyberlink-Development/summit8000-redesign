@@ -1,8 +1,8 @@
 <?php
 
-namespace App\DTO\Footer;
+namespace App\DTO\Header;
 
-class TripDTO
+class HeaderLinkDTO
 {
     public function __construct(
         public string $label,
@@ -10,13 +10,12 @@ class TripDTO
         public string $link_type
     ) {}
 
-    public static function fromModel($trip): self
-    {
-        return new self(
-            label: $trip->trip_title,
-            href: '/expeditions/' . $trip->uri,
-            link_type: 'internal'
-        );
+    public static function make(
+        string $label,
+        string $href,
+        string $type = 'internal'
+    ): self {
+        return new self($label, $href, $type);
     }
 
     public function toArray(): array

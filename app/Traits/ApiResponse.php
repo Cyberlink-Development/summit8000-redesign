@@ -19,15 +19,15 @@ trait ApiResponse
         ], $code);
     }
 
- protected function errorResponse(
-    string $message = 'Something went wrong',
-    int $code = 500,
-    $errors = null
-) {
-    return response()->json([
-        'success' => false,
-        'message' => $message,
-        'errors' => $errors,
-    ], $code);
-}
+    protected function errorResponse(
+        ?string $message = null,
+        $errors = null,
+        int $code = Response::HTTP_BAD_REQUEST
+    ): JsonResponse {
+        return response()->json([
+            'success' => false,
+            'message' => $message,
+            'errors' => $errors,
+        ], $code);
+    }
 }
