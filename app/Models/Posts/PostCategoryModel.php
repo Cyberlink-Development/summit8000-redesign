@@ -10,4 +10,9 @@ class PostCategoryModel extends Model
     protected $fillable = [
     	'post_type','category','category_caption','category_content','uri','ordering','thumbnail'
     ];
+
+    public function posts()
+    {
+        return $this->hasMany(PostModel::class, 'post_category', 'id');
+    }
 }
