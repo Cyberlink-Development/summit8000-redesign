@@ -100,7 +100,6 @@ class FrontpageController extends Controller
         $blog = PostTypeModel::where('id' , 33)->first();
         $blogs = PostModel::where('post_type' , $blog->id)->latest()->take(3)->get();
         $homebrief = HomeBriefModel::where('id',1)->first();
-        // dd($reviews);
         return view('themes.default.frontpage', compact('banners','allActivities','best_seller','about','luxury_tirps','blog','blogs','reviews','homebrief'));
     }
 

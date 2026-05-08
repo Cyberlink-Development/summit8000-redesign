@@ -20,4 +20,8 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+Route::middleware('throttle:60,1')->get('/footer', [FooterController::class, 'index']);
+Route::middleware('throttle:60,1')->get('/home', [App\Http\Controllers\Api\HomeController::class, 'index']);
+Route::middleware('throttle:60,1')->get('/blog', [App\Http\Controllers\Api\BlogController::class, 'index']);
+Route::get('/blog/{slug}', [App\Http\Controllers\Api\BlogController::class, 'show']);
 Route::middleware('throttle:60,1')->get('/settings', [SettingsController::class, 'index']);

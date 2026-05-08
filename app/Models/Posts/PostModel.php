@@ -24,4 +24,9 @@ class PostModel extends Model
         return $this->morphOne(SeoMeta::class, 'seoable');
     }
 
+    public function category()
+    {
+        return $this->belongsTo(PostCategoryModel::class, 'post_category', 'id');
+    }
+
 }
