@@ -319,6 +319,7 @@ class FrontpageController extends Controller
     }
     public function post_tripbooking(Request $request)
     {
+        dd($request->all());
         $setting = SettingModel::where('id', 1)->first();
         $g_recaptcha_response = $request->input('g_recaptcha_response');
         $result = $this->getCaptcha($g_recaptcha_response);
@@ -457,7 +458,7 @@ class FrontpageController extends Controller
         }
         return view('themes.default.inquiry',compact('trips','activity','data','sidebar','uri'));
     }
-    
+
     public function post_inquiry(Request $request)
     {
         $g_recaptcha_response = $request->input('g_recaptcha_response4');
@@ -1190,7 +1191,7 @@ class FrontpageController extends Controller
     {
         $item= ActivityModel::where('uri', $request->uri)->firstOrFail();
         $data = $item->trips()->with('destinations')->where('status', 1)->orderBy('ordering', 'asc')->paginate(6);
-        
+
         // dd($item,$data);
         return view('themes.default.trip-list', compact('data','item'));
     }
