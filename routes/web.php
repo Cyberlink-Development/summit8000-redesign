@@ -60,6 +60,7 @@ Route::get('customize-trip/{uri}', 'FrontendControllers\FrontpageController@cust
 Route::post('custom-trip-submit', 'FrontendControllers\FrontpageController@custom_trip_post')->name('custom-trip-post');
 Route::post('tell-friend-submit', 'FrontendControllers\FrontpageController@tell_friend_post')->name('tell-friend-post');
 Route::get('book-trip/{uri}', 'FrontendControllers\FrontpageController@book_trip')->name('book-trip');
+Route::post('book-trip-success', 'FrontendControllers\FrontpageController@post_tripbooking')->name('book-trip-success');
 
 Route::get('book-now', 'FrontendControllers\FrontpageController@book_now')->name('book-now');
 Route::get('/get-trips', 'FrontendControllers\FrontpageController@getTrips')->name('getTripsActivity');
@@ -123,10 +124,10 @@ Route::middleware(['auth'])->group(function () {
         'admin.faq' => 'AdminControllers\Faqs\FaqController',
 
     ]);
-    // For all trips Only for Developer 
+    // For all trips Only for Developer
     Route::get('admin/alltrips','AdminControllers\Travels\TripController@alltrips')->name('admin.trip.all');
     // Upto here
-    
+
     Route::get('trip-customize','AdminControllers\Inquiry\TripCustomizeController@index')->name('admin.trip.customize');
     Route::get('trip-plan','AdminControllers\Inquiry\TripCustomizeController@showplan')->name('admin.trip.plan');
     Route::get('trip-private','AdminControllers\Inquiry\TripCustomizeController@showprivate')->name('admin.trip.private');
