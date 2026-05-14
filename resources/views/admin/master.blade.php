@@ -326,12 +326,12 @@
                                         <span class="sidebar-title">Trip Booking</span>
                                     </a>
                                 </li>
-                                <!-- <li class="{{ Request::segment(1) == 'trip-inquiry' ? 'active' : '' }}">
+                                <li class="{{ Request::segment(1) == 'trip-inquiry' ? 'active' : '' }}">
                                     <a href="{{ url('trip-inquiry') }}">
                                         <span class="fa fa-ticket "></span>
                                         <span class="sidebar-title">Inquiries</span>
                                     </a>
-                                </li> -->
+                                </li>
 
                                 <!-- <li class="{{ Request::segment(1) == 'training-enrollment' ? 'active' : '' }}">
                                     <a href="{{ url('training-enrollment') }}">

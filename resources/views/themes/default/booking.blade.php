@@ -28,7 +28,6 @@
         <!-- Main Content -->
         <form action="{{ route('book-trip-success') }}" method="post">
         @csrf
-            <input type="hidden" id="g_recaptcha_response" name="g_recaptcha_response"/>
             <input type="hidden" name="trip_uri" value="{{ $trip->uri }}">
             <div class="bg-white rounded-2xl border shadow-xs overflow-hidden relative">
                 <div class="grid lg:grid-cols-5 gap-0">
@@ -376,21 +375,4 @@
     </div>
 </div>
 
-<script src="https://www.google.com/recaptcha/api.js?render={{env('SITE_KEY')}}"></script>
-<script>
-    grecaptcha.ready(function () {
-        function executeRecaptcha() {
-            grecaptcha.execute('<?php echo env("SITE_KEY"); ?>', {action: 'homepage'}).then(function (token) {
-                document.getElementById('g_recaptcha_response').value = token;
-            });
-        }
-
-        // Initial execution of reCAPTCHA
-        executeRecaptcha();
-
-        // Refresh the reCAPTCHA token every 100 seconds (less than 2 minutes)
-        setInterval(executeRecaptcha, 900000);
-    });
-
-</script>
 @stop
