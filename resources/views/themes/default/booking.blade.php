@@ -28,8 +28,8 @@
         <!-- Main Content -->
         <form action="{{ route('book-trip-success') }}" method="post">
         @csrf
+            <input type="hidden" id="g_recaptcha_response" name="g_recaptcha_response"/>
             <input type="hidden" name="trip_uri" value="{{ $trip->uri }}">
-            <input type="hidden" name="trip_price" value="{{ $trip->price }}">
             <div class="bg-white rounded-2xl border shadow-xs overflow-hidden relative">
                 <div class="grid lg:grid-cols-5 gap-0">
                     <!-- Left: Form Section -->
@@ -256,7 +256,7 @@
                                 <div class="space-y-2">
                                     <label for="message" class="block text-brand-900 mb-1.5 font-bold">Special
                                         Requirements</label>
-                                    <textarea id="message" rows="4"
+                                    <textarea id="message" rows="4" name="message"
                                         placeholder="Special Requirement? Please tell us more about yourself to help you better."
                                         class="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:outline-none focus:ring-1 focus:ring-blue-400 focus:border-blue-400 block w-full px-3 py-2.5 shadow-xs placeholder:text-body"></textarea>
                                 </div>
@@ -375,4 +375,22 @@
         </form>
     </div>
 </div>
+
+<script src="https://www.google.com/recaptcha/api.js?render={{env('SITE_KEY')}}"></script>
+<script>
+    grecaptcha.ready(function () {
+        function executeRecaptcha() {
+            grecaptcha.execute('<?php echo env("SITE_KEY"); ?>', {action: 'homepage'}).then(function (token) {
+                document.getElementById('g_recaptcha_response').value = token;
+            });
+        }
+
+        // Initial execution of reCAPTCHA
+        executeRecaptcha();
+
+        // Refresh the reCAPTCHA token every 100 seconds (less than 2 minutes)
+        setInterval(executeRecaptcha, 900000);
+    });
+
+</script>
 @stop
