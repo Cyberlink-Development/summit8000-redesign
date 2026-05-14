@@ -3,67 +3,73 @@
 namespace App\Services;
 
 use App\DTO\About\AboutPageDTO;
+use App\Models\Posts\PostModel;
 use App\Models\Posts\PostTypeModel;
 
 class AboutPageService
 {
-    /*
-    |--------------------------------------------------------------------------
-    | SECTION IDS
-    |--------------------------------------------------------------------------
-    */
-
-    private const STATS_ID = 33;
-    private const STORY_ID = 34;
-    private const FOUNDER_ID = 35;
-    private const TEAM_ID = 35;
-    private const WHY_ID = 37;
-    private const TESTIMONIAL_ID = 38;
-    private const CERTIFICATION_ID = 39;
-
     public function getPageData(): AboutPageDTO
     {
-        $postTypes = PostTypeModel::with([
-                'posts' => function ($query) {
-                    $query->where('status', 1)
-                        ->orderBy('id', 'asc');
-                }
-            ])
-            ->where('status', 1)
+        /*
+        |--------------------------------------------------------------------------
+        | ABOUT POST TYPE
+        |--------------------------------------------------------------------------
+        */
+
+        $about = PostTypeModel::with('posts')
+            ->where('id', 1)
+            ->first();
+
+        if (!$about) {
+            return new AboutPageDTO();
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | FETCH ALL SECTIONS ONCE
+        |--------------------------------------------------------------------------
+        */
+
+        $sections = PostModel::where('posttype', $about->id)
             ->get()
-            ->keyBy('id');
-            // dd($postTypes);
+            ->keyBy('type');
+
+        /*
+        |--------------------------------------------------------------------------
+        | DTO RESPONSE
+        |--------------------------------------------------------------------------
+        */
 
         return new AboutPageDTO(
 
             hero: [],
 
             stats: $this->mapStats(
-                $postTypes[self::STATS_ID] ?? null
+                $sections['stats'] ?? null
             ),
 
             story: $this->mapStory(
-                $postTypes[self::STORY_ID] ?? null
+                $sections['story'] ?? null
             ),
 
             founder: $this->mapFounder(
-                $postTypes[self::FOUNDER_ID] ?? null
+                $sections['founder'] ?? null
             ),
 
             team: $this->mapTeam(
-                $postTypes[self::TEAM_ID] ?? null
+                $sections['team'] ?? null
             ),
 
             why: $this->mapWhy(
-                $postTypes[self::WHY_ID] ?? null
+                $sections['why'] ?? null
             ),
 
             testimonials: $this->mapTestimonials(
-                $postTypes[self::TESTIMONIAL_ID] ?? null
+                $sections['testimonials'] ?? null
             ),
 
             certifications: $this->mapCertifications(
-                $postTypes[self::CERTIFICATION_ID] ?? null
+                $sections['certifications'] ?? null
             ),
 
             cta: [],
@@ -78,20 +84,17 @@ class AboutPageService
     |--------------------------------------------------------------------------
     */
 
-    private function mapStats($postType): array
+    private function mapStats($post): array
     {
-        if (!$postType) {
+        if (!$post) {
             return [];
         }
 
-        return $postType->posts->map(function ($post) {
-
-            return [
-                'value' => $post->sub_title ?? '',
-                'label' => $post->post_title,
-            ];
-
-        })->values()->toArray();
+        return [
+            'caption' => $post->caption ?? '',
+            'title' => $post->post_title ?? '',
+            'items' => $post->meta['items'] ?? [],
+        ];
     }
 
     /*
@@ -100,23 +103,18 @@ class AboutPageService
     |--------------------------------------------------------------------------
     */
 
-    private function mapStory($postType): array
+    private function mapStory($post): array
     {
-        if (!$postType) {
+        if (!$post) {
             return [];
         }
 
         return [
-
-            'caption' => $postType->associated_title,
-
-            'title' => $postType->post_type,
-
-            'description' => $postType->content,
-
-            'guides' => [],
-
-            'gallery' => [],
+            'caption' => $post->caption ?? '',
+            'title' => $post->post_title ?? '',
+            'description' => $post->post_content ?? '',
+            'guides' => $post->meta['guides'] ?? [],
+            'gallery' => $post->meta['gallery'] ?? [],
         ];
     }
 
@@ -126,38 +124,36 @@ class AboutPageService
     |--------------------------------------------------------------------------
     */
 
-    private function mapFounder($postType): array
+    private function mapFounder($post): array
     {
-        if (!$postType || $postType->posts->isEmpty()) {
+        if (!$post) {
             return [];
         }
-
-        $post = $postType->posts->first();
 
         return [
 
             'slug' => $post->uri,
 
-            'caption' => $postType->associated_title,
+            'caption' => $post->caption ?? '',
 
             'title' => $post->post_title,
 
             'sub_title' => $post->sub_title ?? '',
 
-            'tag' => '',
+            'tag' => $post->meta['tag'] ?? '',
 
             'thumbnail' => [
                 'url' => $post->page_thumbnail,
                 'alt' => $post->post_title,
             ],
 
-            'badge' => [],
+            'badge' => $post->meta['badge'] ?? [],
 
             'description' => [
                 $post->post_content
             ],
 
-            'achievements' => [],
+            'achievements' => $post->meta['achievements'] ?? [],
         ];
     }
 
@@ -167,48 +163,23 @@ class AboutPageService
     |--------------------------------------------------------------------------
     */
 
-    private function mapTeam($postType): array
+    private function mapTeam($post): array
     {
-        if (!$postType) {
+        if (!$post) {
             return [];
         }
 
         return [
 
-            'slug' => $postType->uri,
+            'slug' => $post->uri,
 
-            'caption' => $postType->associated_title,
+            'caption' => $post->caption ?? '',
 
-            'title' => $postType->post_type,
+            'title' => $post->post_title,
 
-            'description' => $postType->content,
+            'description' => $post->post_content,
 
-            'items' => $postType->posts->map(function ($post) {
-
-                return [
-
-                    'uuid' => $post->id,
-
-                    'slug' => $post->uri,
-
-                    'name' => $post->post_title,
-
-                    'role' => $post->sub_title ?? '',
-
-                    'experience_years' =>
-                        $post->experience_years ?? 0,
-
-                    'thumbnail' => [
-                        'url' => $post->page_thumbnail,
-                        'alt' => $post->post_title,
-                    ],
-
-                    'description' => $post->post_content,
-
-                    'badges' => [],
-                ];
-
-            })->values()->toArray(),
+            'items' => $post->meta['items'] ?? [],
         ];
     }
 
@@ -218,34 +189,21 @@ class AboutPageService
     |--------------------------------------------------------------------------
     */
 
-    private function mapWhy($postType): array
+    private function mapWhy($post): array
     {
-        if (!$postType) {
+        if (!$post) {
             return [];
         }
 
         return [
 
-            'caption' => $postType->caption,
+            'caption' => $post->caption ?? '',
 
-            'title' => $postType->title,
+            'title' => $post->post_title ?? '',
 
-            'description' => $postType->description,
+            'description' => $post->post_content ?? '',
 
-            'items' => $postType->posts->map(function ($post) {
-
-                return [
-
-                    'label' => $post->meta['label'] ?? '',
-
-                    'title' => $post->title,
-
-                    'description' => $post->description,
-
-                    'bullets' => $post->meta['bullets'] ?? [],
-                ];
-
-            })->values()->toArray(),
+            'items' => $post->meta['items'] ?? [],
         ];
     }
 
@@ -255,39 +213,19 @@ class AboutPageService
     |--------------------------------------------------------------------------
     */
 
-    private function mapTestimonials($postType): array
+    private function mapTestimonials($post): array
     {
-        if (!$postType) {
+        if (!$post) {
             return [];
         }
 
         return [
 
-            'caption' => $postType->caption,
+            'caption' => $post->caption ?? '',
 
-            'title' => $postType->title,
+            'title' => $post->post_title ?? '',
 
-            'items' => $postType->posts->map(function ($post) {
-
-                return [
-
-                    'uuid' => $post->uuid,
-
-                    'rating' => $post->meta['rating'] ?? 5,
-
-                    'flag' => $post->meta['flag'] ?? '',
-
-                    'quote' => $post->description,
-
-                    'tag' => $post->meta['tag'] ?? '',
-
-                    'name' => $post->title,
-
-                    'achievement' =>
-                        $post->meta['achievement'] ?? '',
-                ];
-
-            })->values()->toArray(),
+            'items' => $post->meta['items'] ?? [],
         ];
     }
 
@@ -297,26 +235,19 @@ class AboutPageService
     |--------------------------------------------------------------------------
     */
 
-    private function mapCertifications($postType): array
+    private function mapCertifications($post): array
     {
-        if (!$postType) {
+        if (!$post) {
             return [];
         }
 
-        return $postType->posts->map(function ($post) {
+        return [
 
-            return [
+            'caption' => $post->caption ?? '',
 
-                'uuid' => $post->uuid,
+            'title' => $post->post_title ?? '',
 
-                'logo' => [
-                    'url' => $post->thumbnail,
-                    'alt' => $post->title,
-                ],
-
-                'title' => $post->title,
-            ];
-
-        })->values()->toArray();
+            'items' => $post->meta['items'] ?? [],
+        ];
     }
 }
