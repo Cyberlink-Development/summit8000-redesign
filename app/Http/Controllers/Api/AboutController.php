@@ -16,11 +16,19 @@ class AboutController extends Controller
 
     public function index()
     {
-        $dto = $this->service->getPageData();
+        try {
+            $dto = $this->service->getPageData();
 
-        return $this->successResponse([
-            'data' => $dto->toArray(),
-            'meta' => []
-        ], 'About page fetched successfully');
+            return $this->successResponse([
+                'data' => $dto->toArray(),
+                'meta' => []
+            ], 'About page fetched successfully');
+        } catch (\Throwable $e) {
+
+            return $this->errorResponse(
+                $e->getMessage(),
+                500
+            );
+        }
     }
 }

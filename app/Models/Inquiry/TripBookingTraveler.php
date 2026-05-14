@@ -4,6 +4,7 @@ namespace App\Models\Inquiry;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Inquiry\BookingModel;
 
 class TripBookingTraveler extends Model
 {

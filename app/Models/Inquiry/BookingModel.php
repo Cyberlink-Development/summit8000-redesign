@@ -5,13 +5,64 @@ namespace App\Models\Inquiry;
 use App\Models\Travels\TripModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Inquiry\TripBookingTraveler;
 
 class BookingModel extends Model
 {
     use HasFactory;
 
     protected $table = 'cl_trip_booking';
-    protected $fillable = ['trip_id','title','full_name', 'total_travellers', 'nationality', 'country', 'address', 'zip', 'email', 'gender', 'tshirt_size', 'phone', 'medication', 'restrictions', 'trip_start_date', 'trip_end_date', 'trip_days', 'dob', 'passport_number', 'passport_expire', 'paid_status', 'payment_type', 'hear','price','message'];
+
+    protected $fillable = [
+
+        'trip_id',
+        'title',
+        'price',
+        'message',
+
+        // Lead traveler
+        'full_name',
+        'total_travellers',
+        'nationality',
+        'country',
+        'address',
+        'zip',
+        'email',
+        'gender',
+        'tshirt_size',
+        'phone',
+        'medication',
+        'restrictions',
+        'trip_start_date',
+        'trip_end_date',
+        'trip_days',
+        'dob',
+        'passport_number',
+        'passport_expire',
+
+        // Payment
+        'paid_status',
+        'payment_type',
+
+        // Other
+        'hear',
+
+        // Flight
+        'flight_status',
+        'arrival_date',
+        'arrival_flight_number',
+        'pickup',
+
+        'departure_date',
+        'departure_flight_number',
+        'dropoff',
+
+        // Insurance
+        'insurance',
+
+        // Terms
+        'agree_terms',
+    ];
 
     public function bookTrips()
     {

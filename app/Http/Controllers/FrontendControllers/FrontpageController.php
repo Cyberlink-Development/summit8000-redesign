@@ -320,136 +320,147 @@ class FrontpageController extends Controller
     }
     public function post_tripbooking(Request $request)
     {
-        // dd($request->all());
-        $g_recaptcha_response = $request->input('g_recaptcha_response');
-        $result = $this->getCaptcha($g_recaptcha_response);
-        if ($result->success == true) {
-            if ($request->isMethod('post')) {
-                $request->validate([
-                    // Trip
-                    'trip_uri' => 'required|string',
+        dd($request->all());
+        if ($request->isMethod('post')) {
+            $request->validate([
+                // Trip
+                'trip_uri' => 'required|string',
 
-                    // Lead Traveler
-                    'lead-fullname' => 'required|string|max:255',
-                    'lead-gender' => 'required|string|in:male,female,Male,Female',
-                    'lead-email' => 'required|email|max:255',
-                    'lead-nationality' => 'required|string|max:100',
-                    'lead-dob' => 'required|date|before:today',
-                    'lead-mobile' => 'required|string|max:50',
-                    'lead-passport' => 'required|string|max:100',
+                // Lead Traveler
+                'lead-fullname' => 'required|string|max:255',
+                'lead-gender' => 'required|string|in:male,female,Male,Female',
+                'lead-email' => 'required|email|max:255',
+                'lead-nationality' => 'required|string|max:100',
+                'lead-dob' => 'required|date|before:today',
+                'lead-mobile' => 'required|string|max:50',
+                'lead-passport' => 'required|string|max:100',
 
-                    // Additional Travelers
-                    'travelers' => 'nullable|array',
+                // Additional Travelers
+                'travelers' => 'nullable|array',
 
-                    'travelers.*.full_name' => 'required|string|max:255',
-                    'travelers.*.gender' => 'required|string|in:male,female,Male,Female',
-                    'travelers.*.email' => 'required|email|max:255',
-                    'travelers.*.nationality' => 'required|string|max:100',
-                    'travelers.*.dob' => 'required|date|before:today',
-                    'travelers.*.mobile' => 'nullable|string|max:50',
-                    'travelers.*.passport' => 'nullable|string|max:100',
+                'travelers.*.full_name' => 'required|string|max:255',
+                'travelers.*.gender' => 'required|string|in:male,female,Male,Female',
+                'travelers.*.email' => 'required|email|max:255',
+                'travelers.*.nationality' => 'required|string|max:100',
+                'travelers.*.dob' => 'required|date|before:today',
+                'travelers.*.mobile' => 'nullable|string|max:50',
+                'travelers.*.passport' => 'nullable|string|max:100',
 
-                    // Flight
-                    'flight-status' => 'required|in:booked,not-booked',
+                // Flight
+                'flight-status' => 'required|in:booked,not-booked',
 
-                    'arrival_date' => 'nullable|date',
-                    'arrival_flight_number' => 'nullable|string|max:100',
-                    'pickup' => 'nullable|in:yes,no',
+                'arrival_date' => 'nullable|date',
+                'arrival_flight_number' => 'nullable|string|max:100',
+                'pickup' => 'nullable|in:yes,no',
 
-                    'departure_date' => 'nullable|date',
-                    'departure_flight_number' => 'nullable|string|max:100',
-                    'dropoff' => 'nullable|in:yes,no',
+                'departure_date' => 'nullable|date',
+                'departure_flight_number' => 'nullable|string|max:100',
+                'dropoff' => 'nullable|in:yes,no',
 
-                    // Insurance
-                    'insurance' => 'required|in:yes,no',
+                // Insurance
+                'insurance' => 'required|in:yes,no',
 
-                    // Find Us
-                    'find_us' => 'nullable|string|max:255',
-                    'find_us_specify' => 'nullable|string|max:255',
+                // Find Us
+                'find_us' => 'nullable|string|max:255',
+                'find_us_specify' => 'nullable|string|max:255',
 
-                    // Terms
-                    'agree_terms' => 'required|accepted',
-                ]);
-                $trip = TripModel::where('uri', $request->trip_uri)->first();
-                $setting = SettingModel::where('id', 1)->first();
+                // Terms
+                'agree_terms' => 'required|accepted',
+            ]);
+            $trip = TripModel::where('uri', $request->trip_uri)->first();
+            $setting = SettingModel::where('id', 1)->first();
 
-                $data = BookingModel::create([
+            $data = BookingModel::create([
 
-                    'trip_id' => $trip->id,
-                    'title' => $trip->trip_title,
-                    'price' => $trip->price,
+                'trip_id' => $trip->id,
+                'title' => $trip->trip_title,
+                'price' => $trip->price,
 
-                    // Lead traveler
-                    'full_name' => $request->input('lead-fullname'),
-                    'email' => $request->input('lead-email'),
-                    'gender' => $request->input('lead-gender'),
-                    'nationality' => $request->input('lead-nationality'),
-                    'phone' => $request->input('lead-mobile'),
-                    'dob' => $request->input('lead-dob'),
-                    'passport_number' => $request->input('lead-passport'),
-                    'message' => $request->input('message'),
+                // Lead traveler
+                'full_name' => $request->input('lead-fullname'),
+                'email' => $request->input('lead-email'),
+                'gender' => $request->input('lead-gender'),
+                'nationality' => $request->input('lead-nationality'),
+                'phone' => $request->input('lead-mobile'),
+                'dob' => $request->input('lead-dob'),
+                'passport_number' => $request->input('lead-passport'),
+                'message' => $request->input('message'),
 
-                    // Total travelers
-                    'total_travellers' => count($request->travelers ?? []) + 1,
+                // Total travelers
+                'total_travellers' => count($request->travelers ?? []) + 1,
 
-                    // Existing booking table fields
-                    'country' => $request->input('lead-nationality'),
+                // Country
+                'country' => $request->input('lead-nationality'),
 
-                    // Optional / not currently available in form
-                    'address' => null,
-                    'zip' => null,
-                    'tshirt_size' => null,
-                    'medication' => null,
-                    'restrictions' => null,
-                    'trip_start_date' => null,
-                    'trip_end_date' => null,
-                    'trip_days' => null,
-                    'passport_expire' => null,
+                // Optional
+                'address' => null,
+                'zip' => null,
+                'tshirt_size' => null,
+                'medication' => null,
+                'restrictions' => null,
+                'trip_start_date' => null,
+                'trip_end_date' => null,
+                'trip_days' => null,
+                'passport_expire' => null,
 
-                    // Payment
-                    'payment_type' => null,
+                // Payment
+                'payment_type' => null,
+                'paid_status' => 0,
 
-                    // Hear about us
-                    'hear' => $request->find_us == 'Others'
-                        ? $request->find_us_specify
-                        : $request->find_us,
+                // Hear about us
+                'hear' => $request->find_us == 'Others'
+                    ? $request->find_us_specify
+                    : $request->find_us,
 
-                    // Payment status
-                    'paid_status' => 0,
-                ]);
-                if (!empty($request->travelers)) {
-                    foreach ($request->travelers as $traveler) {
+                // Flight
+                'flight_status' => $request->input('flight-status'),
 
-                        TripBookingTraveler::create([
-                            'trip_booking_id' => $data->id,
+                'arrival_date' => $request->input('arrival_date'),
+                'arrival_flight_number' => $request->input('arrival_flight_number'),
+                'pickup' => $request->input('pickup'),
 
-                            'full_name' => $traveler['full_name'] ?? null,
-                            'gender' => $traveler['gender'] ?? null,
-                            'email' => $traveler['email'] ?? null,
-                            'nationality' => $traveler['nationality'] ?? null,
-                            'dob' => $traveler['dob'] ?? null,
-                            'mobile' => $traveler['mobile'] ?? null,
-                            'passport_no' => $traveler['passport'] ?? null,
-                        ]);
-                    }
+                'departure_date' => $request->input('departure_date'),
+                'departure_flight_number' => $request->input('departure_flight_number'),
+                'dropoff' => $request->input('dropoff'),
+
+                // Insurance
+                'insurance' => $request->input('insurance'),
+
+                // Terms
+                'agree_terms' => $request->has('agree_terms') ? 1 : 0,
+            ]);
+            if (!empty($request->travelers)) {
+                foreach ($request->travelers as $traveler) {
+
+                    TripBookingTraveler::create([
+                        'trip_booking_id' => $data->id,
+                        'full_name' => $traveler['full_name'] ?? null,
+                        'gender' => $traveler['gender'] ?? null,
+                        'email' => $traveler['email'] ?? null,
+                        'nationality' => $traveler['nationality'] ?? null,
+                        'dob' => $traveler['dob'] ?? null,
+                        'mobile' => $traveler['mobile'] ?? null,
+                        'passport_no' => $traveler['passport'] ?? null,
+                    ]);
                 }
-
-                return new BookTrip($data);
-                return new AdminBookingMail($data);
-                // Mail::to($setting->email_primary)->send(new AdminBookingMail($data));
-
-                try {
-                    // Mail::to($data->email)->send(new BookTrip($data));
-                } catch (\Exception $e) {
-                    Log::warning('User email failed: ' . $e->getMessage());
-                }
-
-                return back()->with([
-                    'success' => true,
-                    'message' => 'Booking form submitted successfully'
-                ]);
-                // return view('themes.default.booking-success', compact('name', 'message'));
             }
+
+            return new BookTrip($data);
+            return new AdminBookingMail($data);
+            // Mail::to($setting->email_primary)->send(new AdminBookingMail($data));
+
+            try {
+                // Mail::to($data->email)->send(new BookTrip($data));
+            } catch (\Exception $e) {
+                Log::warning('User email failed: ' . $e->getMessage());
+            }
+
+            return back()->with([
+                'success' => true,
+                'message' => 'Booking form submitted successfully'
+            ]);
+            // return view('themes.default.booking-success', compact('name', 'message'));
+
         } else {
 
             return back()->with([
