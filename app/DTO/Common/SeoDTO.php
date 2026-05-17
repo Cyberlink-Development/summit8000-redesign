@@ -19,6 +19,8 @@ class SeoDTO
         public readonly bool    $inSitemap,
         public readonly float   $sitemapPriority,
         public readonly ?string $changeFrequency,
+        public readonly array   $extraMeta,
+        public readonly array   $scriptTags,
     ) {}
 
     public static function fromModel($model): ?self
@@ -28,20 +30,22 @@ class SeoDTO
         if (!$seo) return null;
 
         return new self(
-            metaTitle:        $seo->meta_title,
-            metaDescription:  $seo->meta_description,
-            ogTitle:          $seo->og_title,
-            ogDescription:    $seo->og_description,
-            ogImage:          $seo->og_image,
-            ogImageAlt:       $seo->og_image_alt,
-            canonicalUrl:     $seo->canonical_url,
-            robots:           $seo->robots,
-            robotsTxtExtras:  $seo->robots_txt_extras ?? null,
-            schema:           $seo->schema_data ?? [],
-            focusKeyword:     $seo->focus_keyword,
-            inSitemap:        (bool)  $seo->in_sitemap,
-            sitemapPriority:  (float) $seo->sitemap_priority,
-            changeFrequency:  $seo->change_frequency,
+            metaTitle:       $seo->meta_title,
+            metaDescription: $seo->meta_description,
+            ogTitle:         $seo->og_title,
+            ogDescription:   $seo->og_description,
+            ogImage:         $seo->og_image,
+            ogImageAlt:      $seo->og_image_alt,
+            canonicalUrl:    $seo->canonical_url,
+            robots:          $seo->robots,
+            robotsTxtExtras: $seo->robots_txt_extras ?? null,
+            schema:          $seo->schema_data        ?? [],
+            focusKeyword:    $seo->focus_keyword,
+            inSitemap:       (bool)  ($seo->in_sitemap       ?? false),
+            sitemapPriority: (float) ($seo->sitemap_priority ?? 0.5),
+            changeFrequency: $seo->change_frequency,
+            extraMeta:       $seo->extra_meta  ?? [],
+            scriptTags:      $seo->script_tags ?? [],
         );
     }
 
@@ -57,6 +61,8 @@ class SeoDTO
             'robots'            => $this->robots,
             'robots_txt_extras' => $this->robotsTxtExtras,
             'schema'            => $this->schema,
+            'extra_meta'        => $this->extraMeta,
+            'script_tags'       => $this->scriptTags,
             'sitemap'           => [
                 'include'          => $this->inSitemap,
                 'priority'         => $this->sitemapPriority,

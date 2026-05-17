@@ -17,8 +17,8 @@ class ImageDTO
     public function toArray(): array
     {
         return [
-            'url'  => $this->url ?? '',
-            'alt'  => $this->alt ?? '',
+            'url' => $this->url ?? '',
+            'alt' => $this->alt ?? '',
         ];
     }
 }
