@@ -3,30 +3,35 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Services\AboutPageService;
-use App\Traits\ApiResponse;
+use App\Http\Resources\About\AboutResource;
+use App\Services\About\AboutPageService;
+use Exception;
+use Illuminate\Http\JsonResponse;
+use Log;
 
 class AboutController extends Controller
 {
-    use ApiResponse;
-
     public function __construct(
-        protected AboutPageService $service
+        private readonly AboutPageService $service
     ) {}
 
-    public function index()
+    public function index(): JsonResponse
     {
         try {
-            $dto = $this->service->getPageData();
+            $data = $this->service->getPageData();
 
-            return $this->successResponse([
-                'data' => $dto->toArray(),
-                'meta' => []
-            ], 'About page fetched successfully');
-        } catch (\Throwable $e) {
-
+            return $this->successResponse(
+                new AboutResource($data),
+                'About page fetched successfully'
+            );
+        } catch (Exception $e) {
+            Log::error("Failed to fetch about data: ", [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
             return $this->errorResponse(
-                $e->getMessage(),
+                app()->isLocal() ? $e->getMessage() : trans('common.internal-server-error'),
+                null,
                 500
             );
         }
