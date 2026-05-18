@@ -216,6 +216,7 @@ class FrontpageController extends Controller
     public function tripdetail($uri)
     {
         $data = TripModel::where('uri', $uri)->orWhere('trip_code', $uri)->first();
+        // dd($data);
         $local = PostTypeModel::whereIn('id', ['20', '19'])->get();
         if ($data->id) {
             $itinerary = $data->itineraries()->orderBy('ordering', 'asc')->get();

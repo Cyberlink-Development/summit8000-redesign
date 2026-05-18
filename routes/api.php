@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use App\Http\Controllers\Api\SettingsController;
 use App\Http\Controllers\Api\AboutController;
+use App\Http\Controllers\Api\TripController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,3 +25,6 @@ Route::middleware('throttle:60,1')->get('/blog', [App\Http\Controllers\Api\BlogC
 Route::get('/blog/{slug}', [App\Http\Controllers\Api\BlogController::class, 'show']);
 Route::middleware('throttle:60,1')->get('/settings', [SettingsController::class, 'index']);
 Route::get('/about', [AboutController::class, 'index']);
+Route::get('/trip/{slug}', [TripController::class, 'detail']);
+Route::get('/trips/{parent}', [TripController::class, 'index']);
+Route::get('/trip-category/{slug}', [TripController::class, 'category']);
