@@ -64,9 +64,7 @@ class AboutPageService
                 $sections->firstWhere('about_type', 'why')
             ),
 
-            testimonials: $this->mapTestimonials(
-                $sections->firstWhere('about_type', 'testimonials')
-            ),
+            testimonials: $this->mapTestimonials(),
 
             certifications: $this->mapCertifications(
                 $sections['certifications'] ?? null
@@ -288,7 +286,7 @@ class AboutPageService
     |--------------------------------------------------------------------------
     */
 
-    private function mapTestimonials($post): array
+    private function mapTestimonials(): array
     {
         $reviews = TripReview::latest()
             ->take(6)
