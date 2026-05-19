@@ -105,7 +105,7 @@ private function seo($post)
 
         'canonical_url' => url('/blog/' . $post->uri),
 
-        'robots' => $seo?->robots ?? 'index, follow',
+        'robots' => $seo?->robots ?? 'index, follow',     
 
         'robots_txt_extras' => $seo?->robots_txt_extras,
 
