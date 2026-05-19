@@ -115,26 +115,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <div class="form-group">
-                        <label for="inputStandard" class="col-lg-2 control-label">Meta Key</label>
-                        <div class="col-lg-9">
-                            <div class="bs-component">
-                                <input type="text" id="inputStandard" name="meta_keyword" class="form-control"
-                                    value="{{ $data->meta_keyword }}" />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="col-lg-2 control-label" for="textArea3"> Meta Description </label>
-                        <div class="col-lg-9">
-                            <div class="bs-component">
-                                <textarea class="form-control" id="textArea3" name="meta_description"
-                                    rows="3">{{ $data->meta_description }}</textarea>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
             @include('admin.seo.seo-form', [
@@ -157,6 +137,26 @@
                         <div class="clearfix"></div>
                     </footer>
                     <div class="clearfix"></div>
+                </div>
+                <div class="sid_bvijay mb10">
+                    <label class="field select">
+                        <select id="about_type" name="about_type" required>
+                            <option value="" hidden>Choose Type</option>
+                            <option value="story"
+                                {{ old('about_type', $data->about_type ?? '') == 'story' ? 'selected' : '' }}>
+                                Is Story?
+                            </option>
+                            <option value="founder"
+                                {{ old('about_type', $data->about_type ?? '') == 'founder' ? 'selected' : '' }}>
+                                Is Founder?
+                            </option>
+                            <option value="why"
+                                {{ old('about_type', $data->about_type ?? '') == 'why' ? 'selected' : '' }}>
+                                Is Why Summit8000?
+                            </option>
+                        </select>
+                        <i class="arrow"></i>
+                    </label>
                 </div>
 
                 <div class="sid_bvijay mb10">

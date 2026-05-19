@@ -110,24 +110,6 @@
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label for="inputStandard" class="col-lg-2 control-label">Meta Key</label>
-                        <div class="col-lg-9">
-                            <div class="bs-component">
-                                <input type="text" id="" name="meta_keyword" class="form-control" placeholder="" />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="col-lg-2 control-label" for="textArea3"> Meta Description </label>
-                        <div class="col-lg-9">
-                            <div class="bs-component">
-                                <textarea class="form-control" id="textArea3" name="meta_description" rows="3"></textarea>
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
             </div>
             @include('admin.seo.seo-form', [
@@ -152,6 +134,17 @@
                     <div class="clearfix"></div>
                 </div>
 
+                <div class="sid_bvijay mb10">
+                    <label class="field select">
+                        <select id="about_type" name="about_type" required>
+                            <option value="" selected hidden>Choose Type</option>
+                            <option value="story">Is Story?</option>
+                            <option value="founder">Is Founder?</option>
+                            <option value="why">Is Why Summit8000?</option>
+                        </select>
+                        <i class="arrow"></i>
+                    </label>
+                </div>
                 <div class="sid_bvijay mb10">
                     <label class="field select">
                         <select id="template" name="template">

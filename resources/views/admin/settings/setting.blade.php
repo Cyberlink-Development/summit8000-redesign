@@ -25,6 +25,7 @@
                             <div class="card-header d-flex p-0">
                                 <ul class="nav nav-pills ml-auto p4 mb10 mt10 nav-custom">
                                     <li class="nav-item active"><a class="nav-link active" href="#tab_1" data-toggle="tab">Contact Information</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="#tab_6" data-toggle="tab"> Stats</a></li>
                                     <li class="nav-item"><a class="nav-link" href="#tab_2" data-toggle="tab"> Social Media Links </a></li>
                                     <li class="nav-item"><a class="nav-link" href="#tab_3" data-toggle="tab"> SEO</a></li>
                                 </ul>

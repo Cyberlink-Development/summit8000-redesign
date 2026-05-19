@@ -375,6 +375,7 @@ class PostController extends Controller
         $posttypeId = $this->getPostTypeId($request->post_type);
         $data->post_date = $request->post_date;
         $data->post_author = $request->post_author;
+        $data->about_type = $request->about_type;
         $data->template = $request->template;
         $data->template_child = $request->template_child;
         $data->post_title = $request->post_title;
