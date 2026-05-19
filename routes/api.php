@@ -24,6 +24,7 @@ Route::middleware('throttle:60,1')->get('/home', [App\Http\Controllers\Api\HomeC
 Route::middleware('throttle:60,1')->get('/blog', [App\Http\Controllers\Api\BlogController::class, 'index']);
 Route::get('/blog/{slug}', [App\Http\Controllers\Api\BlogController::class, 'show']);
 Route::middleware('throttle:60,1')->get('/team', [App\Http\Controllers\Api\TeamController::class, 'index']);
+Route::get('/team/{slug}', [App\Http\Controllers\Api\TeamController::class, 'show']);
 Route::middleware('throttle:60,1')->get('/settings', [SettingsController::class, 'index']);
 Route::get('/about', [AboutController::class, 'index']);
 Route::get('/trip/{slug}', [TripController::class, 'detail']);
