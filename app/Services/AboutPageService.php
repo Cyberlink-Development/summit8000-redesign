@@ -5,20 +5,26 @@ namespace App\Services;
 use App\DTO\About\AboutPageDTO;
 use App\Models\Posts\PostModel;
 use App\Models\Posts\PostTypeModel;
+use App\Models\Settings\SettingModel;
+use App\Services\Team\TeamService;
+use App\Model\TripReview;
 
 class AboutPageService
 {
+    public function __construct(
+        protected TeamService $teamService
+    ) {}
     public function getPageData(): AboutPageDTO
     {
-        /*
-        |--------------------------------------------------------------------------
-        | ABOUT POST TYPE
-        |--------------------------------------------------------------------------
-        */
-
-        $about = PostTypeModel::with('posts')
-            ->where('id', 1)
+        $about = PostTypeModel::with('posts','seo')
+            ->where('id', '22')
             ->first();
+
+        $settings = SettingModel::select(
+            'text1_title', 'text1_sub_title', 'text2_title', 'text2_sub_title', 'text3_title', 'text3_sub_title','text4_title', 'text4_sub_title','text5_title', 'text5_sub_title'
+        )->first();
+
+        // dd($about,$review);
 
         if (!$about) {
             return new AboutPageDTO();
@@ -30,9 +36,7 @@ class AboutPageService
         |--------------------------------------------------------------------------
         */
 
-        $sections = PostModel::where('posttype', $about->id)
-            ->get()
-            ->keyBy('type');
+        $sections = PostModel::with('associated_posts')->where('post_type', $about->id)->where('status', 1)->get();
 
         /*
         |--------------------------------------------------------------------------
@@ -42,30 +46,26 @@ class AboutPageService
 
         return new AboutPageDTO(
 
-            hero: [],
+            hero: $this->mapHero($about),
 
-            stats: $this->mapStats(
-                $sections['stats'] ?? null
-            ),
+            stats: $this->mapStats($settings),
 
             story: $this->mapStory(
                 $sections['story'] ?? null
             ),
 
             founder: $this->mapFounder(
-                $sections['founder'] ?? null
+                $sections->firstWhere('about_type', 'founder')
             ),
 
-            team: $this->mapTeam(
-                $sections['team'] ?? null
-            ),
+            team: $this->teamService->aboutSection(),
 
             why: $this->mapWhy(
-                $sections['why'] ?? null
+                $sections->firstWhere('about_type', 'why')
             ),
 
             testimonials: $this->mapTestimonials(
-                $sections['testimonials'] ?? null
+                $sections->firstWhere('about_type', 'testimonials')
             ),
 
             certifications: $this->mapCertifications(
@@ -80,20 +80,82 @@ class AboutPageService
 
     /*
     |--------------------------------------------------------------------------
-    | STATS
+    | HERO
     |--------------------------------------------------------------------------
     */
 
-    private function mapStats($post): array
+    private function mapHero($about): array
     {
-        if (!$post) {
+        if (!$about) {
             return [];
         }
 
         return [
-            'caption' => $post->caption ?? '',
-            'title' => $post->post_title ?? '',
-            'items' => $post->meta['items'] ?? [],
+
+            'banner' => [
+                'url' => $about->banner,
+                'alt' => $about->post_type,
+            ],
+
+            'breadcrumb' => [
+
+                'previous' => [
+                    'label' => 'Home',
+                    'href' => '/',
+                    'type' => 'internal',
+                ],
+
+                'current' => [
+                    'label' => $about->post_type,
+                ],
+            ],
+
+            'caption' => $about->associated_title ?? '',
+
+            'title' => $about->post_type ?? '',
+
+            'description' => strip_tags($about->content ?? ''),
+        ];
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | STATS
+    |--------------------------------------------------------------------------
+    */
+
+    private function mapStats($settings): array
+    {
+        if (!$settings) {
+            return [];
+        }
+
+        return [
+
+            [
+                'value' => $settings->text1_title ?? '',
+                'label' => $settings->text1_sub_title ?? '',
+            ],
+
+            [
+                'value' => $settings->text2_title ?? '',
+                'label' => $settings->text2_sub_title ?? '',
+            ],
+
+            [
+                'value' => $settings->text3_title ?? '',
+                'label' => $settings->text3_sub_title ?? '',
+            ],
+
+            [
+                'value' => $settings->text4_title ?? '',
+                'label' => $settings->text4_sub_title ?? '',
+            ],
+
+            [
+                'value' => $settings->text5_title ?? '',
+                'label' => $settings->text5_sub_title ?? '',
+            ],
         ];
     }
 
@@ -132,54 +194,26 @@ class AboutPageService
 
         return [
 
-            'slug' => $post->uri,
+            'slug' => $post->uri ?? '',
 
-            'caption' => $post->caption ?? '',
+            'caption' => 'Meet the Founder',
 
-            'title' => $post->post_title,
+            'title' => $post->post_title ?? '',
 
             'sub_title' => $post->sub_title ?? '',
 
-            'tag' => $post->meta['tag'] ?? '',
+            'tag' => $post->about_type ?? '',
 
             'thumbnail' => [
-                'url' => $post->page_thumbnail,
-                'alt' => $post->post_title,
+                'url' => $post->page_thumbnail ?? '',
+                'alt' => $post->post_title ?? '',
             ],
 
-            'badge' => $post->meta['badge'] ?? [],
+            'badge' => [],
 
-            'description' => [
-                $post->post_content
-            ],
+            'description' => $post->post_excerpt ?? '',
 
-            'achievements' => $post->meta['achievements'] ?? [],
-        ];
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | TEAM
-    |--------------------------------------------------------------------------
-    */
-
-    private function mapTeam($post): array
-    {
-        if (!$post) {
-            return [];
-        }
-
-        return [
-
-            'slug' => $post->uri,
-
-            'caption' => $post->caption ?? '',
-
-            'title' => $post->post_title,
-
-            'description' => $post->post_content,
-
-            'items' => $post->meta['items'] ?? [],
+            'achievements' => $post->post_content ?? '',
         ];
     }
 
@@ -197,13 +231,33 @@ class AboutPageService
 
         return [
 
-            'caption' => $post->caption ?? '',
+            'caption' => $post->post_title ?? '',
 
-            'title' => $post->post_title ?? '',
+            'title' => $post->sub_title ?? '',
 
             'description' => $post->post_content ?? '',
 
-            'items' => $post->meta['items'] ?? [],
+            'items' => collect($post->associated_posts ?? [])
+                ->map(function ($item) {
+
+                    return [
+
+                        'thumbnail' => [
+                            'url' => $item->thumbnail
+                                ? asset('uploads/associated/' . $item->thumbnail)
+                                : '',
+
+                            'alt' => $item->title ?? '',
+                        ],
+
+                        'title' => $item->title ?? '',
+
+                        'description' => $item->brief ?? '',
+
+                        'bullets' => $item->content ?? '',
+                    ];
+                })
+                ->values(),
         ];
     }
 
@@ -215,17 +269,47 @@ class AboutPageService
 
     private function mapTestimonials($post): array
     {
-        if (!$post) {
-            return [];
-        }
+        $reviews = TripReview::latest()
+            ->take(6)
+            ->get();
 
         return [
 
-            'caption' => $post->caption ?? '',
+            'caption' => 'Client Stories',
 
-            'title' => $post->post_title ?? '',
+            'title' => 'Words from the Summit',
 
-            'items' => $post->meta['items'] ?? [],
+            'description' => 'Our greatest achievement is not the records we hold — it`s the stories our clients carry home from the highest places on Earth.',
+
+            'items' => collect($reviews)
+                ->map(function ($review, $index) {
+
+                    return [
+
+                        'slug' => 't' . ($index + 1),
+
+                        'rating' => (float) ($review->rating ?? 5),
+
+                        'thumbnail' => [
+                            'url' => $review->image
+                                ? asset('uploads/reviews/' . $review->image)
+                                : '',
+
+                            'alt' => $review->full_name ?? '',
+                        ],
+
+                        'comment' => $review->message ?? '',
+
+                        'tag' => $review->trip_title ?? '',
+
+                        'name' => $review->full_name ?? '',
+
+                        'avatar' => strtoupper(substr($review->full_name ?? '', 0, 2)),
+
+                        'achievement' => $review->title ?? '',
+                    ];
+                })
+            ->values(),
         ];
     }
 

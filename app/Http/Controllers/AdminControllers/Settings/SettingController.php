@@ -281,6 +281,10 @@ class SettingController extends Controller
         $data->text2_sub_title = $request->text2_sub_title;
         $data->text3_title = $request->text3_title;
         $data->text3_sub_title = $request->text3_sub_title;
+        $data->text4_title = $request->text4_title;
+        $data->text4_sub_title = $request->text4_sub_title;
+        $data->text5_title = $request->text5_title;
+        $data->text5_sub_title = $request->text5_sub_title;
         $data->fp_activity = $request->fp_activity;
         $data->fp_training = $request->fp_training;
         $data->fp_about = $request->fp_about;

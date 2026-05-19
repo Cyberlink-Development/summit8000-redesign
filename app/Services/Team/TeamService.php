@@ -32,7 +32,7 @@ class TeamService
 
                 'stats' => $this->stats(),
 
-                'join_cta' => $this->joinCta(),  
+                'join_cta' => $this->joinCta(),
 
                 'seo' => $this->seo($data),
             ],
@@ -110,7 +110,7 @@ class TeamService
             ],
 
             'excerpt' => $member->content,
- 
+
             'tags' => $member->tags ?? [],
         ];
     }
@@ -195,4 +195,26 @@ private function seo($page)
         ],
     ];
 }
+
+    public function aboutItems()
+    {
+        $leadership = TeamModel::where('category', 1)
+            ->orderBy('ordering', 'asc')
+            ->get();
+
+        return collect($leadership)
+            ->map(fn($member) => $this->member($member))
+            ->values();
+    }
+    public function aboutSection()
+    {
+        $data = PostTypeModel::where('id', 35)->first();
+
+        return [
+
+            'hero' => $this->hero($data),
+
+            'items' => $this->aboutItems(),
+        ];
+    }
 }
