@@ -28,5 +28,9 @@ class PostModel extends Model
     {
         return $this->belongsTo(PostCategoryModel::class, 'post_category', 'id');
     }
+    public function images()
+    {
+        return $this->hasMany('App\Models\Posts\PostImageModel', 'post_id');
+    }
 
 }

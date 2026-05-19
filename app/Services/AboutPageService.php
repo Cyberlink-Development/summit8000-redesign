@@ -21,7 +21,7 @@ class AboutPageService
             ->first();
 
         $settings = SettingModel::select(
-            'text1_title', 'text1_sub_title', 'text2_title', 'text2_sub_title', 'text3_title', 'text3_sub_title','text4_title', 'text4_sub_title','text5_title', 'text5_sub_title'
+            'text1_title', 'text1_sub_title', 'text2_title', 'text2_sub_title', 'text3_title', 'text3_sub_title','text4_title', 'text4_sub_title','text5_title', 'text5_sub_title','address','phone','usa_phone','email_primary'
         )->first();
 
         // dd($about,$review);
@@ -36,7 +36,7 @@ class AboutPageService
         |--------------------------------------------------------------------------
         */
 
-        $sections = PostModel::with('associated_posts')->where('post_type', $about->id)->where('status', 1)->get();
+        $sections = PostModel::with('associated_posts','images')->where('post_type', $about->id)->where('status', 1)->get();
 
         /*
         |--------------------------------------------------------------------------
@@ -51,7 +51,7 @@ class AboutPageService
             stats: $this->mapStats($settings),
 
             story: $this->mapStory(
-                $sections['story'] ?? null
+                $sections->firstWhere('about_type', 'story')
             ),
 
             founder: $this->mapFounder(
@@ -72,9 +72,9 @@ class AboutPageService
                 $sections['certifications'] ?? null
             ),
 
-            cta: [],
+            cta: $this->mapCta($settings),
 
-            seo: [],
+            seo: $this->mapSeo($about),
         );
     }
 
@@ -172,11 +172,32 @@ class AboutPageService
         }
 
         return [
-            'caption' => $post->caption ?? '',
-            'title' => $post->post_title ?? '',
+
+            'caption' => $post->post_title ?? '',
+
+            'title' => $post->sub_title ?? '',
+
             'description' => $post->post_content ?? '',
-            'guides' => $post->meta['guides'] ?? [],
-            'gallery' => $post->meta['gallery'] ?? [],
+
+            'guides' => [],
+
+            'gallery' => collect($post->images ?? [])
+                ->map(function ($image) {
+
+                    return [
+
+                        'thumbnail' => [
+                            'url' => $image->file_name
+                                ? asset('uploads/medium/' . $image->file_name)
+                                : '',
+
+                            'alt' => $image->title ?? '',
+                        ],
+
+                        'caption' => $image->title ?? '',
+                    ];
+                })
+                ->values(),
         ];
     }
 
@@ -334,4 +355,102 @@ class AboutPageService
             'items' => $post->meta['items'] ?? [],
         ];
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | CTA
+    |--------------------------------------------------------------------------
+    */
+
+    private function mapCta($settings): array
+    {
+        return [
+            'caption' => 'Your Expedition Begins Here',
+            'title' => 'Ready to Stand at the Top of the World?',
+            'description' => 'Whether you\'re planning an Everest Base Camp trek, a full Himalayan expedition, or a personalised mountain adventure, our team is ready to make it happen — safely, expertly, and unforgettably.',
+            'primary' => [
+                'label' => 'Plan My Expedition',
+                'href' => '/contact',
+                'type' => 'internal',
+            ],
+            'secondary' => [
+                'label' => 'Speak to a Guide',
+                'href' => $settings->usa_phone
+                    ? 'https://wa.me/' . preg_replace('/[^0-9]/', '', $settings->whatsapp_phone)
+                    : '/contact',
+
+                'type' => 'external',
+            ],
+            'contacts' => [
+                [
+                    'label' => 'address',
+                    'value' => $settings->address ?? '',
+                    'href' => null,
+                    'type' => null,
+                ],
+                [
+                    'label' => 'phone',
+                    'value' => $settings->phone ?? '',
+                    'href' => $settings->phone
+                        ? 'tel:' . preg_replace('/\s+/', '', explode(',', $settings->phone)[0])
+                        : null,
+                    'type' => 'external',
+                ],
+                [
+                    'label' => 'email',
+                    'value' => $settings->email_primary ?? '',
+                    'href' => null,
+                    'type' => 'external',
+                ],
+            ],
+        ];
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | SEO
+    |--------------------------------------------------------------------------
+    */
+
+    private function mapSeo($page): array
+    {
+        $seo = $page?->seo;
+
+        return [
+
+            'meta_title' => $seo?->meta_title ?? '',
+
+            'meta_description' => $seo?->meta_description ?? '',
+
+            'og_title' => $seo?->og_title ?? '',
+
+            'og_description' => $seo?->og_description ?? '',
+
+            'og_image' => $seo?->og_image
+                ? asset('uploads/original/' . $seo->og_image)
+                : '',
+
+            'canonical_url' => $seo?->canonical_url
+                ?? url('/about'),
+
+            'robots' => $seo?->robots
+                ? str_replace(',', ', ', $seo->robots)
+                : 'index, follow',
+
+            'schema' => $seo?->schema_data
+                ?? [
+                    '@context' => 'https://schema.org',
+
+                    '@type' => 'AboutPage',
+
+                    'name' => 'About Summit 8000',
+
+                    'description' => 'About Summit 8000 expedition company',
+
+                    'url' => url('/about'),
+                ],
+        ];
+    }
+
+
 }
