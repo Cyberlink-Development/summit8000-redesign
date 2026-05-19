@@ -20,8 +20,8 @@ class HeaderResource extends JsonResource
 
             'cta' => [
                 'label' => 'Plan Expedition',
-                'href' => '/plan-expedition',
-                'type' => 'internal',
+                'href'  => '/plan-expedition',
+                'type'  => 'internal',
             ],
         ];
     }
