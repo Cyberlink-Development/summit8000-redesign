@@ -72,11 +72,13 @@
                                                     class="fa fa-plus fa fa-2x"></i></a>
                                             @endif
 
-                                            @if (has_postimage($row->id) > 0)
+                                            {{-- @if (has_postimage($row->id) > 0) --}}
+                                            @if ($row->id == '204' )
                                                 <a href="{{ route('admin.multiplephoto', $row->id) }}" title="Photo">
                                                     <i class="fa fa-file-image-o" aria-hidden="true" style="color:#ff5000;"></i>
                                                 </a>
                                             @endif
+                                            {{-- @endif --}}
                                         </td>
                                         <td class="date"> {{ $row->created_at }} </td>
                                     </tr>

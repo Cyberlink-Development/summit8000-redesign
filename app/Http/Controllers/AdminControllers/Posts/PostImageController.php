@@ -40,7 +40,7 @@ class PostImageController extends Controller
     public function store(Request $request)
     {
        $request->validate([
-            'file_image' => 'required|image|mimes:jpeg,png,jpg,gif|max:3072|dimensions:max_width=2500,max_height=2000',
+            'file_image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:3072|dimensions:max_width=2500,max_height=2000',
         ]);
 
         $medium_width = env('MEDIUM_WIDTH');
@@ -52,13 +52,13 @@ class PostImageController extends Controller
         if($request->hasfile('file_image')){
             $_file = $request->file('file_image')->getClientOriginalName();
             $extension = $request->file('file_image')->getClientOriginalExtension();
-            $_file = explode('.', $_file);            
+            $_file = explode('.', $_file);
             $file_name = Str::slug($_file[0]) . '-' . Str::random(40) . '.' . $extension;
             $destinationPath_medium = public_path('uploads/medium');
             $thumbanil_picture = Image::make($file->getRealPath());
-            $thumbanil_picture->save($destinationPath_medium .'/'. $file_name );           
+            $thumbanil_picture->save($destinationPath_medium .'/'. $file_name );
         }
-        
+
         $req['post_id'] = $request->post_id;
         $req['file_name'] = $file_name;
         $req['title'] = $request->title;
@@ -103,15 +103,15 @@ class PostImageController extends Controller
         $post_id = $req->post_id;
          $data = PostImageModel::where('post_id',$post_id)->get();
         $document = "";
-        
+
           if($request->hasfile('file_name')){
 
             $req = PostImageModel::find($id);
-         
+
              if(file_exists(public_path('uploads/medium/' .  $req->file_name))){
                 unlink('uploads/medium/' . $req->file_name);
             }
-          
+
 
             $doc = $request->file('file_name')->getClientOriginalName();
             $extension = $request->file('file_name')->getClientOriginalExtension();
@@ -120,7 +120,7 @@ class PostImageController extends Controller
             $request->file('file_name')->move( public_path('uploads/medium/'), $document);
 
         $req->file_name = $document;
-    } 
+    }
 
     $req->title = $request->title;
 
@@ -141,11 +141,11 @@ class PostImageController extends Controller
     {
         $data = PostImageModel::find($id);
         if($data->file_name){
-            
+
         if(file_exists(public_path('uploads/medium/' .  $data->file_name))){
             unlink('uploads/medium/' . $data->file_name);
         }
-        
+
     }
     $data->delete();
     return response()->json([
