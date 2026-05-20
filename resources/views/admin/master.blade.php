@@ -222,7 +222,7 @@
                             </ul>
                     </li>
 
-                    <!-- <li class="">
+                     <li class="">
                 @if(Request::segment(2) == 'teamcategory'||Request::segment(2) == 'teams')
                     <a class="accordion-toggle menu-open">
                     @else
@@ -246,7 +246,7 @@
                     </a>
                   </li>
                   </ul>
-              </li> -->
+              </li> 
                     <?php /*
                <!-- <li class="{{ (Request::segment(2) == 'teams')?'active':'' }}">-->
                <!--    <a href="{{ url('admin/teams') }}">-->

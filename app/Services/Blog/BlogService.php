@@ -3,7 +3,7 @@
 namespace App\Services\Blog;
 
 use App\Models\Posts\PostCategoryModel;
-use App\Models\Posts\PostModel;    
+use App\Models\Posts\PostModel;
 use App\Models\Posts\PostTypeModel;
 
 class BlogService
@@ -19,6 +19,7 @@ class BlogService
                 'hero' => $this->hero(),
                 'featured' => $this->featured($data),
                 'categories' => $this->categories($data),
+                'list'=> $this->articleListControls(),
                 'items' => $this->items($data->posts()->latest()->paginate(10)),
                 'seo' => $this->seo($data),
 
@@ -61,37 +62,42 @@ class BlogService
         }
 
         return [
-            'uuid' => (string) $post->id,
+            'title' => 'Featured Expedition',
 
-            'title' => $post->post_title,
+            'item' => [
+                'uuid' => (string) $post->id,
 
-            'slug' => $post->uri,
+                'title' => $post->post_title,
 
-            'category' => $post->category?->post_title,
+                'slug' => $post->uri,
 
-            'excerpt' => $post->post_excerpt,
+                'category' => $post->category ? $post->category->category : $post->post_title,
 
-            'published_at' => $post->created_at?->toDateString(),
+                'excerpt' => $post->post_excerpt,
 
-            'reading_time' => $post->reading_time ?? '5 min read',
+                'published_at' => $post->created_at?->toDateString(),
 
-            'views' => $post->visiter ?? 0,
+                'reading_time' => $post->reading_time ?? '5 min read',
 
-            'thumbnail' => [
-                'url' => $post->page_thumbnail ? asset('uploads/medium/' . $post->page_thumbnail) : asset('theme-assets/assets/trip/2.jpg'),
-                'alt' => $post->post_title,
+                'views' => $post->visiter ?? 0,
+
+                'thumbnail' => [
+                    'url' => $post->page_thumbnail ? asset('uploads/medium/' . $post->page_thumbnail) : asset('theme-assets/assets/trip/2.jpg'),
+                    'alt' => $post->post_title,
+                ],
+
+                'highlight' => [
+                    'altitude' => $post->altitude ?? null,
+                    'peak' => $post->peak ?? null,
+                ],
+
+                'cta' => [
+                    'label' => 'Read Story',
+                    'href' => '/blog/' . $post->uri,
+                    'type' => 'internal',
+                ],
             ],
 
-            'highlight' => [
-                'altitude' => $post->altitude ?? null,
-                'peak' => $post->peak ?? null,
-            ],
-
-            'cta' => [
-                'label' => 'Read Story',
-                'href' => '/blog/' . $post->uri,
-                'type' => 'internal',
-            ],
         ];
     }
 
@@ -116,11 +122,13 @@ class BlogService
         return collect($posts->items())->map(fn($post) => [
             'uuid' => (string) $post->id,
 
+            "href" => $post->uri,
+
             'title' => $post->post_title,
 
             'slug' => $post->uri,
 
-            'category' => $post->category?->post_title,
+            'category' => $post->category ? $post->category->category : $post->post_title,
 
             'excerpt' => $post->post_excerpt,
 
@@ -134,6 +142,38 @@ class BlogService
             ],
         ]);
     }
+
+    private function articleListControls(): array
+{
+    return [
+        'title' => 'Latest Articles',
+
+        'controls' => [
+            [
+                'type' => 'sort',
+
+                'default' => 'latest',
+
+                'options' => [
+                    [
+                        'slug' => 'latest',
+                        'label' => 'Latest',
+                    ],
+
+                    [
+                        'slug' => 'popular',
+                        'label' => 'Popular',
+                    ],
+
+                    [
+                        'slug' => 'beginner',
+                        'label' => 'Beginner',
+                    ],
+                ],
+            ],
+        ],
+    ];
+}
 
     private function seo($data)
     {
