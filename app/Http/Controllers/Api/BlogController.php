@@ -22,7 +22,7 @@ class BlogController extends Controller
 
             return $this->errorResponse(
                 $e->getMessage(),
-                500
+                500 
             );
         }
     }

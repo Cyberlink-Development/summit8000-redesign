@@ -183,6 +183,7 @@ class PostController extends Controller
         $data['page_thumbnail'] = $page_thumbnail;
         $isChecked = $request->has('show_in_home');
         $data['show_in_home'] = ($isChecked) ? '1' : '0';
+        $data['reading_time']=$request->reading_time;
         $result = PostModel::create($data);
         $last_id = $result->id;
 
@@ -375,6 +376,7 @@ class PostController extends Controller
         $posttypeId = $this->getPostTypeId($request->post_type);
         $data->post_date = $request->post_date;
         $data->post_author = $request->post_author;
+        $data->reading_time = $request->reading_time;
         $data->about_type = $request->about_type;
         $data->template = $request->template;
         $data->template_child = $request->template_child;
