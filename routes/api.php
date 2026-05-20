@@ -30,3 +30,5 @@ Route::get('/about', [AboutController::class, 'index']);
 Route::get('/trip/{slug}', [TripController::class, 'detail']);
 Route::get('/trips/{parent}', [TripController::class, 'index']);
 Route::get('/trip-category/{slug}', [TripController::class, 'category']);
+
+
