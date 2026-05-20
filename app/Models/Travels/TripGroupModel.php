@@ -3,6 +3,7 @@
 namespace App\Models\Travels;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\PageSlug;
 
 class TripGroupModel extends Model
 {
@@ -11,6 +12,10 @@ class TripGroupModel extends Model
 
     public function trips(){
     	return $this->belongsToMany('App\Models\Travels\TripModel','cl_trip_group_rel','group_id','trip_id');
+    }
+    public function slugs()
+    {
+        return $this->morphMany(PageSlug::class, 'sluggable');
     }
 
 }

@@ -8,10 +8,17 @@ use App\Models\Travels\RegionModel;
 use App\Http\Controllers\Controller;
 use App\Models\Travels\ActivityModel;
 use Intervention\Image\Facades\Image;
+use App\Services\Slug\SlugService;
 
 
 class RegionController extends Controller
 {
+    protected $slugService;
+
+    public function __construct(SlugService $slugService)
+    {
+        $this->slugService = $slugService;
+    }
     /**
      * Display a listing of the resource.
      *
@@ -46,7 +53,7 @@ class RegionController extends Controller
     {
         $request->validate([
             'title' => 'required',
-             'uri' => 'required|unique:cl_trip_regions',
+            'uri' => 'required|unique:cl_trip_regions',
         ]);
 
         $data = $request->all();
@@ -62,30 +69,33 @@ class RegionController extends Controller
             $destinationPath = public_path('uploads/banners');
 
             $banner_picture = Image::make($file->getRealPath());
-           
+
             $banner_picture->save($destinationPath . '/' . $banner_name);
 
         }
-          $icon_file = $request->file('thumbnail');
-          $icon_name = '';
-          if ($request->hasfile('thumbnail')) {
-              $icon = $request->file('thumbnail')->getClientOriginalName();
-              $extension = $request->file('thumbnail')->getClientOriginalExtension();
-              $icon = explode('.', $icon);
-              $icon_name = Str::slug($icon[0]) . '-' . Str::random(40) . '.' . $extension;
+        $icon_file = $request->file('thumbnail');
+        $icon_name = '';
+        if ($request->hasfile('thumbnail')) {
+            $icon = $request->file('thumbnail')->getClientOriginalName();
+            $extension = $request->file('thumbnail')->getClientOriginalExtension();
+            $icon = explode('.', $icon);
+            $icon_name = Str::slug($icon[0]) . '-' . Str::random(40) . '.' . $extension;
 
-              $OdestinationPath = public_path('uploads/original');
+            $OdestinationPath = public_path('uploads/original');
 
-              $icon_picture = Image::make($icon_file->getRealPath());
-              $width = Image::make($icon_file->getRealPath())->width();
-              $height = Image::make($icon_file->getRealPath())->height();
-              $icon_picture->save($OdestinationPath . '/' . $icon_name);
-          }
+            $icon_picture = Image::make($icon_file->getRealPath());
+            $width = Image::make($icon_file->getRealPath())->width();
+            $height = Image::make($icon_file->getRealPath())->height();
+            $icon_picture->save($OdestinationPath . '/' . $icon_name);
+        }
 
         $data['banner'] = $banner_name;
         $data['thumbnail'] = $icon_name;
         $result = RegionModel::create($data);
         $last_id = $result->id;
+
+        // SLug Table
+        $this->slugService->store($result, $request->uri);
 
         return redirect()->back()->with('success', 'Successfully added.');
 
@@ -111,7 +121,7 @@ class RegionController extends Controller
     public function edit($id)
     {
         $data = RegionModel::find($id);
-       
+
         $activities = ActivityModel::all();
         return view('admin.regions.edit', compact('data', 'activities'));
     }
@@ -127,7 +137,7 @@ class RegionController extends Controller
     {
         $request->validate([
             'title' => 'required',
-             'uri' => 'required|unique:cl_trip_regions,uri,'.$id,
+            'uri' => 'required|unique:cl_trip_regions,uri,' . $id,
         ]);
 
         // return $request;
@@ -138,7 +148,7 @@ class RegionController extends Controller
         $data = RegionModel::find($id);
         $file = $request->file('banner');
         $banner_name = '';
-        if ($request->hasfile('banner')) {          
+        if ($request->hasfile('banner')) {
             if ($data->banner) {
                 if (file_exists(env('PUBLIC_PATH') . 'uploads/banners/' . $data->banner)) {
                     unlink(env('PUBLIC_PATH') . 'uploads/banners/' . $data->banner);
@@ -160,28 +170,28 @@ class RegionController extends Controller
             $data->banner = $banner_name;
         }
 
-        $i_file = $request->file('thumbnail'); 
-      $icon_name = '';
-      if($request->hasfile('thumbnail')){       
-        if($data->thumbnail){
-          if(file_exists(env('PUBLIC_PATH').'uploads/original/' . $data->thumbnail)){
-            unlink(env('PUBLIC_PATH').'uploads/original/' . $data->thumbnail);
-          }
+        $i_file = $request->file('thumbnail');
+        $icon_name = '';
+        if ($request->hasfile('thumbnail')) {
+            if ($data->thumbnail) {
+                if (file_exists(env('PUBLIC_PATH') . 'uploads/original/' . $data->thumbnail)) {
+                    unlink(env('PUBLIC_PATH') . 'uploads/original/' . $data->thumbnail);
+                }
+            }
+            $icon = $request->file('thumbnail')->getClientOriginalName();
+            $extension = $request->file('thumbnail')->getClientOriginalExtension();
+            $icon = explode('.', $icon);
+            $icon_name = Str::slug($icon[0]) . '-' . Str::random(40) . '.' . $extension;
+
+            $destinationPath = public_path('uploads/original');
+            $icon_picture = Image::make($i_file->getRealPath());
+            $icon_picture->save($destinationPath . '/' . $icon_name);
+
+            $data->thumbnail = $icon_name;
         }
-        $icon = $request->file('thumbnail')->getClientOriginalName();
-        $extension = $request->file('thumbnail')->getClientOriginalExtension();
-        $icon = explode('.', $icon);
-        $icon_name = Str::slug($icon[0]) . '-' . Str::random(40) . '.' . $extension;
-
-        $destinationPath = public_path('uploads/original');
-        $icon_picture = Image::make($i_file->getRealPath());
-        $icon_picture->save($destinationPath .'/'. $icon_name ); 
-
-        $data->thumbnail = $icon_name;
-      }      
 
         $data->title = $request->title;
-        $data->sub_title = $request->sub_title;       
+        $data->sub_title = $request->sub_title;
         $data->excerpt = $request->excerpt;
         $data->content = $request->content;
         $data->uri = $request->uri;
@@ -190,9 +200,12 @@ class RegionController extends Controller
         $data->meta_description = $request->meta_description;
         $data->video = $request->video;
 
-        if ($data->save()) {
-            return redirect()->back()->with('success', 'Update Sucessfully.');
-        }
+        $data->save();
+        // Slug
+        $this->slugService->update($data, $request->uri);
+
+        return redirect()->back()->with('success', 'Update Sucessfully.');
+
     }
 
     /**
@@ -217,13 +230,13 @@ class RegionController extends Controller
         $data->delete();
         return 'Are you sure to delete?';
     }
-    
-      public function filter($id)
+
+    public function filter($id)
     {
         $data = RegionModel::find($id)->trips()->get();
-       return view('admin.trips.index', compact('data'));
+        return view('admin.trips.index', compact('data'));
     }
-    
+
     // Delete Region Banner
     public function delete_region_banner($id)
     {
@@ -238,7 +251,7 @@ class RegionController extends Controller
         return response('Delete Successful.');
     }
 
-     public function delete_region_thumb($id)
+    public function delete_region_thumb($id)
     {
         $data = RegionModel::find($id);
         if ($data->thumbnail) {

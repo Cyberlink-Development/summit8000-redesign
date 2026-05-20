@@ -4,6 +4,7 @@ namespace App\Models\Posts;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\SeoMeta;
+use App\Models\PageSlug;
 
 class PostModel extends Model
 {
@@ -24,13 +25,18 @@ class PostModel extends Model
         return $this->morphOne(SeoMeta::class, 'seoable');
     }
 
-    public function category() 
+    public function category()
     {
         return $this->belongsTo(PostCategoryModel::class, 'post_category', 'id');
     }
     public function images()
     {
         return $this->hasMany('App\Models\Posts\PostImageModel', 'post_id');
+    }
+
+    public function slugs()
+    {
+        return $this->morphMany(PageSlug::class, 'sluggable');
     }
 
 }

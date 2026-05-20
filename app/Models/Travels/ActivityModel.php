@@ -4,6 +4,7 @@ namespace App\Models\Travels;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\SeoMeta;
+use App\Models\PageSlug;
 
 class ActivityModel extends Model
 {
@@ -23,6 +24,10 @@ class ActivityModel extends Model
     public function seo()
     {
         return $this->morphOne(SeoMeta::class, 'seoable');
+    }
+    public function slugs()
+    {
+        return $this->morphMany(PageSlug::class, 'sluggable');
     }
 }
 
