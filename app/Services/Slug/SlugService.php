@@ -52,33 +52,26 @@ class SlugService
      */
     protected function generateUniqueSlug($slug, $model = null)
     {
-        $slug = Str::slug($slug);
-
+        $slug = '/' . ltrim(Str::slug($slug), '/');
+        $slug = preg_replace('#/+#', '/', $slug);
+        
         $originalSlug = $slug;
-
         $count = 1;
-
+        
         while (
             PageSlug::where('slug', $slug)
                 ->when($model, function ($query) use ($model) {
-
                     return $query->where(function ($q) use ($model) {
                         $q->where('sluggable_id', '!=', $model->id)
-                          ->orWhere(
-                              'sluggable_type',
-                              '!=',
-                              get_class($model)
-                          );
+                        ->orWhere('sluggable_type', '!=', get_class($model));
                     });
-
                 })
                 ->exists()
         ) {
             $slug = $originalSlug . '-' . $count;
-
             $count++;
         }
-
+        
         return $slug;
     }
 }

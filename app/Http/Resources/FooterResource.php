@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources;
+namespace app\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\DTO\Footer\FooterLinkDTO;

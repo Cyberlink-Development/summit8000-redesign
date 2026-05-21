@@ -2,31 +2,67 @@
 
 namespace App\Services\Blog;
 
+use App\Http\Resources\BlogListResource;
+use App\Http\Resources\GlobalCollection;
+use app\Models\PageSlug;
 use App\Models\Posts\PostCategoryModel;
 use App\Models\Posts\PostModel;
 use App\Models\Posts\PostTypeModel;
+use Illuminate\Http\Request;
 
 class BlogService
 {
-    public function get()
+    public function handle(PageSlug $pageRoute, Request $request)
     {
-        $data = PostTypeModel::with('seo')
-            ->where('id', 33)
-            ->first();
+        $postType = $pageRoute->sluggable;
+        $postType['path'] = $pageRoute->slug;
 
-        return [
-            'data' => [
-                'hero' => $this->hero(),
-                'featured' => $this->featured($data),
-                'categories' => $this->categories($data),
-                'list' => $this->articleListControls(),
-                'items' => $this->items($data->posts()->latest()->paginate(10)),
-                'seo' => $this->seo($data),
+        $query = PostModel::query()
+            ->where('post_type', $postType->id);
 
-            ],
+        $category = $request->query('category');
 
-            // 'meta' => $this->meta($data->posts()),
-        ];
+        if ($category && $category !== 'all') {
+            $query->where('category', $category);
+        }
+
+        $sort = $request->query('sort', 'latest');
+        
+        $query = match ($sort) {
+            'popular'  => $query->orderByDesc('views'),
+            'beginner' => $query->where('is_beginner_friendly', true)->latest(),
+            default    => $query->latest('updated_at'),
+        };
+
+        $posts = $query->paginate(
+            perPage: (int) $request->query('per_page', 8),
+            page: (int) $request->query('page', 1),
+        );
+        return new GlobalCollection(
+            resourceData: new BlogListResource(
+                postType: $postType,
+                posts: $posts,
+            ),
+            paginator: $posts,
+        );
+
+        // $data = PostTypeModel::with('seo')
+        //     ->where('id', 33)
+        //     ->first();
+
+        // return [
+        //     'data' => [
+        //         'hero' => $this->hero(),
+        //         'featured' => $this->featured($data),
+        //         'categories' => $this->categories($data),
+        //         'list' => $this->articleListControls(),
+        //         'items' => $this->items($data->posts()->latest()->paginate(10)),
+        //         'seo' => $this->seo($data),
+
+        //     ],
+
+        //     // 'meta' => $this->meta($data->posts()),
+        // ];
     }
 
     private function hero()

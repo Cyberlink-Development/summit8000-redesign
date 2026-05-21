@@ -13,68 +13,67 @@ class SettingsController extends Controller
 {
     public function index()
     {
-        // $data = Cache::remember('settings', 3600, function () {
+        $settings = SettingModel::with('seo')->first();
 
-            $settings = SettingModel::with('seo')->first();
+        $menus = PostTypeModel::where('status', 1)
+            ->where('is_menu', '1')
+            ->orderBy('ordering')
+            ->get();
 
-            $menus = PostTypeModel::where('status', 1)
-                ->where('is_menu', 1)
-                ->orderBy('ordering')
-                ->get();
+        $pages = PostTypeModel::where('status', 1)
+            ->where('is_footer', 1)
+            ->orderBy('ordering')
+            ->get();
 
-            $pages = PostTypeModel::where('status', 1)
-                ->where('is_footer', 1)
-                ->orderBy('ordering')
-                ->get();
+        // dd($menus,$pages);
+        $data = [
+            'data' => [
+                'site_name' => $settings->site_name,
 
-            return [
-                'data' => [
-                    'site_name' => $settings->site_name,
-
-                    'branding' => [
-                        'logo' => [
-                            'light' => [
-                                'url' => $settings->logo
-                                    ? asset('uploads/original/' . $settings->logo)
-                                    : '',
-                                'alt' => $settings->site_name . ' Logo - Light Mode',
-                            ],
-                            'dark' => [
-                                'url' => $settings->logo_dark
-                                    ? asset('uploads/original/' . $settings->logo_dark)
-                                    : '',
-                                'alt' => $settings->site_name . ' Logo - Dark Mode',
-                            ],
-                        ],
-                        'favicon' => [
-                            'url' => $settings->favicon
-                                ? asset('uploads/original/' . $settings->favicon)
+                'branding' => [
+                    'logo' => [
+                        'light' => [
+                            'url' => $settings->logo
+                                ? asset('uploads/original/' . $settings->logo)
                                 : '',
-                            'alt' => $settings->site_name . ' Favicon',
+                            'alt' => $settings->site_name . ' Logo - Light Mode',
+                        ],
+                        'dark' => [
+                            'url' => $settings->logo_dark
+                                ? asset('uploads/original/' . $settings->logo_dark)
+                                : '',
+                            'alt' => $settings->site_name . ' Logo - Dark Mode',
                         ],
                     ],
 
-                    'display_mode' => [
-                        'enabled' => true,
-                        'default' => 'light',
+                    'favicon' => [
+                        'url' => $settings->favicon
+                            ? asset('uploads/original/' . $settings->favicon)
+                            : '',
+                        'alt' => $settings->site_name . ' Favicon',
                     ],
-
-                    'header' => (new HeaderResource([
-                        'menus'    => $menus,
-                        'settings' => $settings,
-                    ]))->resolve(),
-
-                    'footer' => (new FooterResource([
-                        'settings' => $settings,
-                        'pages'    => $pages,
-                    ]))->resolve(),
-
-                    'seo' => SeoDTO::fromModel($settings),
                 ],
 
-                'meta' => [],
-            ];
-        // });
+                'display_mode' => [
+                    'enabled' => true,
+                    'default' => 'light',
+                ],
+
+                'header' => (new HeaderResource([
+                    'menus'    => $menus,
+                    'settings' => $settings,
+                ]))->resolve(),
+
+                'footer' => (new FooterResource([
+                    'settings' => $settings,
+                    'pages'    => $pages,
+                ]))->resolve(),
+
+                'seo' => SeoDTO::fromModel($settings),
+            ],
+
+            'meta' => [],
+        ];
 
         return $this->successResponse(
             $data,
