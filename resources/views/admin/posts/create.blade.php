@@ -144,9 +144,10 @@
                     <div class="clearfix"></div>
                 </div>
 
+                @if(Request::segment(2) == 'about-us')
                 <div class="sid_bvijay mb10">
                     <label class="field select">
-                        <select id="about_type" name="about_type" required>
+                        <select id="about_type" name="about_type" >
                             <option value="" selected hidden>Choose Type</option>
                             <option value="story">Is Story?</option>
                             <option value="founder">Is Founder?</option>
@@ -155,6 +156,7 @@
                         <i class="arrow"></i>
                     </label>
                 </div>
+                @endif
                 <div class="sid_bvijay mb10">
                     <label class="field select">
                         <select id="template" name="template">

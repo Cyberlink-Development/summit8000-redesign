@@ -4,6 +4,7 @@ namespace App\Models\Posts;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\SeoMeta;
+use App\Models\PageSlug;
 
 class PostTypeModel extends Model
 {
@@ -18,5 +19,9 @@ class PostTypeModel extends Model
     public function seo()
     {
         return $this->morphOne(SeoMeta::class, 'seoable');
+    }
+    public function slugs()
+    {
+        return $this->morphMany(PageSlug::class, 'sluggable');
     }
 }

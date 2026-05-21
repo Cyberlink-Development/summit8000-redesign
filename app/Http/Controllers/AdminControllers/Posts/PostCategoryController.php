@@ -8,9 +8,16 @@ use App\Http\Controllers\Controller;
 use App\Models\Posts\PostCategoryModel;
 use App\Models\Posts\PostTypeModel;
 use Image;
+use App\Services\Slug\SlugService;
 
 class PostCategoryController extends Controller
 {
+    protected $slugService;
+
+    public function __construct(SlugService $slugService)
+    {
+        $this->slugService = $slugService;
+    }
     /**
      * Display a listing of the resource.
      *
@@ -60,16 +67,20 @@ class PostCategoryController extends Controller
             $destinationOriginal = public_path('uploads/original');
             $pic = Image::make($file->getRealPath());
             $width = Image::make($file->getRealPath())->width();
-            $height = Image::make($file->getRealPath())->height(); 
+            $height = Image::make($file->getRealPath())->height();
 
             $pic->resize($width, $height, function($constraint){
             $constraint->aspectRatio();
              })->save($destinationOriginal .'/'. $file_name );
         }
 
-        $data['uri'] = Str::slug($request->uri); 
+        $data['uri'] = Str::slug($request->uri);
         $data['thumbnail'] = $file_name;
         $result = PostCategoryModel::create($data);
+
+        // SLug Table
+        $this->slugService->store($result, $request->uri);
+
         if($result){
             return redirect()->back()->with('message','Successfully added.');
         }else{
@@ -95,7 +106,7 @@ class PostCategoryController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function edit(PostCategoryModel $postCategoryModel, $id)
-    {   
+    {
        $data = PostCategoryModel::find($id);
        $posttype = PostTypeModel::all();
        return view('admin.post-category.edit', compact('data','posttype'));
@@ -114,44 +125,48 @@ class PostCategoryController extends Controller
             'category'=>'required',
             'uri'=>'required'
         ]);
-        
+
         $data = PostCategoryModel::find($id);
         $file =  $request->file('thumbnail');
         $file_name = '';
         if($request->hasfile('thumbnail')){
-            $data = PostCategoryModel::find($id);  
-            if($data->thumbnail){               
+            $data = PostCategoryModel::find($id);
+            if($data->thumbnail){
                 if(file_exists(public_path('uploads/original/' .  $data->thumbnail))){
                     unlink('uploads/original/' . $data->thumbnail);
-                }                  
+                }
             }
             $category_file = $request->file('thumbnail')->getClientOriginalName();
             $extension = $request->file('thumbnail')->getClientOriginalExtension();
             $category_file = explode('.', $category_file);
             $file_name = Str::slug($category_file[0]) . '-' . Str::random(40) . '.' . $extension;
-            
+
             $destinationOriginal = public_path('uploads/original');
-            
+
 
         $product_picture = Image::make($file->getRealPath());
         $width = Image::make($file->getRealPath())->width();
-        $height = Image::make($file->getRealPath())->height();        
-      
+        $height = Image::make($file->getRealPath())->height();
+
         /****Upload Original Image****/
         $product_picture->resize($width, $height, function($constraint){
             $constraint->aspectRatio();
-             })->save($destinationOriginal .'/'. $file_name ); 
+             })->save($destinationOriginal .'/'. $file_name );
 
         $data->thumbnail = $file_name;
-        }   
+        }
 
         $data->post_type = $request->post_type;
         $data->category = $request->category;
-        $data->uri = Str::slug($request->uri);  
-        $data->ordering = $request->ordering;  
+        $data->uri = Str::slug($request->uri);
+        $data->ordering = $request->ordering;
         $data->category_caption = $request->category_caption;
-        $data->category_content = $request->category_content;        
+        $data->category_content = $request->category_content;
         $data->save();
+        
+        // Slug
+        $this->slugService->update($data, $request->uri);
+
         return redirect()->back()->with('message','Update Successful.');
     }
 
@@ -174,10 +189,10 @@ class PostCategoryController extends Controller
      // Delete Post Thumbnail
      function delete_category_thumb(PostCategoryModel $postCategoryModel, $id){
          $data = PostCategoryModel::find($id);
-         if($data->thumbnail){                
+         if($data->thumbnail){
                 if(file_exists(public_path('uploads/original/' .  $data->thumbnail))){
                     unlink('uploads/original/' . $data->thumbnail);
-                }                   
+                }
             }
          $data->thumbnail = NULL;
          $data->save();

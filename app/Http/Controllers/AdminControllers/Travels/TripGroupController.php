@@ -7,9 +7,16 @@ use Illuminate\Support\Str;
 use App\Http\Controllers\Controller;
 use App\Models\Travels\TripGroupModel;
 use Image;
+use App\Services\Slug\SlugService;
 
 class TripGroupController extends Controller
 {
+    protected $slugService;
+
+    public function __construct(SlugService $slugService)
+    {
+        $this->slugService = $slugService;
+    }
     /**
      * Display a listing of the resource.
      *
@@ -17,8 +24,8 @@ class TripGroupController extends Controller
      */
     public function index()
     {
-        $data = TripGroupModel::orderBy('id','desc')->get();
-        return view('admin.tripgroups.index',compact('data'));
+        $data = TripGroupModel::orderBy('id', 'desc')->get();
+        return view('admin.tripgroups.index', compact('data'));
     }
 
     /**
@@ -32,7 +39,7 @@ class TripGroupController extends Controller
         $ord = TripGroupModel::max('ordering');
         $ordering += $ord + 1;
         return view('admin.tripgroups.create', compact('ordering'));
-      // return redirect()->back();
+        // return redirect()->back();
     }
 
     /**
@@ -44,32 +51,34 @@ class TripGroupController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-        'title'=>'required',
-        'uri' => 'required|unique:cl_trip_groups',       
+            'title' => 'required',
+            'uri' => 'required|unique:cl_trip_groups',
         ]);
 
         $data = $request->all();
-        $file =  $request->file('banner');
+        $file = $request->file('banner');
         $banner_name = '';
-        if($request->hasfile('banner')){
+        if ($request->hasfile('banner')) {
 
-        $banner = $request->file('banner')->getClientOriginalName();
-        $extension = $request->file('banner')->getClientOriginalExtension();
-        $banner = explode('.', $banner);
-        $banner_name = Str::slug($banner[0]) . '-' . Str::random(40) . '.' . $extension;
+            $banner = $request->file('banner')->getClientOriginalName();
+            $extension = $request->file('banner')->getClientOriginalExtension();
+            $banner = explode('.', $banner);
+            $banner_name = Str::slug($banner[0]) . '-' . Str::random(40) . '.' . $extension;
 
-        $destinationPath = public_path('uploads/banners');
+            $destinationPath = public_path('uploads/banners');
 
-        $banner_picture = Image::make($file->getRealPath());
-      
-        $banner_picture->save($destinationPath .'/'. $banner_name ); 
+            $banner_picture = Image::make($file->getRealPath());
 
-      }
-      $data['uri'] = Str::slug($request->uri);    
-      $data['banner'] = $banner_name;     
-      $result = TripGroupModel::create($data);
+            $banner_picture->save($destinationPath . '/' . $banner_name);
 
-      return redirect()->back()->with('success','Successfully added.');
+        }
+        $data['uri'] = Str::slug($request->uri);
+        $data['banner'] = $banner_name;
+        $result = TripGroupModel::create($data);
+        // SLug Table
+        $this->slugService->store($result, $request->uri);
+
+        return redirect()->back()->with('success', 'Successfully added.');
 
 
     }
@@ -106,49 +115,51 @@ class TripGroupController extends Controller
      */
     public function update(Request $request, $id)
     {
-      $request->validate([
-        'title'=>'required',
-         'uri' => 'required|unique:cl_trip_groups,uri,'.$id, 
-      ]); 
+        $request->validate([
+            'title' => 'required',
+            'uri' => 'required|unique:cl_trip_groups,uri,' . $id,
+        ]);
 
-      $data = TripGroupModel::find($id);  
-      $file = $request->file('banner'); 
-      $banner_name = '';
-      if($request->hasfile('banner')){
-        $data = TripGroupModel::find($id); 
-        if($data->banner){
-          if(file_exists(env('PUBLIC_PATH').'uploads/banners/' . $data->banner)){
-            unlink(env('PUBLIC_PATH').'uploads/banners/' . $data->banner);
-          }
+        $data = TripGroupModel::find($id);
+        $file = $request->file('banner');
+        $banner_name = '';
+        if ($request->hasfile('banner')) {
+            $data = TripGroupModel::find($id);
+            if ($data->banner) {
+                if (file_exists(env('PUBLIC_PATH') . 'uploads/banners/' . $data->banner)) {
+                    unlink(env('PUBLIC_PATH') . 'uploads/banners/' . $data->banner);
+                }
+            }
+            $banner = $request->file('banner')->getClientOriginalName();
+            $extension = $request->file('banner')->getClientOriginalExtension();
+            $banner = explode('.', $banner);
+            $banner_name = Str::slug($banner[0]) . '-' . Str::random(40) . '.' . $extension;
+
+            $destinationPath = public_path('uploads/banners');
+
+            $banner_picture = Image::make($file->getRealPath());
+            $width = Image::make($file->getRealPath())->width();
+            $height = Image::make($file->getRealPath())->height();
+
+            $banner_picture->save($destinationPath . '/' . $banner_name);
+
+            $data->banner = $banner_name;
         }
-        $banner = $request->file('banner')->getClientOriginalName();
-        $extension = $request->file('banner')->getClientOriginalExtension();
-        $banner = explode('.', $banner);
-        $banner_name = Str::slug($banner[0]) . '-' . Str::random(40) . '.' . $extension;
 
-        $destinationPath = public_path('uploads/banners');
+        $data->title = $request->title;
+        $data->sub_title = $request->sub_title;
+        $data->content = $request->content;
+        $data->excerpt = $request->excerpt;
+        $data->uri = Str::slug($request->uri);
+        $data->ordering = $request->ordering;
+        $data->meta_keyword = $request->meta_keyword;
+        $data->meta_description = $request->meta_description;
+        $data->save();
+        // Slug
+        $this->slugService->update($data, $request->uri);
 
-        $banner_picture = Image::make($file->getRealPath());
-        $width = Image::make($file->getRealPath())->width();
-        $height = Image::make($file->getRealPath())->height();    
+        return redirect()->back()->with('success', 'Update Sucessfully.');
 
-        $banner_picture->save($destinationPath .'/'. $banner_name ); 
-
-        $data->banner = $banner_name;
-      }    
-         
-      $data->title = $request->title;
-      $data->sub_title = $request->sub_title;      
-      $data->content = $request->content;
-      $data->excerpt = $request->excerpt;
-      $data->uri = Str::slug($request->uri);    
-      $data->ordering = $request->ordering;            
-      $data->meta_keyword = $request->meta_keyword;
-      $data->meta_description = $request->meta_description;
-     
-      if($data->save()){
-        return redirect()->back()->with('success','Update Sucessfully.');
-      }
 
     }
 
@@ -161,25 +172,26 @@ class TripGroupController extends Controller
     public function destroy($id)
     {
         $data = TripGroupModel::find($id);
-        if($data->banner){
-        if(file_exists(env('PUBLIC_PATH').'uploads/banners/' . $data->banner)){
-          unlink(env('PUBLIC_PATH').'uploads/banners/' . $data->banner);
+        if ($data->banner) {
+            if (file_exists(env('PUBLIC_PATH') . 'uploads/banners/' . $data->banner)) {
+                unlink(env('PUBLIC_PATH') . 'uploads/banners/' . $data->banner);
+            }
         }
-      }
-      $data->delete();
-      return 'Are you sure to delete?';
+        $data->delete();
+        return 'Are you sure to delete?';
     }
 
-     // Delete banner
-     function delete_tripgroup_thumb(TripGroupModel $tripGroupModel, $id){
-      $data = TripGroupModel::find($id);
-      if($data->banner){
-       if(file_exists(env('PUBLIC_PATH').'uploads/banners/' . $data->banner)){
-         unlink(env('PUBLIC_PATH').'uploads/banners/' . $data->banner);
-       }      
-     }
-     $data->banner = NULL;
-     $data->save();
-     return response('Delete Successful.');
-   }
+    // Delete banner
+    function delete_tripgroup_thumb(TripGroupModel $tripGroupModel, $id)
+    {
+        $data = TripGroupModel::find($id);
+        if ($data->banner) {
+            if (file_exists(env('PUBLIC_PATH') . 'uploads/banners/' . $data->banner)) {
+                unlink(env('PUBLIC_PATH') . 'uploads/banners/' . $data->banner);
+            }
+        }
+        $data->banner = NULL;
+        $data->save();
+        return response('Delete Successful.');
+    }
 }

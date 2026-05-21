@@ -22,15 +22,18 @@ use App\Models\Destinations\DestinationModel;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Travels\TripScheduleModel;
 use App\Models\Faqs\FaqModel;
+use App\Services\Slug\SlugService;
 
 
 class TripController extends Controller
 {
+    protected $slugService;
 
-    public function __construct()
+    public function __construct(SlugService $slugService)
     {
-        //
+        $this->slugService = $slugService;
     }
+
     /**
      * Display a listing of the resource.
      *
@@ -246,6 +249,9 @@ class TripController extends Controller
             $data['is_draft'] = $is_draft;
             $result = TripModel::create($data);
             $last_id = $result->id;
+
+            // SLug Table
+            $this->slugService->store($result, $request->uri);
 
             // Seo
             if ($result && $request->has('seo')) {
@@ -1026,6 +1032,8 @@ class TripController extends Controller
             }
 
             $data->save();
+            // Slug
+            $this->slugService->update($data, $request->uri);
 
             if ($request->has('seo')) {
                 $seoData = $request->seo ?? [];

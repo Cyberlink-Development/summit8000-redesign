@@ -8,9 +8,16 @@ use App\Models\Travels\TripModel;
 use App\Http\Controllers\Controller;
 use App\Models\Travels\ActivityModel;
 use Intervention\Image\Facades\Image;
+use App\Services\Slug\SlugService;
 
 class ActivityController extends Controller
 {
+    protected $slugService;
+
+    public function __construct(SlugService $slugService)
+    {
+        $this->slugService = $slugService;
+    }
     /**
      * Display a listing of the resource.
      *
@@ -115,6 +122,9 @@ class ActivityController extends Controller
         $result->isdefault = $request->isdefault;
         $result->save();
         $last_id = $result->id;
+
+        // SLug Table
+        $this->slugService->store($result, $request->uri);
 
         // Save SEO Data
         if ($result && $request->has('seo')) {
@@ -278,6 +288,9 @@ class ActivityController extends Controller
         // $_data->relatedActivities()->attach($request->related_activity);
 
         $data->save();
+        
+        // Slug
+        $this->slugService->update($data, $request->uri);
 
         /************/
         if ($request->has('seo')) {

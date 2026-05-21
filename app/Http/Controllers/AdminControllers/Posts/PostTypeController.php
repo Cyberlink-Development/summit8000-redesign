@@ -6,9 +6,16 @@ use Illuminate\Http\Request;
 use App\Models\Posts\PostTypeModel;
 use App\Http\Controllers\Controller;
 use Intervention\Image\Facades\Image;
+use App\Services\Slug\SlugService;
 
 class PostTypeController extends Controller
 {
+    protected $slugService;
+
+    public function __construct(SlugService $slugService)
+    {
+        $this->slugService = $slugService;
+    }
     /**
      * Display a listing of the resource.
      *
@@ -96,6 +103,9 @@ class PostTypeController extends Controller
         $data['banner'] = $product_name;
         $data['uri'] = Str::slug($request->uri);
         $result = PostTypeModel::create($data);
+
+        // SLug Table
+        $this->slugService->store($result, $request->uri);
 
         // Save SEO Data
         if ($result && $request->has('seo')) {
@@ -248,6 +258,9 @@ class PostTypeController extends Controller
         // $data->meta_keyword = $request->meta_keyword;
         // $data->meta_description = $request->meta_description;
         $data->save();
+
+        // Slug
+        $this->slugService->update($data, $request->uri);
 
         if ($request->has('seo')) {
             $seoData = $request->seo ?? [];

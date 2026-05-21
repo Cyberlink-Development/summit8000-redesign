@@ -9,10 +9,17 @@ use App\Models\Travels\ActivityModel;
 use Intervention\Image\Facades\Image;
 use App\Models\Destinations\DestinationModel;
 use App\Models\Destinations\DestinationActivityrelModel;
+use App\Services\Slug\SlugService;
 
 
 class DestinationController extends Controller
 {
+    protected $slugService;
+
+    public function __construct(SlugService $slugService)
+    {
+        $this->slugService = $slugService;
+    }
     /**
      * Display a listing of the resource.
      *
@@ -109,6 +116,9 @@ class DestinationController extends Controller
         $result->status = $request->status;
         $result->brief = $request->brief;
         $result->save();
+
+        // SLug Table
+        $this->slugService->store($result, $request->uri);
 
         // Seo
         if ($result && $request->has('seo')) {
@@ -260,10 +270,13 @@ class DestinationController extends Controller
         $data->video = $request->video;
         $data->status = $request->status;
         $data->save();
+        
+        // Slug
+        $this->slugService->update($data, $request->uri);
 
         if ($request->has('seo')) {
             $seoData = $request->seo ?? [];
-            
+
             $index = isset($seoData['index']) && $seoData['index'] == 1;
             $follow = isset($seoData['follow']) && $seoData['follow'] == 1;
 
