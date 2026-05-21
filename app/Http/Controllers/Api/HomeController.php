@@ -3,19 +3,19 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Services\Home\HeroService;
+use App\Services\Home\HomeService;
 use App\Traits\ApiResponse;
 
 class HomeController extends Controller
 {
     use ApiResponse;
 
-    public function index(HeroService $heroService)
+    public function index(HomeService $homeService)
     {
         try {
             return $this->successResponse([
                 'data' => [
-                    'hero' => $heroService->get(),
+                    'hero' => $homeService->get(),
                 ],
                 'meta' => (object)[]
             ], 'Home page fetched successfully');
