@@ -19,7 +19,7 @@ class BlogService
                 'hero' => $this->hero(),
                 'featured' => $this->featured($data),
                 'categories' => $this->categories($data),
-                'list'=> $this->articleListControls(),
+                'list' => $this->articleListControls(),
                 'items' => $this->items($data->posts()->latest()->paginate(10)),
                 'seo' => $this->seo($data),
 
@@ -117,63 +117,69 @@ class BlogService
             ->toArray();
     }
 
-    private function items($posts)
-    {
-        return collect($posts->items())->map(fn($post) => [
-            'uuid' => (string) $post->id,
+  private function items($posts)
+{
+    return collect($posts)->map(fn($post) => [
 
-            "href" => $post->uri,
+        'uuid' => (string) $post->id,
 
-            'title' => $post->post_title,
+        'href' => $post->uri,
 
-            'slug' => $post->uri,
+        'title' => $post->post_title,
 
-            'category' => $post->category ? $post->category->category : $post->post_title,
+        'slug' => $post->uri,
 
-            'excerpt' => $post->post_excerpt,
+        'category' => $post->category
+            ? $post->category->category
+            : $post->post_title,
 
-            'published_at' => $post->created_at?->toDateString(),
+        'excerpt' => $post->post_excerpt,
 
-            'reading_time' => $post->reading_time ?? '5 min read',
+        'published_at' => $post->created_at?->toDateString(),
 
-            'thumbnail' => [
-                'url' => $post->page_thumbnail ? asset('uploads/medium/' . $post->page_thumbnail) : asset('theme-assets/assets/trip/2.jpg'),
-                'alt' => $post->post_title,
-            ],
-        ]);
-    }
+        'reading_time' => $post->reading_time ?? '5 min read',
+
+        'thumbnail' => [
+            'url' => $post->page_thumbnail
+                ? asset('uploads/medium/' . $post->page_thumbnail)
+                : asset('theme-assets/assets/trip/2.jpg'),
+
+            'alt' => $post->post_title,
+        ],
+    ]);
+}
 
     private function articleListControls(): array
-{
-    return [
-        'title' => 'Latest Articles',
+    {
+        return [
+            'title' => 'Latest Articles',
 
-        'controls' => [
-            [
-                'type' => 'sort',
+            'controls' => [
+                [
+                    'type' => 'sort',
 
-                'default' => 'latest',
+                    'default' => 'latest',
 
-                'options' => [
-                    [
-                        'slug' => 'latest',
-                        'label' => 'Latest',
-                    ],
+                    'options' => [
+                        [
+                            'slug' => 'latest',
+                            'label' => 'Latest',
+                        ],
 
-                    [
-                        'slug' => 'popular',
-                        'label' => 'Popular',
-                    ],
+                        [
+                            'slug' => 'popular',
+                            'label' => 'Popular',
+                        ],
 
-                    [
-                        'slug' => 'beginner',
-                        'label' => 'Beginner',
+                        [
+                            'slug' => 'beginner',
+                            'label' => 'Beginner',
+                        ],
                     ],
                 ],
             ],
-        ],
-    ];
-}
+        ];
+    }
 
     private function seo($data)
     {
@@ -211,6 +217,20 @@ class BlogService
                 'url' => url('/blog'),
             ],
         ];
+    }
+
+    public function homeItems()
+    {
+        $data = PostTypeModel::query()
+            ->where('id', 33)
+            ->first();
+
+        return $this->items(
+            $data->posts()
+                ->latest()
+                ->take(3)
+                ->get()
+        );
     }
 
     // private function meta($posts)

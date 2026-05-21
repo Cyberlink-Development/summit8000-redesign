@@ -484,4 +484,78 @@ public function getWhySection(): array
     return $this->mapWhy($why);
 }
 
+public function getTestimonials(): array
+{
+    $reviews = TripReview::query()
+        ->latest()
+        ->take(3)
+        ->get();
+
+    return [
+
+        'caption' => 'Client Stories',
+
+        'title' => 'Words from the Summit',
+
+        'description' => 'Our greatest achievement is not the records we hold — it`s the stories our clients carry home from the highest places on Earth.',
+
+        'items' => collect($reviews)
+            ->map(function ($review, $index) {
+
+                return [
+
+                    'slug' => 't' . ($index + 1),
+
+                    'rating' => (float) ($review->rating ?? 5),
+
+                    'thumbnail' => [
+                        'url' => $review->image
+                            ? asset('uploads/reviews/' . $review->image)
+                            : '',
+
+                        'alt' => $review->full_name ?? '',
+                    ],
+
+                    'comment' => $review->message ?? '',
+
+                    'tag' => $review->trip_title ?? '',
+
+                    'name' => $review->full_name ?? '',
+
+                    'avatar' => strtoupper(
+                        substr($review->full_name ?? '', 0, 2)
+                    ),
+
+                    'achievement' => $review->title ?? '',
+                ];
+            })
+            ->values(),
+
+        // Optional
+        'certifications' => [
+            [
+                'slug' => 'certi-1',
+
+                'thumbnail' => [
+                    'url' => asset('/images/placeholder-logo.jpg'),
+                    'alt' => 'certificate-1',
+                ],
+
+                'title' => 'Nepal Mountaineering Association Licensed',
+            ],
+
+            [
+                'slug' => 'certi-2',
+
+                'thumbnail' => [
+                    'url' => asset('/images/placeholder-logo.jpg'),
+                    'alt' => 'certificate-2',
+                ],
+
+                'title' => 'UIAA Mountain Medicine Certified',
+            ],
+        ],
+    ];
+}
+
 }
