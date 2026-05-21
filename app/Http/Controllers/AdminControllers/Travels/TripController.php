@@ -478,6 +478,7 @@ class TripController extends Controller
     public function edit($id, $training = null)
     {
         $data = TripModel::with('seo')->find($id);
+        // dd($data);
         $checked_destinations = array();
         $checked_regions = array();
         $checked_activities = array();

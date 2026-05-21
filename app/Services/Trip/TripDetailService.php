@@ -5,11 +5,14 @@ namespace App\Services\Trip;
 use App\DTO\Trip\TripDetailDTO;
 use App\Models\Travels\TripModel;
 use Illuminate\Support\Collection;
+use App\Models\PageSlug;
 
 class TripDetailService
 {
     public function get($slug)
     {
+        $slugData = PageSlug::where('slug', $slug)->firstOrFail();
+
         $trip = TripModel::with([
             'activities',
             'itineraries',
@@ -20,19 +23,23 @@ class TripDetailService
             'relatedtrips',
             'schedules',
             'seo',
+            'relatedblogs',
+            'slugs',
         ])
-        ->where('uri', $slug)
-        ->where('status', '1')
-        ->firstOrFail();
+        ->where('id', $slugData->sluggable_id)
+        ->where('status', '1')->firstOrFail();
+
+        // dd($trip, $trip->seo->toArray());
 
         $relatedTrips = $this->resolveRelatedTrips($trip);
 
         return new TripDetailDTO(
+            slug:           $this->buildSlug($trip),
             hero:           $this->buildHero($trip),
             breadcrumb:     $this->buildBreadcrumb($trip),
             title:          $this->buildTitle($trip),
-            nav_items:      $this->buildNavItems($trip),
-            related_blogs:  $this->buildRelatedBlogs(),
+            nav_items:      $this->buildNavItems($trip,$relatedTrips),
+            related_blogs:  $this->buildRelatedBlogs($trip),
             booking_widget: $this->buildBookingWidget($trip),
             seo:            $this->buildSeo($trip),
         );
@@ -82,18 +89,25 @@ class TripDetailService
     // Top-level DTO Builders
     // ─────────────────────────────────────────────
 
+    private function buildSlug(TripModel $trip): ?string
+    {
+        return $trip->slugs()->first()?->slug;
+    }
+
     private function buildHero(TripModel $trip): array
     {
         return [
             'title'     => $trip->trip_title,
             'caption'   => $trip->caption,
             'sub_title' => $trip->sub_title,
-            'items'     => $this->col($trip->banners)->map(fn($item) => [
+            'items' => $this->col($trip->gears)->take(3)->map(fn($item) => [
                 'thumbnail' => [
-                    'url' => $item->thumbnail,
-                    'alt' => $item->thumbnail_alt,
+                    'url' => asset('uploads/original/' . $item->thumbnail),
+                    'alt' => $item->title,
                 ],
-                'caption' => $item->caption,
+
+                'caption' => $item->title,
+
             ])->values()->toArray(),
         ];
     }
@@ -128,33 +142,110 @@ class TripDetailService
     private function buildSeo(TripModel $trip): array
     {
         return [
-            'meta_title'       => $trip->seo?->meta_title       ?? $trip->trip_title,
-            'meta_description' => $trip->seo?->meta_description ?? null,
-            'og_title'         => $trip->seo?->og_title         ?? null,
-            'og_description'   => $trip->seo?->og_description   ?? null,
-            'og_image'         => $trip->seo?->og_image         ?? null,
-            'canonical_url'    => $trip->seo?->canonical_url    ?? null,
-            'robots'           => $trip->seo?->robots           ?? 'index, follow',
-            'schema'           => $trip->seo?->schema           ?? null,
-            'sitemap'          => [
-                'include'          => true,
-                'priority'         => 0.9,
-                'change_frequency' => 'monthly',
+
+            'meta_title' => $trip->seo?->meta_title
+                ?? $trip->trip_title,
+
+            'meta_description' => $trip->seo?->meta_description
+                ?? null,
+
+            'og_title' => $trip->seo?->og_title
+                ?? $trip->trip_title,
+
+            'og_description' => $trip->seo?->og_description
+                ?? null,
+
+            'og_image' => $trip->seo?->og_image
+                ? asset(
+                    'uploads/original/' .
+                    $trip->seo->og_image
+                )
+                : null,
+
+            'canonical_url' => $trip->seo?->canonical_url
+                ?? url('/' . $trip->uri),
+
+            'robots' => $trip->seo?->robots
+                ?? 'index,follow',
+
+            'robots_txt_extras' => null,
+
+            'schema' => $trip->seo?->schema_data ?? null,
+
+            'sitemap' => [
+
+                'include' => (bool) (
+                    $trip->seo?->in_sitemap ?? true
+                ),
+
+                'priority' => (float) (
+                    $trip->seo?->sitemap_priority ?? 0.9
+                ),
+
+                'change_frequency' => $trip->seo?->change_frequency
+                    ?? 'monthly',
             ],
         ];
     }
 
-    private function buildRelatedBlogs(): array
+    private function buildRelatedBlogs(TripModel $trip): array
     {
-        // Placeholder — wire up BlogModel queries when ready
         return [
+
             'title' => 'Related Blogs',
-            'cta'   => [
-                'href'  => '/blog',
+
+            'cta' => [
+                'href' => '/blog',
+
                 'label' => 'View all articles',
-                'type'  => 'internal',
+
+                'type' => 'internal',
             ],
-            'items' => [],
+
+            'items' => $this->col($trip->relatedblogs)
+
+                ->take(3)
+
+                ->map(fn($item) => [
+
+                    'thumbnail' => [
+                        'url' => $item->page_thumbnail
+                            ? asset(
+                                'uploads/original/' .
+                                $item->page_thumbnail
+                            )
+                            : null,
+
+                        'alt' => $item->post_title,
+                    ],
+
+                    'published_at' => optional(
+                        $item->post_date
+                    )
+                        ? \Carbon\Carbon::parse(
+                            $item->post_date
+                        )->format('Y-m-d')
+                        : null,
+
+                    'title' => $item->post_title,
+
+                    'excerpt' => strip_tags(
+                        $item->post_excerpt
+                    ),
+
+                    'cta' => [
+                        'href' => '/' . $item->uri,
+
+                        'label' => 'Read More',
+
+                        'type' => 'internal',
+                    ],
+
+                ])
+
+                ->values()
+
+                ->toArray(),
         ];
     }
 
@@ -162,7 +253,7 @@ class TripDetailService
     // nav_items (the big nested section)
     // ─────────────────────────────────────────────
 
-    private function buildNavItems(TripModel $trip): array
+    private function buildNavItems(TripModel $trip, Collection $relatedTrips): array
     {
         return [
             'overview'           => $trip->trip_excerpt,
@@ -180,7 +271,7 @@ class TripDetailService
             'reviews'            => $this->buildReviews($trip),
             'availability'       => $this->buildAvailability($trip),
             'info_accordion'     => $this->buildInfoAccordion($trip),
-            'comparison'         => $this->buildComparison($trip),
+            'comparison'         => $this->buildComparison($trip,$relatedTrips),
             'faq'                => $this->buildFaq($trip),
         ];
     }
@@ -191,19 +282,18 @@ class TripDetailService
 
     private function buildTripFacts(TripModel $trip): array
     {
-        $destinations = $this->col($trip->destinations);
-        $activities   = $this->col($trip->activities);
+        $destinations = trip_destination_title($trip->id);
 
         return [
             'items' => [
                 ['label' => 'Duration',        'value' => $trip->duration  ? $trip->duration . ' Days' : null],
-                ['label' => 'Trip Grade',       'value' => $trip->trip_grade],
-                ['label' => 'Country',          'value' => $trip->country],
+                ['label' => 'Trip Grade',       'value' => grade_message_trek($trip->trip_grade)],
+                ['label' => 'Country',          'value' => $destinations],
                 ['label' => 'Maximum Altitude', 'value' => $trip->max_altitude],
                 ['label' => 'Group Size',       'value' => $trip->group_size],
-                ['label' => 'Starts',           'value' => optional($destinations->first())->title],
-                ['label' => 'Ends',             'value' => optional($destinations->last())->title],
-                ['label' => 'Activities',       'value' => $activities->pluck('title')->implode(' / ') ?: null],
+                ['label' => 'Starts',           'value' => $trip->route],
+                ['label' => 'Ends',             'value' => ''],
+                ['label' => 'Activities',       'value' => $trip->walking_per_day ],
                 ['label' => 'Best Time',        'value' => $trip->best_season],
             ],
         ];
@@ -213,8 +303,8 @@ class TripDetailService
     {
         return [
             'title'       => 'Highlights',
-            'items'       => $this->col($trip->highlights)->pluck('title')->toArray(),
-            'description' => $trip->trip_excerpt,
+            'items'       => [],
+            'description' => $trip->trip_content,
             'extra'       => $this->col($trip->highlight_extras)->map(fn($item) => [
                 'heading' => $item->heading,
                 'body'    => $item->body,
@@ -248,26 +338,47 @@ class TripDetailService
 
     private function buildGallery(TripModel $trip): array
     {
-        $gallery = $this->col($trip->gallery);
+        $gallery = $this->col($trip->gears);
 
         return [
             'title' => 'Photo Gallery',
-            'items' => $gallery->map(fn($item) => [
-                'slug'      => 'gallery-' . $item->id,
-                'thumbnail' => [
-                    'url' => $item->thumbnail,
-                    'alt' => $item->caption,
-                ],
-                'caption' => $item->caption,
-            ])->values()->toArray(),
-            'video' => $gallery->filter(fn($item) => !empty($item->video_url))->map(fn($item) => [
-                'slug'      => 'gallery-video-' . $item->id,
-                'thumbnail' => [
-                    'url' => $item->thumbnail,
-                    'alt' => $item->caption,
-                ],
-                'video_url' => $item->video_url,
-            ])->values()->toArray(),
+
+            'items' => $gallery
+                ->skip(3)
+                ->map(fn($item) => [
+
+                    'slug' => 'gallery-' . $item->id,
+
+                    'thumbnail' => [
+                        'url' => asset(
+                            'uploads/original/' . $item->thumbnail
+                        ),
+
+                        'alt' => $item->title,
+                    ],
+
+                    'caption' => $item->title,
+
+                ])->values()->toArray(),
+
+            'video' => $gallery
+                ->filter(fn($item) => !empty($item->video))
+                ->take(1)
+                ->map(fn($item) => [
+
+                    'slug' => 'gallery-video-' . $item->id,
+
+                    'thumbnail' => [
+                        'url' => asset(
+                            'uploads/original/' . $item->thumbnail
+                        ),
+
+                        'alt' => $item->title,
+                    ],
+
+                    'video_url' => $item->video,
+
+                ])->values()->toArray(),
         ];
     }
 
@@ -310,24 +421,57 @@ class TripDetailService
 
     private function buildDetailedItinerary(TripModel $trip): array
     {
-        $destinations = $this->col($trip->destinations);
+        $destination = trip_destination_title($trip->id);
 
         return [
-            'title'  => 'Day-by-Day Itinerary',
-            'starts' => optional($destinations->first())->title,
-            'ends'   => optional($destinations->last())->title,
-            'items'  => $this->col($trip->itineraries)->map(fn($item) => [
-                'slug'        => 'detail-day-' . $item->id,
-                'day'         => $item->days,
-                'title'       => $item->title,
-                'description' => $item->content,
-                'info'        => [
-                    ['label' => 'Max Alt',   'value' => $item->max_altitude],
-                    ['label' => 'Meals',     'value' => $item->meals],
-                    ['label' => 'Stay',      'value' => $item->accommodation],
-                    ['label' => 'Transport', 'value' => $item->transportation],
-                ],
-            ])->values()->toArray(),
+
+            'title' => 'Day-by-Day Itinerary',
+
+            'starts' => $destination,
+
+            'ends' => $destination,
+
+            'items' => $this->col($trip->itineraries)
+                ->map(fn($item) => [
+
+                    'slug' => 'detail-day-' . $item->id,
+
+                    'day' => 'Day ' . str_pad($item->days, 2, '0', STR_PAD_LEFT),
+
+                    'title' => $item->title,
+
+                    'description' => strip_tags($item->content),
+
+                    'info' => array_values(array_filter([
+
+                        [
+                            'label' => 'Max Alt',
+                            'value' => $item->max_altitude,
+                        ],
+
+                        [
+                            'label' => 'Meals',
+                            'value' => $item->meals,
+                        ],
+
+                        [
+                            'label' => 'Stay',
+                            'value' => $item->max_altitude,
+                        ],
+
+                        [
+                            'label' => 'Duration',
+                            'value' => $item->duration,
+                        ],
+
+                        [
+                            'label' => 'Transport',
+                            'value' => $item->distance,
+                        ],
+
+                    ], fn($info) => !empty($info['value']))),
+
+                ])->values()->toArray(),
         ];
     }
 
@@ -357,18 +501,25 @@ class TripDetailService
     private function buildRouteMap(TripModel $trip): array
     {
         return [
-            'title'       => 'Route Map & Elevation',
-            'description' => 'A visual guide to your journey.',
-            'thumbnail'   => [
-                'url' => $trip->route_map,
-                'alt' => $trip->trip_title . ' Route Map',
+
+            'title' => 'Route Map & Elevation',
+
+            'description' => 'A visual guide to your journey through the legendary Khumbu region.',
+
+            'thumbnail' => [
+                'url' => $trip->route_map
+                    ? asset('uploads/original/' . $trip->route_map)
+                    : null,
+
+                'alt' => $trip->tripmap_alt
+                    ?: $trip->trip_title . ' Route Map',
             ],
+
             'altitude_chart' => [
-                'title'     => $trip->trip_title . ' — Elevation Progression',
-                'thumbnail' => [
-                    'url' => $trip->elevation_chart,
-                    'alt' => $trip->trip_title . ' Elevation Chart',
-                ],
+
+                'title' => '',
+
+                'thumbnail' => [],
             ],
         ];
     }
@@ -432,27 +583,57 @@ class TripDetailService
         $schedules = $this->col($trip->schedules);
 
         return [
-            'title'     => 'Dates & Availability',
+
+            'title' => 'Dates & Availability',
+
             'sub_title' => 'Select Departure Dates',
-            'months'    => $schedules->isNotEmpty()
+
+            'months' => $schedules->isNotEmpty()
+
                 ? $schedules
-                    ->groupBy(fn($item) => \Carbon\Carbon::parse($item->start_date)->format('M Y'))
+
+                    ->groupBy(fn($item) =>
+                        \Carbon\Carbon::parse($item->start_date)
+                            ->format('M Y')
+                    )
+
                     ->map(fn($dates, $monthLabel) => [
+
                         'label' => $monthLabel,
+
                         'dates' => $dates->map(fn($item) => [
-                            'slug'          => 'avail-date-' . $item->id,
-                            'start_date'    => \Carbon\Carbon::parse($item->start_date)->format('d M, Y'),
-                            'end_date'      => \Carbon\Carbon::parse($item->end_date)->format('d M, Y'),
-                            'status'        => $item->status,
-                            'current_price' => 'US$' . number_format((float) $item->price),
-                            'old_price'     => 'US$' . number_format((float) $item->old_price),
-                            'cta'           => [
-                                'href'  => '/book',
+
+                            'slug' => 'avail-date-' . $item->id,
+
+                            'start_date' => \Carbon\Carbon::parse(
+                                $item->start_date
+                            )->format('d M, Y'),
+
+                            'end_date' => \Carbon\Carbon::parse(
+                                $item->end_date
+                            )->format('d M, Y'),
+
+                            'status' => $item->availability
+                                ?: 'Available',
+
+                            'current_price' => $item->price
+                                ? 'US$' . number_format((float) $item->price)
+                                : null,
+
+                            'old_price' => null,
+
+                            'cta' => [
+                                'href' => '/book',
+
                                 'label' => 'Book',
-                                'type'  => 'internal',
+
+                                'type' => 'internal',
                             ],
+
                         ])->values()->toArray(),
+
                     ])->values()->toArray()
+
                 : [],
         ];
     }
@@ -472,37 +653,111 @@ class TripDetailService
         ];
     }
 
-    private function buildComparison(TripModel $trip): array
-    {
-        return [
-            'caption' => 'Trek Comparison',
-            'title'   => 'How ' . $trip->trip_title . ' Compares',
-            'items'   => $this->col($trip->comparisons)->map(fn($item) => [
-                'label'         => $item->label,
-                'duration'      => $item->duration,
-                'max_altitude'  => $item->max_altitude,
-                'difficulty'    => $item->difficulty,
-                'price_from'    => '$' . number_format((float) $item->price_from),
-                'iconic_factor' => $item->iconic_factor,
-                'cta'           => [
-                    'type'  => $item->cta_type,
-                    'label' => $item->cta_label,
-                    'href'  => $item->cta_href,
+    private function buildComparison(
+        TripModel $trip,
+        Collection $relatedTrips
+    ): array {
+
+        $items = [];
+
+        // Current Trip
+        $items[] = [
+
+            'label' => $trip->trip_title . ' ★ You Are Here',
+
+            'duration' => $trip->duration
+                ? $trip->duration . ' Days'
+                : null,
+
+            'max_altitude' => $trip->max_altitude,
+
+            'difficulty' => grade_message_trek(
+                $trip->trip_grade
+            ),
+
+            'price_from' => $trip->price
+                ? '$' . number_format((float) $trip->price)
+                : null,
+
+            'iconic_factor' => '5/5',
+
+            'cta' => [
+                'type' => 'internal',
+
+                'label' => '—',
+
+                'href' => '#',
+            ],
+        ];
+
+        // Related Trips
+        foreach ($relatedTrips->take(2) as $item) {
+
+            $items[] = [
+
+                'label' => $item->trip_title,
+
+                'duration' => $item->duration
+                    ? $item->duration . ' Days'
+                    : null,
+
+                'max_altitude' => $item->max_altitude,
+
+                'difficulty' => grade_message_trek(
+                    $item->trip_grade
+                ),
+
+                'price_from' => $item->price
+                    ? '$' . number_format((float) $item->price)
+                    : null,
+
+                'iconic_factor' => '5/5',
+
+                'cta' => [
+                    'type' => 'link',
+
+                    'label' => 'View Details',
+
+                    'href' => '/' . optional(
+                        $item->slugs()->first()
+                    )->slug,
                 ],
-            ])->values()->toArray(),
+            ];
+        }
+
+        return [
+
+            'caption' => 'Trek Comparison',
+
+            'title' => 'How ' . $trip->trip_title . ' Compares',
+
+            'items' => $items,
         ];
     }
 
     private function buildFaq(TripModel $trip): array
     {
         return [
+
             'caption' => 'Common Questions',
-            'title'   => 'Frequently Asked Questions',
-            'items'   => $this->col($trip->faqs)->map(fn($faq) => [
-                'slug'        => 'faq-' . $faq->id,
-                'title'       => $faq->question,
-                'description' => $faq->answer,
-            ])->values()->toArray(),
+
+            'title' => 'Frequently Asked Questions',
+
+            'items' => $this->col($trip->faqs)
+
+                ->map(fn($faq) => [
+
+                    'slug' => 'faq-' . $faq->id,
+
+                    'title' => $faq->title,
+
+                    'description' => strip_tags($faq->content),
+
+                ])
+
+                ->values()
+
+                ->toArray(),
         ];
     }
 

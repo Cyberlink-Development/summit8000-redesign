@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Api\SettingsController;
 use App\Http\Controllers\Api\AboutController;
 use App\Http\Controllers\Api\TripController;
+use App\Http\Controllers\Api\SlugResolverController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,3 +31,4 @@ Route::get('/about', [AboutController::class, 'index']);
 Route::get('/trip/{slug}', [TripController::class, 'detail']);
 Route::get('/trips/{parent}', [TripController::class, 'index']);
 Route::get('/trip-category/{slug}', [TripController::class, 'category']);
+Route::get('/resolve/{slug}', [SlugResolverController::class, 'resolve']);

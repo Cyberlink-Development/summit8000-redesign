@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use Intervention\Image\Facades\Image;
 use App\Models\Posts\PostCategoryModel;
 use App\Services\Slug\SlugService;
+use App\Models\Travels\ActivityModel;
 
 class PostController extends Controller
 {
@@ -66,6 +67,16 @@ class PostController extends Controller
      */
     public function create()
     {
+        $category = ActivityModel::with([
+            'trips:id,trip_title'
+        ])->where('activity_parent', '!=', 'package')->get();
+
+        $alltrips = $category->flatMap(function ($cat) {
+            return $cat->trips;
+        })->sortByDesc('ordering')->values();
+
+        // dd($alltrips,$category);
+
         // List Template
         $fileList = scandir(resource_path('views/themes/default/'));
         $filterArray = $this->filter_template($fileList);
@@ -103,7 +114,8 @@ class PostController extends Controller
         $ord = PostModel::max('post_order');
         $post_order = $ord + 1;
         $category = PostCategoryModel::where('post_type', $posttype_id)->get();
-        return view('admin.posts.create', compact('category', 'parent_post', 'templates', 'templates_child', 'post_order'));
+
+        return view('admin.posts.create', compact('category', 'parent_post', 'templates', 'templates_child', 'post_order','alltrips'));
     }
 
     /**
@@ -262,6 +274,14 @@ class PostController extends Controller
      */
     public function edit(PostModel $postModel, $posttype, $id)
     {
+        $category = ActivityModel::with([
+            'trips:id,trip_title'
+        ])->where('activity_parent', '!=', 'package')->get();
+
+        $alltrips = $category->flatMap(function ($cat) {
+            return $cat->trips;
+        })->sortByDesc('ordering')->values();
+
         $fileList = scandir(resource_path('views/themes/default/'));
         $filterArray = $this->filter_template($fileList);
 
@@ -296,7 +316,8 @@ class PostController extends Controller
         $parent_post = PostModel::where(['post_type' => $posttype_id, 'post_parent' => 0])->get();
         $category = PostCategoryModel::where('post_type', $posttype_id)->get();
         $data = PostModel::with('seo')->find($id);
-        return view('admin.posts.edit', compact('data', 'parent_post', 'templates', 'templates_child', 'category'));
+
+        return view('admin.posts.edit', compact('data', 'parent_post', 'templates', 'templates_child', 'category','alltrips'));
     }
 
     /**
@@ -405,6 +426,7 @@ class PostController extends Controller
         $data->external_link = $request->external_link;
         $data->page_video = $request->page_video;
         $data->post_tags = $request->post_tags;
+        $data->trip = $request->trip;
         $isChecked = $request->has('show_in_home');
         $data->show_in_home = ($isChecked) ? '1' : '0';
         $data['uri'] = Str::slug($request->uri);

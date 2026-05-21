@@ -54,11 +54,27 @@
                             </div>
                         </div>
 
-                            <div class="form-group">
-                                <label for="inputStandard" class="col-lg-2 control-label">Reading Time</label>
+                        <div class="form-group">
+                            <label for="inputStandard" class="col-lg-2 control-label">Reading Time</label>
                             <div class="col-lg-9">
                                 <div class="bs-component">
                                     <input type="text" id="" name="reading_time" class="form-control" placeholder="" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputStandard" class="col-lg-2 control-label">Choose Trip</label>
+
+                            <div class="col-lg-9">
+                                <div class="bs-component">
+                                    <select name="trip" class="form-control">
+                                        <option value="" selected hidden>Choose Trip </option>
+                                        @foreach ($alltrips as $trips)
+                                            <option value="{{ $trips->id }}">{{ ucfirst($trips->trip_title) }}</option>
+                                        @endforeach
+                                    </select>
+                                    <div id="source-button" class="btn btn-primary btn-xs" style="display: none;">&lt; &gt;
+                                    </div>
                                 </div>
                             </div>
                         </div>
