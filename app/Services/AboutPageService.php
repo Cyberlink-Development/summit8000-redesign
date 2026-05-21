@@ -450,5 +450,38 @@ class AboutPageService
         ];
     }
 
+    public function getStorySection(): array
+{
+    $about = PostTypeModel::where('id', 22)->first();
+
+    if (!$about) {
+        return [];
+    }
+
+    $story = PostModel::with('images')
+        ->where('post_type', $about->id)
+        ->where('about_type', 'story')
+        ->where('status', 1)
+        ->first();
+
+    return $this->mapStory($story);
+}
+
+public function getWhySection(): array
+{
+    $about = PostTypeModel::where('id', 22)->first();
+
+    if (!$about) {
+        return [];
+    }
+
+    $why = PostModel::with('associated_posts')
+        ->where('post_type', $about->id)
+        ->where('about_type', 'why')
+        ->where('status', 1)
+        ->first();
+
+    return $this->mapWhy($why);
+}
 
 }
