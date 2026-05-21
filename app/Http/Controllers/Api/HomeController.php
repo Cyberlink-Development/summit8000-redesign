@@ -21,9 +21,11 @@ class HomeController extends Controller
             ], 'Home page fetched successfully');
 
         } catch (\Throwable $e) {
-            \Log::error('Home API Error: ' . $e->getMessage());
 
-            return $this->errorResponse();
+            return $this->errorResponse(
+                $e->getMessage(),
+                500
+            );
         }
     }
 

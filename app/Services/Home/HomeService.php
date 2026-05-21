@@ -6,12 +6,14 @@ use App\Models\Banners\BannerModel;
 use App\Models\Travels\ActivityModel;
 use App\Models\Travels\TripModel;
 use App\Services\AboutPageService;
+use App\Services\Blog\BlogService;
 
 class HomeService
 {
 
    public function __construct(
-        protected AboutPageService $aboutPageService
+        protected AboutPageService $aboutPageService,
+        protected BlogService $blogService
     ) {}
     public function get(): array
     {
@@ -288,47 +290,7 @@ class HomeService
 
     private function testimonials(): array
     {
-        return [
-            'caption' => 'Trusted by Climbers Worldwide',
-
-            'title' => 'Words from the Summit',
-
-            'description' => 'Our greatest achievement is not the records we hold — it\'s the stories our clients carry home from the highest places on Earth.',
-
-            'items' => [
-                [
-                    'slug' => 'testimonial-1',
-
-                    'rating' => 5,
-
-                    'thumbnail' => [
-                        'url' => asset('/images/placeholder-avatar.jpg'),
-                        'alt' => 'james-whitfield',
-                    ],
-
-                    'comment' => 'Summit 8000 didn\'t just get me to the top of Everest — they brought me home safely.',
-
-                    'name' => 'Marcus Kühn',
-
-                    'avatar' => 'MK',
-
-                    'tag' => 'Everest South Col · 2024',
-                ],
-            ],
-
-            'certifications' => [
-                [
-                    'slug' => 'certi-1',
-
-                    'thumbnail' => [
-                        'url' => asset('/images/placeholder-logo.jpg'),
-                        'alt' => 'certificate-1',
-                    ],
-
-                    'title' => 'Nepal Mountaineering Association Licensed',
-                ],
-            ],
-        ];
+        return $this->aboutPageService->getTestimonials();
     }
 
     /*
@@ -432,9 +394,10 @@ class HomeService
     |--------------------------------------------------------------------------
     */
 
-    private function blog(): array
+     private function blog(): array
     {
         return [
+
             'caption' => 'Inspiration & Knowledge',
 
             'title' => 'From the Field',
@@ -445,28 +408,8 @@ class HomeService
                 'type' => 'internal',
             ],
 
-            'items' => [
-                [
-                    'slug' => 'blog-1',
-
-                    'category' => 'High Altitude Tips',
-
-                    'title' => 'The Truth About Acclimatization',
-
-                    'author' => 'By Ang Dorji Sherpa · 12 min read · March 2025',
-
-                    'href' => '/blog/acclimatization-guide',
-
-                    'published_at' => '2026-03-28',
-
-                    'reading_time' => '6 min read',
-
-                    'thumbnail' => [
-                        'url' => asset('/images/placeholder-thumbnail.webp'),
-                        'alt' => 'blog 1',
-                    ],
-                ],
-            ],
+            // 👇 pulling reusable items from BlogPageService
+            'items' => $this->blogService->homeItems(),
         ];
     }
 
