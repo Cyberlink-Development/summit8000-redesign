@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Trip;
+namespace app\Services\Trip;
 
 use App\DTO\Trip\TripListDTO;
 use App\Models\Travels\ActivityModel;

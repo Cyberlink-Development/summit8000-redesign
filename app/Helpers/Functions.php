@@ -552,3 +552,19 @@ function is_empty_teamcategory($id){
   }
 
 //By Sangam Ends
+
+
+if (! function_exists('slug_formatter')) {
+    function slug_formatter(string $value): string
+    {
+        $value = trim($value);
+        $value = trim($value, '/');
+        $value = str_replace('/', '-', $value);
+        $value = preg_replace('/\s+/', '-', $value);
+        $value = preg_replace('/[^a-zA-Z0-9\-]/', '', $value);
+        $value = preg_replace('/-+/', '-', $value);
+
+        return strtolower($value);
+    }
+    //input=> /exp/ever/trek , output => exp-ever-trek
+}
