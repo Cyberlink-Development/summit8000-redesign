@@ -21,8 +21,8 @@ trait ApiResponse
 
     protected function errorResponse(
         ?string $message = null,
-        $errors = null,
-        int $code = Response::HTTP_BAD_REQUEST
+        int $code = Response::HTTP_BAD_REQUEST,
+        $errors = null
     ): JsonResponse {
         return response()->json([
             'success' => false,
