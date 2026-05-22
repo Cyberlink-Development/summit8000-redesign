@@ -249,6 +249,7 @@ class PostTypeController extends Controller
         }
         $data->post_type = $request->post_type;
         $data->template = $request->template;
+        $data->api_template = $request->api_template;
         $data->uri = Str::slug($request->uri);
         $data->ordering = $request->ordering;
         $data->is_menu = $request->is_menu;

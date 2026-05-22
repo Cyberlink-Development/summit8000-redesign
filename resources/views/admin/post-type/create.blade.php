@@ -125,12 +125,25 @@
                     <div class="clearfix"></div>
                 </div>
 
-                <div class="sid_bvijay mb10">
+                <!-- <div class="sid_bvijay mb10">
                     <label class="field select">
                         <select id="template" name="template">
                             @foreach($templates as $key => $template)
                                 <option value="{{$key}}">{{ ucfirst($template) }}</option>
                             @endforeach
+                        </select>
+                        <i class="arrow"></i>
+                    </label>
+                </div> -->
+
+                <div class="sid_bvijay mb10">
+                    <h4> Choose Template </h4>
+                    <label class="field select">
+                        <select id="api_template" name="api_template" required>
+                            <option value="" selected hidden>Select Template</option>
+                            <option value="blog">Blog</option>
+                            <option value="about">About</option>
+                            <option value="gallery">Gallery</option>
                         </select>
                         <i class="arrow"></i>
                     </label>
