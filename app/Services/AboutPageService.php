@@ -17,14 +17,14 @@ class AboutPageService
     public function getPageData(): AboutPageDTO
     {
         $about = PostTypeModel::with('posts','seo')
-            ->where('id', '22')
+            ->where('api_template', 'about')
             ->first();
 
         $settings = SettingModel::select(
             'text1_title', 'text1_sub_title', 'text2_title', 'text2_sub_title', 'text3_title', 'text3_sub_title','text4_title', 'text4_sub_title','text5_title', 'text5_sub_title','address','phone','usa_phone','email_primary'
         )->first();
 
-        // dd($about,$review);
+        // dd($about);
 
         if (!$about) {
             return new AboutPageDTO();
@@ -45,6 +45,7 @@ class AboutPageService
         */
 
         return new AboutPageDTO(
+            template: $about->api_template,
 
             hero: $this->mapHero($about),
 

@@ -5,6 +5,7 @@ namespace App\DTO\About;
 class AboutPageDTO
 {
     public function __construct(
+        public string $template = '',
         public array $hero = [],
         public array $stats = [],
         public array $story = [],
@@ -20,6 +21,7 @@ class AboutPageDTO
     public function toArray(): array
     {
         return [
+            'template' => $this->template,
             'hero' => $this->hero,
             'stats' => $this->stats,
             'story' => $this->story,

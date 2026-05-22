@@ -11,7 +11,7 @@ class TripDetailService
 {
     public function get($slug)
     {
-        $slugData = PageSlug::where('slug', $slug)->firstOrFail();
+        $slugData = PageSlug::where('slug', '/' . ltrim($slug, '/'))->firstOrFail();
 
         $trip = TripModel::with([
             'activities',
@@ -34,6 +34,7 @@ class TripDetailService
         $relatedTrips = $this->resolveRelatedTrips($trip);
 
         return new TripDetailDTO(
+            template:       'trip-detail',
             slug:           $this->buildSlug($trip),
             hero:           $this->buildHero($trip),
             breadcrumb:     $this->buildBreadcrumb($trip),

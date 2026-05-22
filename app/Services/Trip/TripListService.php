@@ -35,6 +35,7 @@ class TripListService
 
         // dd($activities);
         return new TripListDTO(
+            template: "trip-list",
             hero: [],
             items: $activities->toArray(),
             seo: [],
@@ -67,6 +68,7 @@ class TripListService
             ->first();
 
         return new TripListDTO(
+            template: "trip-list",
 
             hero: [
                 'id' => $activity->id,

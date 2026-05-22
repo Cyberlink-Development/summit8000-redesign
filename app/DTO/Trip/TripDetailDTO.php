@@ -5,6 +5,7 @@ namespace App\DTO\Trip;
 class TripDetailDTO
 {
     public function __construct(
+        public string $template      = '',
         public ?string $slug         = null,
         public array $hero           = [],
         public array $breadcrumb     = [],
@@ -18,6 +19,7 @@ class TripDetailDTO
     public function toArray(): array
     {
         return [
+            'template'       => $this->template,
             'slug'           => $this->slug,
             'hero'           => $this->hero,
             'breadcrumb'     => $this->breadcrumb,
