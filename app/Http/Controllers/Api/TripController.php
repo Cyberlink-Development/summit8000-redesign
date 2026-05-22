@@ -11,45 +11,84 @@ class TripController extends Controller
     public function index($parent, TripListService $service)
     {
         try {
-            $data = $service->get($parent);
+            $page = (int) request()->get('page', 1);
+            $data = $service->get($parent, $page);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Trips fetched successfully',
-                'data' => [
-                    'data' => $data->toArray(),
+                'data'    => [
+                    'data'  => $data->toArray(),
+                    'meta'  => $data->meta,
+                    'links' => $data->links,
                 ],
-                'meta' => [],
             ]);
         } catch (\Throwable $e) {
-
-            return $this->errorResponse(
-                $e->getMessage(),
-                500
-            );
+            return $this->errorResponse($e->getMessage(), 500);
         }
     }
+
     public function category($slug, TripListService $service)
     {
         try {
-            $data = $service->category($slug);
+            $page = (int) request()->get('page', 1);
+            $data = $service->category($slug, $page);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Trips fetched successfully',
-                'data' => [
-                    'data' =>  $data->toArray(),
+                'data'    => [
+                    'data'  => $data->toArray(),
+                    'meta'  => $data->meta,
+                    'links' => $data->links,
                 ],
-                'meta' => [],
             ]);
         } catch (\Throwable $e) {
-
-            return $this->errorResponse(
-                $e->getMessage(),
-                500
-            );
+            return $this->errorResponse($e->getMessage(), 500);
         }
     }
+    // public function index($parent, TripListService $service)
+    // {
+    //     try {
+    //         $data = $service->get($parent);
+
+    //         return response()->json([
+    //             'success' => true,
+    //             'message' => 'Trips fetched successfully',
+    //             'data' => [
+    //                 'data' => $data->toArray(),
+    //             ],
+    //             'meta' => [],
+    //         ]);
+    //     } catch (\Throwable $e) {
+
+    //         return $this->errorResponse(
+    //             $e->getMessage(),
+    //             500
+    //         );
+    //     }
+    // }
+    // public function category($slug, TripListService $service)
+    // {
+    //     try {
+    //         $data = $service->category($slug);
+
+    //         return response()->json([
+    //             'success' => true,
+    //             'message' => 'Trips fetched successfully',
+    //             'data' => [
+    //                 'data' =>  $data->toArray(),
+    //             ],
+    //             'meta' => [],
+    //         ]);
+    //     } catch (\Throwable $e) {
+
+    //         return $this->errorResponse(
+    //             $e->getMessage(),
+    //             500
+    //         );
+    //     }
+    // }
     public function detail($slug, TripDetailService $service)
     {
         try {
