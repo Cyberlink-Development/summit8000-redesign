@@ -15,39 +15,41 @@ class HomeService
         protected AboutPageService $aboutPageService,
         protected BlogService $blogService
     ) {}
-    public function get(): array
-    {
-        return [
-            'success' => true,
+  public function get(): array
+{
+    return [
 
-            'message' => 'Home page fetched successfully',
+        'success' => true,
+
+        'message' => 'Home page fetched successfully',
+
+        'data' => [
 
             'data' => [
-                'data' => [
 
-                    'hero' => $this->hero(),
+                'hero' => $this->hero(),
 
-                    'story' => $this->story(),
+                'story' => $this->story(),
 
-                    'categories' => $this->categories(),
+                'categories' => $this->categories(),
 
-                    'featured' => $this->featured(),
+                'featured' => $this->featured(),
 
-                    'testimonials' => $this->testimonials(),
+                'testimonials' => $this->testimonials(),
 
-                    'why' => $this->why(),
+                'why' => $this->why(),
 
-                    'packages' => $this->packages(),
+                'packages' => $this->packages(),
 
-                    'gallery' => $this->gallery(),
+                'gallery' => $this->gallery(),
 
-                    'blog' => $this->blog(),
-                ],
-
-                'meta' => [],
+                'blog' => $this->blog(),
             ],
-        ];
-    }
+
+            'meta' => [],
+        ],
+    ];
+}
 
     /*
     |--------------------------------------------------------------------------

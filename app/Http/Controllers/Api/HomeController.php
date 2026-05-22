@@ -14,9 +14,7 @@ class HomeController extends Controller
     {
         try {
             return $this->successResponse([
-                'data' => [
                     'hero' => $homeService->get(),
-                ],
                 'meta' => (object)[]
             ], 'Home page fetched successfully');
 
