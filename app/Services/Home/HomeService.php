@@ -19,35 +19,23 @@ class HomeService
 {
     return [
 
-        'success' => true,
+            'hero' => $this->hero(),
 
-        'message' => 'Home page fetched successfully',
+            'story' => $this->story(),
 
-        'data' => [
+            'categories' => $this->categories(),
 
-            'data' => [
+            'featured' => $this->featured(),
 
-                'hero' => $this->hero(),
+            'testimonials' => $this->testimonials(),
 
-                'story' => $this->story(),
+            'why' => $this->why(),
 
-                'categories' => $this->categories(),
+            'packages' => $this->packages(),
 
-                'featured' => $this->featured(),
+            'gallery' => $this->gallery(),
 
-                'testimonials' => $this->testimonials(),
-
-                'why' => $this->why(),
-
-                'packages' => $this->packages(),
-
-                'gallery' => $this->gallery(),
-
-                'blog' => $this->blog(),
-            ],
-
-            'meta' => [],
-        ],
+            'blog' => $this->blog(),
     ];
 }
 
@@ -70,7 +58,7 @@ class HomeService
 
         return [
             'banner' => [
-                'url' => asset($banner->picture),
+                'url' => asset('uploads/banners/'.$banner->picture),
                 'alt' => $banner->picture_alt ?? $banner->title,
             ],
 

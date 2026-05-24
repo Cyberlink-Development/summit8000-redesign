@@ -70,7 +70,7 @@ class SlugResolverController extends Controller
             return $this->errorResponse(
                 'Failed to fetch data',
                 500,
-                ['error' => config('app.debug') ? $e->getMessage() : trans('common.internal-server-error')],
+                ['error' => config('app.debug') ? $e->getMessage() : 'Internal server error'],
             );
         }
     }

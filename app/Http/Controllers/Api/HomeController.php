@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Services\Home\HomeService;
 use App\Traits\ApiResponse;
+use Illuminate\Support\Facades\Log;
+use Exception;
 
 class HomeController extends Controller
 {
@@ -13,16 +15,23 @@ class HomeController extends Controller
     public function index(HomeService $homeService)
     {
         try {
-            return $this->successResponse([
-                    'hero' => $homeService->get(),
+            $data = [
+                'data' => $homeService->get(),
                 'meta' => (object)[]
-            ], 'Home page fetched successfully');
+            ];
+            return $this->successResponse(
+                $data, 'Home page fetched successfully');
 
-        } catch (\Throwable $e) {
+        } catch (Exception $e) {
+            Log::error('Failed to fetch home page data: ', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
 
             return $this->errorResponse(
-                $e->getMessage(),
-                500
+                'Failed to fetch home data',
+                500,
+                ['error' => config('app.debug') ? $e->getMessage() : trans('common.internal-server-error')],
             );
         }
     }
