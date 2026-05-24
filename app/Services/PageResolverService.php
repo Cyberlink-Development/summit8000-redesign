@@ -10,6 +10,7 @@ class PageResolverService
 {
     public function resolve(PageSlug $pageRoute, Request $request)
     {
+        // dd($pageRoute->sluggable->template);
         $template = TemplateEnum::tryFrom($pageRoute->sluggable->template);
         if (!$template) {
             throw new \Exception("Invalid template: {$pageRoute->sluggable->template}");

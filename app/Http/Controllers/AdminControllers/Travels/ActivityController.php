@@ -47,7 +47,7 @@ class ActivityController extends Controller
         foreach ($filterArray as $filterArr) {
             $filename[] = $this->remove_extention($filterArr);
         }
-        $file1 = array('triplist' => 'Choose Template');
+        $file1 = array('trip-list' => 'Choose Template');
         foreach ($filename as $file) {
             $file1[$file] = $file;
         }
@@ -201,7 +201,7 @@ class ActivityController extends Controller
         foreach ($filterArray as $filterArr) {
             $filename[] = $this->remove_extention($filterArr);
         }
-        $file1 = array('triplist' => 'Choose Template');
+        $file1 = array('trip-list' => 'Choose Template');
         foreach ($filename as $file) {
             $file1[$file] = $file;
         }
@@ -288,7 +288,7 @@ class ActivityController extends Controller
         // $_data->relatedActivities()->attach($request->related_activity);
 
         $data->save();
-        
+
         // Slug
         $this->slugService->update($data, $request->uri);
 

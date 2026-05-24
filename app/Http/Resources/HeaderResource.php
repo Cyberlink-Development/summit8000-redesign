@@ -18,17 +18,17 @@ class HeaderResource extends JsonResource
         });
 
         $extraLinks = collect([
-            // (new HeaderLinkDTO(
-            //     'Expedition',
-            //     '/trips/expedition',
-            //     'internal'
-            // ))->toArray(),
+            (new HeaderLinkDTO(
+                'Expedition',
+                '/expedition',
+                'internal'
+            ))->toArray(),
 
-            // (new HeaderLinkDTO(
-            //     'Trekking',
-            //     '/trips/trekking',
-            //     'internal'
-            // ))->toArray(),
+            (new HeaderLinkDTO(
+                'Trekking',
+                '/trekking',
+                'internal'
+            ))->toArray(),
         ]);
 
         return [

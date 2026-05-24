@@ -55,7 +55,7 @@ class TripDetailPageDTO
 
             cta: [
                 'label' => 'Book',
-                'href'  => '/book/' . $trip->slugs()?->first()?->slug,
+                'href'  => '/book' . $trip->slugs()?->first()?->slug,
                 'type'  => 'internal',
             ],
 

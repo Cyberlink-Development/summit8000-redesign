@@ -19,6 +19,7 @@ class SlugResolverController extends Controller
             $slugData = PageSlug::with('sluggable')
                 ->where('slug', $path)
                 ->first();
+                // dd($slugData);
 
             if (!$slugData) {
 
