@@ -17,36 +17,34 @@ class GlobalCollection extends JsonResource
 
     public function toArray(Request $request): array
     {
-        $response = [
+        $path      = $request->query('path', '/');
+        $perPage   = $this->paginator->perPage();
+        $lastPage  = $this->paginator->lastPage();
+        $current   = $this->paginator->currentPage();
+
+        $buildUrl = fn(int $page) =>
+            "/collection?path={$path}&per_page={$perPage}&page={$page}";
+
+        return [
             'data' => $this->resourceData,
 
             'meta' => [
-                'current_page' => $this->paginator->currentPage(),
-                'per_page' => $this->paginator->perPage(),
-                'total' => $this->paginator->total(),
-                'last_page' => $this->paginator->lastPage(),
-                'from' => $this->paginator->firstItem(),
-                'to' => $this->paginator->lastItem(),
-                'has_more' => $this->paginator->hasMorePages(),
+                'current_page' => $current,
+                'per_page'     => $perPage,
+                'total'        => $this->paginator->total(),
+                'last_page'    => $lastPage,
+                'from'         => $this->paginator->firstItem(),
+                'to'           => $this->paginator->lastItem(),
+                'has_more'     => $this->paginator->hasMorePages(),
             ],
 
             'links' => [
-                'self' => $this->paginator->url(
-                    $this->paginator->currentPage()
-                ),
-
-                'next' => $this->paginator->nextPageUrl(),
-
-                'prev' => $this->paginator->previousPageUrl(),
-
-                'first' => $this->paginator->url(1),
-
-                'last' => $this->paginator->url(
-                    $this->paginator->lastPage()
-                ),
+                'self'  => $buildUrl($current),
+                'next'  => $current < $lastPage ? $buildUrl($current + 1) : null,
+                'prev'  => $current > 1         ? $buildUrl($current - 1) : null,
+                'first' => $buildUrl(1),
+                'last'  => $buildUrl($lastPage),
             ],
         ];
-
-        return $response;
     }
 }

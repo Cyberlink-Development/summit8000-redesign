@@ -3,52 +3,78 @@
 namespace App\Services\Trip;
 
 use App\DTO\Trip\TripListDTO;
+use App\Http\Resources\GlobalCollection;
+use App\Http\Resources\TripListResource;
 use App\Models\Travels\ActivityModel;
+use App\Models\Travels\TripModel;
 use Illuminate\Pagination\LengthAwarePaginator;
+use app\Models\PageSlug;
+use Illuminate\Http\Request; 
 
 class TripListService
 {
     protected int $perPage = 8;
 
-    public function get($parent, int $page = 1)
+    public function handle(PageSlug $pageRoute, Request $request)
     {
-        $activities = ActivityModel::where('activity_parent', $parent)
-            ->with(['trips' => function ($query) {
-                $query->select(
-                    'cl_trip_details.id',
-                    'cl_trip_details.trip_title',
-                    'cl_trip_details.sub_title',
-                    'cl_trip_details.uri',
-                    'cl_trip_details.thumbnail',
-                    'cl_trip_details.thumbnail_alt',
-                    'cl_trip_details.duration',
-                    'cl_trip_details.max_altitude',
-                    'cl_trip_details.group_size',
-                    'cl_trip_details.trip_grade',
-                    'cl_trip_details.price',
-                    'cl_trip_details.discount',
-                    'cl_trip_details.route',
-                    'cl_trip_details.best_season',
-                    'cl_trip_details.ordering'
-                )
-                ->where('cl_trip_details.status', '1')
-                ->orderBy('cl_trip_details.ordering', 'asc');
-            }])
+        $tripType = $pageRoute->sluggable;
+        $tripType['path'] = $pageRoute->slug;
+
+        $tripIds = $tripType->trips()->pluck('cl_trip_details.id');
+
+        $tripIds = $tripType->trips()->pluck('cl_trip_details.id');
+
+        $trips = TripModel::whereIn('id', $tripIds)
+            ->select(
+                'id',
+                'trip_title',
+                'sub_title',
+                'uri',
+                'thumbnail',
+                'thumbnail_alt',
+                'duration',
+                'max_altitude',
+                'group_size',
+                'trip_grade',
+                'price',
+                'discount',
+                'route',
+                'best_season',
+                'ordering'
+            )
+            ->where('status', '1')
             ->orderBy('ordering', 'asc')
-            ->get();
+            ->paginate(
+                perPage: $request->query('per_page', 8),
+                page: $request->query('page', 1),
+            )
+            ->appends($request->query());
 
         // Flatten all trips across activities
-        $allTrips = $activities->flatMap(fn($a) => $a->trips)->values();
+        // $allTrips = $trips->flatMap(fn($a) => $a->trips)->values();
 
-        $paginator = $this->paginate($allTrips, $page, "/api/trips/{$parent}");
+        // $tripList = $allTrips->paginate(
+        //     perPage: (int) $request->query('per_page', 8),
+        //     page: (int) $request->query('page', 1),
+        // );
 
-        return new TripListDTO(
-            template: 'trip-list',
-            hero: $this->buildHero($parent),
-            items: $this->formatItems($paginator->items()),
-            seo: $this->buildSeo($parent),
-            meta: $this->buildMeta($paginator),
-            links: $this->buildLinks($paginator),
+        // $paginator = $this->paginate($allTrips, $page, "/api/trips/{$parent}");
+
+        // return new TripListDTO(
+        //     template: 'trip-list',
+        //     hero: $this->buildHero($parent),
+        //     items: $this->formatItems($paginator->items()),
+        //     seo: $this->buildSeo($parent),
+        //     meta: $this->buildMeta($paginator),
+        //     links: $this->buildLinks($paginator),
+        // );
+
+        return new GlobalCollection(
+            resourceData: new TripListResource(
+                tripType: $tripType,
+                trips: $trips,
+            ),
+            paginator: $trips,
         );
     }
 

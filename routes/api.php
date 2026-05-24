@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\CollectionController;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Api\SettingsController;
 use App\Http\Controllers\Api\AboutController;
@@ -33,3 +34,4 @@ Route::get('/trips/{parent}', [TripController::class, 'index']);
 Route::get('/trip-category/{slug}', [TripController::class, 'category']);
 
 Route::get('/page', [SlugResolverController::class, 'resolve']);
+Route::get('/collection', [CollectionController::class, 'index']);
