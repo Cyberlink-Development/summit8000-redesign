@@ -5,7 +5,7 @@ namespace App\Services\Collections;
 use App\Http\Resources\GlobalCollection;
 use App\Models\PageSlug;
 use App\Models\Travels\TripModel;
-use App\DTO\Pages\TripDetailPageDTO;
+use App\DTO\Pages\TripItemDTO;
 use Illuminate\Http\Request;
 
 class TripCollectionService
@@ -42,7 +42,7 @@ class TripCollectionService
             );
 
         return new GlobalCollection(
-            resourceData: TripDetailPageDTO::collect($trips->items()),
+            resourceData: TripItemDTO::collect($trips->items()),
             paginator: $trips,
         );
     }
