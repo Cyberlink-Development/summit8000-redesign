@@ -24,6 +24,8 @@ class TeamService
         return [
             'data' => [
 
+               'template' => 'team-list',
+
                 'hero' => $this->hero($data),
 
                 'leadership' => $this->leadership($leadership),
@@ -89,7 +91,7 @@ class TeamService
     private function member($member)
     {
         return [
-            'slug' => $member->slug,
+            'slug' => $member->uri,
 
             'title' => $member->name,
 

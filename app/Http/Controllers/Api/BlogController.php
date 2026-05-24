@@ -11,7 +11,7 @@ class BlogController extends Controller
 {
     use ApiResponse;
 
-    public function index(BlogService $blogService)
+    public function index(BlogService $blogService) 
     {
         try {
             return $this->successResponse(

@@ -8,7 +8,7 @@ use app\Models\PageSlug;
 use App\Models\Posts\PostCategoryModel;
 use App\Models\Posts\PostModel;
 use App\Models\Posts\PostTypeModel;
-use Illuminate\Http\Request;
+use Illuminate\Http\Request; 
 
 class BlogService
 {
