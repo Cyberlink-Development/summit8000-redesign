@@ -17,7 +17,7 @@ class BlogDetailService
 
         return [
             'data' => [
-
+                'template' => 'blog-detail',
                 'title' => $post->post_title,
 
                 'slug' => $post->uri,
@@ -196,7 +196,7 @@ class BlogDetailService
             ->latest()
             ->take(3)
             ->get()
-            ->map(fn ($item) => [
+            ->map(fn($item) => [
 
                 'title' => $item->post_title,
 
@@ -223,7 +223,7 @@ class BlogDetailService
             ->inRandomOrder()
             ->take(3)
             ->get()
-            ->map(fn ($item) => [
+            ->map(fn($item) => [
 
                 'slug' => $item->uri,
 
@@ -264,8 +264,8 @@ class BlogDetailService
                 ? asset('uploads/original/' . $seo->og_image)
                 : (
                     $post->page_thumbnail
-                        ? asset('uploads/original/' . $post->page_thumbnail)
-                        : null
+                    ? asset('uploads/original/' . $post->page_thumbnail)
+                    : null
                 ),
 
             'canonical_url' => url('/blog/' . $post->uri),
