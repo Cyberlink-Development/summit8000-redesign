@@ -50,7 +50,7 @@ class TripListPageDTO
                 ]
             ],
 
-            items: TripDetailPageDTO::collect($trips->items()),
+            items: TripItemDTO::collect($trips->items()),
 
             seo: SeoDTO::fromModel($tripType),
 

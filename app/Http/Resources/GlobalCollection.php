@@ -10,17 +10,25 @@ class GlobalCollection extends JsonResource
 {
     public function __construct(
         public mixed $resourceData,
-        public LengthAwarePaginator $paginator,
+        public ?LengthAwarePaginator $paginator = null,
     ) {
         parent::__construct($resourceData);
     }
 
     public function toArray(Request $request): array
     {
-        $path      = $request->query('path', '/');
-        $perPage   = $this->paginator->perPage();
-        $lastPage  = $this->paginator->lastPage();
-        $current   = $this->paginator->currentPage();
+        if ($this->paginator === null) {
+            return [
+                'data'  => $this->resourceData,
+                'meta'  => [],
+                'links' => [],
+            ];
+        }
+
+        $path     = $request->query('path', '/');
+        $perPage  = $this->paginator->perPage();
+        $lastPage = $this->paginator->lastPage();
+        $current  = $this->paginator->currentPage();
 
         $buildUrl = fn(int $page) =>
             "/collection?path={$path}&per_page={$perPage}&page={$page}";
