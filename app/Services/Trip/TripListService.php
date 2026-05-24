@@ -9,7 +9,7 @@ use App\Models\Travels\ActivityModel;
 use App\Models\Travels\TripModel;
 use Illuminate\Pagination\LengthAwarePaginator;
 use app\Models\PageSlug;
-use Illuminate\Http\Request; 
+use Illuminate\Http\Request;
 
 class TripListService
 {
@@ -19,8 +19,6 @@ class TripListService
     {
         $tripType = $pageRoute->sluggable;
         $tripType['path'] = $pageRoute->slug;
-
-        $tripIds = $tripType->trips()->pluck('cl_trip_details.id');
 
         $tripIds = $tripType->trips()->pluck('cl_trip_details.id');
 
