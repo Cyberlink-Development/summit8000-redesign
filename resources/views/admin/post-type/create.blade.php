@@ -139,7 +139,7 @@
                 <div class="sid_bvijay mb10">
                     <h4> Choose Template </h4>
                     <label class="field select">
-                        <select id="api_template" name="api_template" required>
+                        <select id="template" name="template" required>
                             <option value="" selected hidden>Select Template</option>
                             <option value="blog">Blog</option>
                             <option value="about">About</option>

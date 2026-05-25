@@ -4,6 +4,7 @@ namespace App\Enums;
 
 use App\Services\Blog\BlogService;
 use App\Services\Trip\TripListService;
+use App\Services\AboutPageService;
 use App\Services\Trip\TripDetailService;
 use App\Services\Trip\TripCategoryService;
 use App\Services\Templates\ActivityListService;
@@ -20,6 +21,7 @@ enum TemplateEnum: string
     case TRIP_DETAIL = 'trip-detail';
     case ACTIVITY_LIST = 'activity-list';
     case GALLERY = 'gallery';
+    case ABOUT = 'about';
     case TRIP_CATEGORY = 'category';
 
     public function service(): string
@@ -31,6 +33,7 @@ enum TemplateEnum: string
             self::TRIP_CATEGORY => TripCategoryService::class,
             // self::ACTIVITY_LIST => ActivityListService::class,
             // self::GALLERY => GalleryService::class,
+            self::ABOUT => AboutPageService::class,
         };
     }
 
