@@ -115,7 +115,7 @@ class PostController extends Controller
         $post_order = $ord + 1;
         $category = PostCategoryModel::where('post_type', $posttype_id)->get();
 
-        return view('admin.posts.create', compact('category', 'parent_post', 'templates', 'templates_child', 'post_order','alltrips'));
+        return view('admin.posts.create', compact('category', 'parent_post', 'posttype','templates', 'templates_child', 'post_order','alltrips'));
     }
 
     /**
@@ -312,12 +312,14 @@ class PostController extends Controller
         // Get parent list by post type ID
         $posttype_uri = request()->segment(2);
         $posttype = $this->getPostTypeId($posttype_uri);
+        $ptdata =$posttype;
         $posttype_id = $posttype->id;
         $parent_post = PostModel::where(['post_type' => $posttype_id, 'post_parent' => 0])->get();
         $category = PostCategoryModel::where('post_type', $posttype_id)->get();
         $data = PostModel::with('seo')->find($id);
+        // dd($posttype);
 
-        return view('admin.posts.edit', compact('data', 'parent_post', 'templates', 'templates_child', 'category','alltrips'));
+        return view('admin.posts.edit', compact('data', 'parent_post','ptdata', 'templates', 'templates_child', 'category','alltrips'));
     }
 
     /**

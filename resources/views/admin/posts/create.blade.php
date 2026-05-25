@@ -160,7 +160,7 @@
                     <div class="clearfix"></div>
                 </div>
 
-                @if(Request::segment(2) == 'about-us')
+                @if($ptdata->template === \App\Enums\TemplateEnum::ABOUT->value)
                 <div class="sid_bvijay mb10">
                     <label class="field select">
                         <select id="about_type" name="about_type" >

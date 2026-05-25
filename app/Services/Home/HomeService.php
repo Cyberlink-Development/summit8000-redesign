@@ -112,7 +112,8 @@ class HomeService
 
   private function story(): array
 {
-    $aboutPage = $this->aboutPageService->getStorySection();
+    // $aboutPage = $this->aboutPageService->getStorySection();
+    $aboutPage = [];
 
     return $aboutPage->story ?? [];
 }
@@ -153,7 +154,7 @@ class HomeService
 
                     'title' => $item->title ?? '',
 
-                    'href' => '/trip-category=' . $item->uri,
+                    'href' => $item->slugs()?->first()?->slug ,
 
                     'elevation' => $item->elevation ?? '',
 
@@ -222,7 +223,7 @@ class HomeService
                         ? '$' . number_format($trip->starting_price)
                         : 'On Request',
 
-                    'href' => '/trip/' . $trip->uri,
+                    'href' => $trip->slugs()?->first()?->slug,
 
                     'attributes' => [
 
@@ -261,7 +262,7 @@ class HomeService
                     'cta' => [
                         'label' => 'Book',
 
-                        'href' => '/book?' . $trip->uri,
+                        'href' => '/book' . $trip->slugs()?->first()?->slug,
 
                         'type' => 'internal',
                     ],
@@ -280,7 +281,8 @@ class HomeService
 
     private function testimonials(): array
     {
-        return $this->aboutPageService->getTestimonials();
+        // return $this->aboutPageService->getTestimonials();
+        return [];
     }
 
     /*
@@ -291,7 +293,8 @@ class HomeService
 
     private function why(): array
 {
-    return $this->aboutPageService->getWhySection();
+    // return $this->aboutPageService->getWhySection();
+    return [];
 }
 
     /*
