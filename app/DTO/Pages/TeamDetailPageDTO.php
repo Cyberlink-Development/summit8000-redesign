@@ -25,7 +25,7 @@ class TeamDetailPageDTO
     {
         return new self(
             template:     $member->template,
-            slug:         $member->uri,
+            slug:         slug_formatter($member->slugs()->first()->slug),
             hero:         self::buildHero($member),
             stats:        self::buildStats($member),
             about:        self::buildAbout($member),
