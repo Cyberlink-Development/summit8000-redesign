@@ -2,6 +2,9 @@
 
 namespace App\DTO\Pages;
 
+use App\DTO\Common\SeoDTO;
+use App\Models\Posts\PostCategoryModel;
+use App\Models\Posts\PostModel;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class BlogListPageDTO
@@ -10,11 +13,10 @@ class BlogListPageDTO
         public readonly ?string $template,
         public readonly ?string $slug,
         public readonly ?string $href,
-        public readonly ?array $hero,
-        public readonly ?array $featured,
-        public readonly ?array $categories,
-        public readonly ?array $controls,
-        public readonly ?array $seo,
+        public readonly ?array  $hero,
+        public readonly ?array  $featured,
+        public readonly ?array  $categories,
+        public readonly ?SeoDTO $seo,
         public readonly ?LengthAwarePaginator $posts,
     ) {}
 
@@ -23,92 +25,94 @@ class BlogListPageDTO
         LengthAwarePaginator $posts,
     ): self {
         return new self(
-            template: $postType->template,
+            template:   $postType->template,
+            slug:       slug_formatter($postType->path),
+            href:       $postType->path,
+            hero:       self::buildHero($postType),
+            featured:   self::buildFeatured($postType),
+            categories: self::buildCategories($postType),
+            seo:        SeoDTO::fromModel($postType),
+            posts:      $posts,
+        );
+    }
 
-            slug: slug_formatter($postType->path),
-            href: $postType->path,
+    private static function buildHero($postType): array
+    {
+        return [
+            'banner' => [
+                'url' => $postType->banner
+                    ? asset('uploads/original/' . $postType->banner)
+                    : asset('theme-assets/assets/trip/8000.jpg'),
+                'alt' => $postType->post_type ?? null,
+            ],
+            'title'   => $postType->post_type ?? 'Our Blog',
+            'caption' => $postType->caption   ?? 'Stories, Guides & Expedition Insights',
+        ];
+    }
 
-            hero: [
-                'title' => $postType->post_type ?? null,
-                'caption' => $postType->caption ?? null,
-                'banner' => [
-                    'url' => $postType->banner
-                        ? asset('uploads/original/' . $postType->banner)
-                        : asset('theme-assets/assets/trip/8000.jpg'),
+    private static function buildFeatured($postType): ?array
+    {
+        $post = PostModel::where('post_type', $postType->id)->latest()->first();
 
-                    'alt' => $postType->post_type,
+        if (!$post) {
+            return null;
+        }
+
+        return [
+            'title' => 'Featured Expedition',
+            'item'  => [
+                'uuid'         => (string) $post->id,
+                'title'        => $post->post_title,
+                'slug'         => $post->uri,
+                'category'     => $post->category?->category ?? null,
+                'excerpt'      => $post->post_excerpt,
+                'published_at' => $post->created_at?->toDateString(),
+                'reading_time' => $post->reading_time ?? '5 min read',
+                'views'        => $post->visiter ?? 0,
+                'thumbnail'    => [
+                    'url' => $post->page_thumbnail
+                        ? asset('uploads/medium/' . $post->page_thumbnail)
+                        : asset('theme-assets/assets/trip/2.jpg'),
+                    'alt' => $post->post_title,
+                ],
+                'highlight' => [
+                    'altitude' => $post->altitude ?? null,
+                    'peak'     => $post->peak     ?? null,
+                ],
+                'cta' => [
+                    'label' => 'Read Story',
+                    'href'  => '/blog/' . $post->uri,
+                    'type'  => 'internal',
                 ],
             ],
+        ];
+    }
 
-            featured: [
-                "title" => "Featured Expedition",
-                'item' => [
-                    'title' => $postType->posts()->latest()->first()->post_title ?? null,
-                    'slug' => slug_formatter($postType->posts()->latest()->first()->slugs()->first()->slug) ?? null,
-                    'category' => '',
-                    'excerpt' => $postType->posts()->latest()->first()->post_excerpt ?? null,
-                    "published_at" => $postType->posts()->latest()->first()->updated_at ?? $postType->posts()->latest()->first()->created_at,
-                    "reading_time" => '',
-                    "views" => '',
-                    'thumbnail' => [
-                        'url' => $postType->posts()->latest()->first()->page_thumbnail
-                            ? asset('uploads/original/' . $postType->posts()->latest()->first()->page_thumbnail)
-                            : asset('theme-assets/assets/trip/8000.jpg'),
-
-                        'alt' => $postType->posts()->latest()->first()->post_title
-                    ],
-                    'highlight' => [
-                        'altitued' => '',
-                        'peak' => '',
-                    ],
-                    "cta" => [
-                        "label"=> "Read Story",
-                        "href"=> $postType->posts()->latest()->first()->slugs()->first()->slug,
-                        "type"=> "internal"
-                    ]
-                ]
-            ],
-
-            categories: $postType->categories ?? [],
-            
-
-            controls: $postType->controls ?? [],
-
-            seo: [
-                'meta_title' => $postType->seo['meta_title'] ?? null,
-                'meta_description' => $postType->seo['meta_description'] ?? null,
-            ],
-
-            posts: $posts,
-        );
+    private static function buildCategories($postType): array
+    {
+        return PostCategoryModel::where('status', 1)
+            ->where('post_type', $postType->id)
+            ->orderBy('ordering', 'asc')
+            ->get()
+            ->map(fn($cat) => [
+                'uuid'  => 'cat-' . $cat->id,
+                'label' => $cat->category,
+                'slug'  => $cat->uri,
+            ])
+            ->values()
+            ->toArray();
     }
 
     public function toArray(): array
     {
         return [
-            'template' => $this->template,
-            'slug' => $this->slug,
-            'href' => $this->href,
-
-            'hero' => $this->hero,
-
-            'featured' => $this->featured,
-
+            'template'   => $this->template,
+            'slug'       => $this->slug,
+            'href'       => $this->href,
+            'hero'       => $this->hero,
+            'featured'   => $this->featured,
             'categories' => $this->categories,
-
-            'list' => [
-                // 'controls' => $this->controls,
-
-                // 'items' => collect($this->posts->items())->map(fn ($post) => [
-                //     'title' => $post->title,
-                //     'slug' => $post->slug,
-                //     'excerpt' => $post->excerpt,
-                //     'thumbnail' => $post->thumbnail,
-                //     'published_at' => $post->published_at,
-                // ])->values(),
-            ],
-
-            'seo' => $this->seo,
+            'seo'        => $this->seo?->toArray(),
         ];
     }
 }
