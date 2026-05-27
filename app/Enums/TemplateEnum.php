@@ -48,8 +48,7 @@ enum TemplateEnum: string
     public function collectionService(): string
     {
         return match ($this) {
-            // self::BLOG_LIST     => BlogCollectionService::class,
-            self::TEAM_LIST => TeamListCollectionService::class,
+            self::BLOG_LIST     => BlogCollectionService::class,
             self::TRIP_LIST     => TripCollectionService::class,
             self::TRIP_CATEGORY => TripCategoryCollectionService::class
             // self::ACTIVITY_LIST => ActivityCollectionService::class,
