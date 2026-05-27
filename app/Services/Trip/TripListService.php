@@ -20,23 +20,6 @@ class TripListService
         $tripIds = $tripType->trips()->pluck('cl_trip_details.id');
 
         $trips = TripModel::whereIn('id', $tripIds)
-            ->select(
-                'id',
-                'trip_title',
-                'sub_title',
-                'uri',
-                'thumbnail',
-                'thumbnail_alt',
-                'duration',
-                'max_altitude',
-                'group_size',
-                'trip_grade',
-                'price',
-                'discount',
-                'route',
-                'best_season',
-                'ordering'
-            )
             ->where('status', '1')
             ->orderBy('ordering', 'asc')
             ->paginate(

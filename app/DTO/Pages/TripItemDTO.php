@@ -24,7 +24,7 @@ class TripItemDTO
     public static function fromModel($trip): self
     {
         return new self(
-            template: null,
+            template: $trip->template,
             slug: $trip->slug ?? null,
             tag: $trip->tag ?? null,
             title: $trip->trip_title ?? null,
