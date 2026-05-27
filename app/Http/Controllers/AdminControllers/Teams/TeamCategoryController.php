@@ -183,23 +183,39 @@ class TeamCategoryController extends Controller
     public function destroy($id)
     {
         $data = TeamCategory::find($id);
-        if ($data->picture != NULL) {
-            unlink('uploads/team/' . $data->picture);
+
+        if ($data && $data->picture != null) {
+
+            $filePath = public_path('uploads/team/' . $data->picture);
+
+            if (file_exists($filePath)) {
+                unlink($filePath);
+            }
         }
+
         $data->delete();
-        return 'Are you sure to delete?';
+
+        return response()->json([
+            'message' => 'Deleted successfully'
+        ]);
     }
 
     public function delete_teamcategory_thumb($id)
     {
         $data = TeamCategory::find($id);
-        if ($data->picture) {
-            if (file_exists(env('PUBLIC_PATH') . 'uploads/team/' . $data->picture)) {
-                unlink(env('PUBLIC_PATH') . 'uploads/team/' . $data->picture);
+
+        if ($data && $data->picture) {
+
+            $filePath = public_path('uploads/team/' . $data->picture);
+
+            if (file_exists($filePath)) {
+                unlink($filePath);
             }
+
+            $data->picture = null;
+            $data->save();
         }
-        $data->picture = NULL;
-        $data->save();
+
         return response('Delete Successful.');
     }
 }

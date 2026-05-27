@@ -14,13 +14,14 @@ class TeamListService
     public function handle(PageSlug $pageRoute, Request $request)
     {
         $teamPostType = $pageRoute->sluggable;
+
         $teamPostType['path'] = $pageRoute->slug;
 
         $leadership = TeamModel::where('category', 1)
             ->orderBy('ordering', 'asc')
             ->get();
 
-        $guides = TeamModel::where('category', 2)
+        $guides = TeamModel::where('category', 3)
             ->orderBy('ordering', 'asc')
             ->paginate(
                 perPage: (int) $request->query('per_page', 8),
