@@ -24,7 +24,7 @@ class TripDetailPageDTO
     public static function fromModel(TripModel $trip, Collection $relatedTrips): self
     {
         return new self(
-            template:       'trip-detail',
+            template:       $trip->template ?? null,
             slug:           $trip->slugs()->first()?->slug,
             hero:           self::buildHero($trip),
             breadcrumb:     self::buildBreadcrumb($trip),
