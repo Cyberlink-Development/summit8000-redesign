@@ -24,7 +24,7 @@ class TeamListPageDTO
         LengthAwarePaginator $guides,
     ): self {
         return new self(
-            template: 'team-list',
+            template: $page->template,
 
             hero: [
                 'banner' => [

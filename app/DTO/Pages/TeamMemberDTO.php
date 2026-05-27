@@ -19,7 +19,7 @@ class TeamMemberDTO
     public static function fromModel($member): self
     {
         return new self(
-            slug:      $member->uri,
+            slug:      slug_formatter($member->slugs()->first()->slug),
             title:     $member->name,
             sub_title: $member->position,
             caption:   $member->category == 1 ? 'Leadership' : 'Guide',
