@@ -12,7 +12,6 @@ class HomeService
 {
 
    public function __construct(
-        protected AboutPageService $aboutPageService,
         protected BlogService $blogService
     ) {}
   public function get(): array
@@ -21,7 +20,7 @@ class HomeService
 
             'hero' => $this->hero(),
 
-            'story' => $this->story(),
+            'story' => [],
 
             'categories' => $this->categories(),
 
