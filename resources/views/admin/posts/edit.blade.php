@@ -195,10 +195,8 @@
                 <div class="sid_bvijay mb10">
                     <label class="field select">
                         <select id="template" name="template">
-                            @foreach ($templates as $key => $template)
-                                <option value="{{ $key }}" {{ $template == $data->template ? 'selected' : '' }}>
-                                    {{ ucfirst($template) }} </option>
-                            @endforeach
+                            <option value="" >Select Template</option>
+                            <option value="blog-detail" {{ ($data->template == 'blog-detail') ? 'selected' : '' }}>Blog</option>
                         </select>
                         <i class="arrow"></i>
                     </label>

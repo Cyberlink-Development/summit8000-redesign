@@ -22,11 +22,11 @@ class BlogItemDTO
     {
         return new self(
             uuid:          (string) $post->id,
-            slug:          $post->uri ?? null,
+            href:          $post->slugs()->first()->slug,
             title:         $post->post_title ?? null,
-            excerpt:       $post->post_excerpt ?? null,
-            href:          '/blog/' . $post->uri,
+            slug:          $post->uri ?? null,
             category:      $post->category?->category ?? null,
+            excerpt:       $post->post_excerpt ?? null,
             category_slug: $post->category?->uri ?? null,
             reading_time:  $post->reading_time ?? '5 min read',
             published_at:  $post->created_at?->toDateString(),

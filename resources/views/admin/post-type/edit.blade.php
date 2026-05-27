@@ -150,7 +150,7 @@
                     <h4> Choose Template </h4>
                     <label class="field select">
                         <select id="template" name="template" required>
-                            <option value="blog" {{ old('template', $data->template) == 'blog' ? 'selected' : '' }}>
+                            <option value="blog-list" {{ old('template', $data->template) == 'blog-list' ? 'selected' : '' }}>
                                 Blog
                             </option>
                             <option value="about" {{ old('template', $data->template) == 'about' ? 'selected' : '' }}>
@@ -158,6 +158,9 @@
                             </option>
                             <option value="gallery" {{ old('template', $data->template) == 'gallery' ? 'selected' : '' }}>
                                 Gallery
+                            </option>
+                            <option value="team-list" {{ old('template', $data->template) == 'team-list' ? 'selected' : '' }}>
+                                Team
                             </option>
                         </select>
                         <i class="arrow"></i>
