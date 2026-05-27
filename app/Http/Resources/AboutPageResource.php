@@ -14,7 +14,6 @@ class AboutPageResource extends JsonResource
         public readonly object     $aboutSlug,
         public readonly ?object    $settings,
         public readonly Collection $sections,
-        public readonly array      $team,
     ) {
         parent::__construct($aboutSlug);
     }
@@ -25,7 +24,6 @@ class AboutPageResource extends JsonResource
             aboutSlug: $this->aboutSlug,
             settings:  $this->settings,
             sections:  $this->sections,
-            team:      $this->team,
         )->toArray();
     }
 }

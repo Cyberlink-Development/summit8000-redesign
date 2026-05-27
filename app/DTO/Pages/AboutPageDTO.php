@@ -4,6 +4,7 @@ namespace App\DTO\Pages;
 
 use App\Model\TripReview;
 use Illuminate\Support\Collection;
+use App\Models\Team\TeamModel;
 
 class AboutPageDTO
 {
@@ -24,7 +25,6 @@ class AboutPageDTO
         object     $aboutSlug,
         ?object    $settings,
         Collection $sections,
-        array      $team,
     ): self {
         return new self(
             template:       $aboutSlug->template,
@@ -36,7 +36,7 @@ class AboutPageDTO
             founder:        self::buildFounder(
                                 $sections->firstWhere('about_type', 'founder')
                             ),
-            team:           $team,
+            team:           self::buildTeam(),
             why:            self::buildWhy(
                                 $sections->firstWhere('about_type', 'why')
                             ),
@@ -67,6 +67,16 @@ class AboutPageDTO
     // ─────────────────────────────────────────────────────────────────────────
     // Builders
     // ─────────────────────────────────────────────────────────────────────────
+    private static function buildTeam(): array
+    {
+        return TeamMemberDTO::collect(
+            TeamModel::where('category', 1)
+                ->orderBy('ordering', 'asc')
+                ->take(3)
+                ->get()
+                ->all()
+        );
+    }
 
     /*
     |--------------------------------------------------------------------------
