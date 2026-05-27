@@ -3,6 +3,7 @@
 namespace App\DTO\Pages;
 
 use App\Model\TripReview;
+use App\Models\Posts\PostTypeModel;
 use Illuminate\Support\Collection;
 use App\Models\Team\TeamModel;
 
@@ -69,13 +70,26 @@ class AboutPageDTO
     // ─────────────────────────────────────────────────────────────────────────
     private static function buildTeam(): array
     {
-        return TeamMemberDTO::collect(
-            TeamModel::where('category', 1)
-                ->orderBy('ordering', 'asc')
-                ->take(3)
-                ->get()
-                ->all()
-        );
+        $team = PostTypeModel::where('template', 'team-list')->first();
+        // dd($team);
+
+        return [
+            "slug" => $team?->uri ?? "meet-the-team",
+
+            "caption" => $team?->post_type ??"Meet the Team",
+
+            "title" => $team?->associated_title ?? "Five Master Sherpa Guides",
+
+            "description" => $team?->content,
+
+            "items" => TeamMemberDTO::collect(
+                TeamModel::where('category', 1)
+                    ->orderBy('ordering', 'asc')
+                    ->take(5)
+                    ->get()
+                    ->all()
+            ),
+        ];
     }
 
     /*

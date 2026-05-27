@@ -67,13 +67,13 @@
                                         <td></td>
                                         <td> {{ $row->post_order }}</td>
                                         <td>
-                                            @if ($row->id == '203' )
+                                            @if ($row->about_type == 'why' )
                                                 <a href="{{ url('admin/associated/' . Request::segment(2) . '/' . $row->id) }}"><i
                                                     class="fa fa-plus fa fa-2x"></i></a>
                                             @endif
 
                                             {{-- @if (has_postimage($row->id) > 0) --}}
-                                            @if ($row->id == '204' )
+                                            @if ($row->about_type == 'story' )
                                                 <a href="{{ route('admin.multiplephoto', $row->id) }}" title="Photo">
                                                     <i class="fa fa-file-image-o" aria-hidden="true" style="color:#ff5000;"></i>
                                                 </a>

@@ -5,18 +5,18 @@ namespace App\Services\Home;
 use App\Models\Banners\BannerModel;
 use App\Models\Travels\ActivityModel;
 use App\Models\Travels\TripModel;
-use App\Services\AboutPageService;
+use App\Services\About\AboutPageService;
 use App\Services\Blog\BlogService;
 
 class HomeService
 {
 
-   public function __construct(
+    public function __construct(
         protected BlogService $blogService
     ) {}
-  public function get(): array
-{
-    return [
+    public function get(): array
+    {
+        return [
 
             'hero' => $this->hero(),
 
@@ -35,8 +35,8 @@ class HomeService
             'gallery' => $this->gallery(),
 
             'blog' => $this->blog(),
-    ];
-}
+        ];
+    }
 
     /*
     |--------------------------------------------------------------------------
@@ -52,7 +52,23 @@ class HomeService
             ->first();
 
         if (!$banner) {
-            return null;
+            return [
+                'banner' => null,
+
+                'caption' => null,
+
+                'title' => null,
+
+                'description' => null,
+
+                'cta' => [
+                    'primary' => null,
+
+                    'secondary' => null,
+                ],
+
+                'stats' => [],
+            ];
         }
 
         return [
@@ -109,13 +125,13 @@ class HomeService
     |--------------------------------------------------------------------------
     */
 
-  private function story(): array
-{
-    // $aboutPage = $this->aboutPageService->getStorySection();
-    $aboutPage = [];
+    private function story(): array
+    {
+        // $aboutPage = $this->aboutPageService->getStorySection();
+        $aboutPage = [];
 
-    return $aboutPage->story ?? [];
-}
+        return $aboutPage->story ?? [];
+    }
 
     /*
     |--------------------------------------------------------------------------
@@ -123,57 +139,57 @@ class HomeService
     |--------------------------------------------------------------------------
     */
 
-   private function categories(): array
-{
-    $expeditions = ActivityModel::query()
-        ->where([
-            'activity_parent' => 'expedition',
-            'status' => 1,
-        ])
-        ->orderBy('ordering', 'asc')
-        ->take(4)
-        ->get();
+    private function categories(): array
+    {
+        $expeditions = ActivityModel::query()
+            ->where([
+                'activity_parent' => 'expedition',
+                'status' => 1,
+            ])
+            ->orderBy('ordering', 'asc')
+            ->take(4)
+            ->get();
 
-    return [
+        return [
 
-        'caption' => 'Expedition Categories',
+            'caption' => 'Expedition Categories',
 
-        'title' => 'Choose Your Summit',
+            'title' => 'Choose Your Summit',
 
-        'description' => 'From high-altitude 8000m challenges to scenic Himalayan treks — an adventure calibrated for every ambition.',
+            'description' => 'From high-altitude 8000m challenges to scenic Himalayan treks — an adventure calibrated for every ambition.',
 
-        'items' => collect($expeditions)
-            ->map(function ($item) {
+            'items' => collect($expeditions)
+                ->map(function ($item) {
 
-                return [
+                    return [
 
-                    'uuid' => $item->uuid ?? '',
+                        'uuid' => $item->uuid ?? '',
 
-                    'caption' => $item->sub_title ?? '',
+                        'caption' => $item->sub_title ?? '',
 
-                    'title' => $item->title ?? '',
+                        'title' => $item->title ?? '',
 
-                    'href' => $item->slugs()?->first()?->slug ,
+                        'href' => $item->slugs()?->first()?->slug ,
 
-                    'elevation' => $item->elevation ?? '',
+                        'elevation' => $item->elevation ?? '',
 
-                    'description' => $item->content ?? '',
+                        'description' => $item->content ?? '',
 
-                    'count' => (int) ($item->total_trips ?? 0),
+                        'count' => (int) ($item->total_trips ?? 0),
 
-                    'thumbnail' => [
-                        'url' => $item->banner
-                            ? asset('uploads/activity/' . $item->banner)
-                            : '',
+                        'thumbnail' => [
+                            'url' => $item->banner
+                                ? asset('uploads/activity/' . $item->banner)
+                                : '',
 
-                        'alt' => $item->activity ?? '',
-                    ],
-                ];
-            })
-            ->values()
-            ->toArray(),
-    ];
-}
+                            'alt' => $item->activity ?? '',
+                        ],
+                    ];
+                })
+                ->values()
+                ->toArray(),
+        ];
+    }
 
     /*
     |--------------------------------------------------------------------------
@@ -181,96 +197,96 @@ class HomeService
     |--------------------------------------------------------------------------
     */
 
- private function featured(): array
-{
-    $bestSellerTrips = TripModel::query()
-        ->where([
-            'trip_of_the_month' => 1,
-            'status' => 1,
-        ])
-        ->orderBy('ordering', 'asc')
-        ->take(3)
-        ->get();
+    private function featured(): array
+    {
+        $bestSellerTrips = TripModel::query()
+            ->where([
+                'trip_of_the_month' => 1,
+                'status' => 1,
+            ])
+            ->orderBy('ordering', 'asc')
+            ->take(3)
+            ->get();
 
-    return [
+        return [
 
-        'caption' => 'Featured Expeditions',
+            'caption' => 'Featured Expeditions',
 
-        'title' => '2025 Season Highlights',
+            'title' => '2025 Season Highlights',
 
-        'cta' => [
-            'label' => 'View All Expeditions',
-            'href' => '/trip',
-            'type' => 'internal',
-        ],
+            'cta' => [
+                'label' => 'View All Expeditions',
+                'href' => ActivityModel::query()->first()?->slugs()?->first()?->slug ,
+                'type' => 'internal',
+            ],
 
-        'items' => collect($bestSellerTrips)
-            ->map(function ($trip) {
+            'items' => collect($bestSellerTrips)
+                ->map(function ($trip) {
 
-                return [
+                    return [
 
-                    'slug' => $trip->uri ?? '',
+                        'slug' => $trip->uri ?? '',
 
-                    'tag' => trim(
-                        ($trip->max_altitude ?? '') .
-                        ($trip->best_season ? ' · ' . $trip->best_season : '')
-                    ),
+                        'tag' => trim(
+                            ($trip->max_altitude ?? '') .
+                            ($trip->best_season ? ' · ' . $trip->best_season : '')
+                        ),
 
-                    'title' => $trip->trip_title ?? '',
+                        'title' => $trip->trip_title ?? '',
 
-                    'price' => $trip->starting_price
-                        ? '$' . number_format($trip->starting_price)
-                        : 'On Request',
+                        'price' => $trip->starting_price
+                            ? '$' . number_format($trip->starting_price)
+                            : 'On Request',
 
-                    'href' => $trip->slugs()?->first()?->slug,
+                        'href' => $trip->slugs()?->first()?->slug,
 
-                    'attributes' => [
+                        'attributes' => [
 
-                        [
-                            'label' => '📅',
+                            [
+                                'label' => '📅',
 
-                            'text' => $trip->duration
-                                ? $trip->duration . ' days'
-                                : '',
+                                'text' => $trip->duration
+                                    ? $trip->duration . ' days'
+                                    : '',
+                            ],
+
+                            [
+                                'label' => '👥',
+
+                                'text' => $trip->group_size
+                                    ? $trip->group_size . ' climbers max'
+                                    : '',
+                            ],
+
+                            [
+                                'label' => '⚠',
+
+                                'text' => $trip->difficulty
+                                    ?? '',
+                            ],
                         ],
 
-                        [
-                            'label' => '👥',
+                        'thumbnail' => [
+                            'url' => $trip->thumbnail
+                                ? asset('uploads/thumbnails/'.$trip->thumbnail)
+                                : asset('theme-assets/assets/trip/1.jpg'),
 
-                            'text' => $trip->group_size
-                                ? $trip->group_size . ' climbers max'
-                                : '',
+                            'alt' => $trip->trip_title ?? '',
                         ],
 
-                        [
-                            'label' => '⚠',
+                        'cta' => [
+                            'label' => 'Book',
 
-                            'text' => $trip->difficulty
-                                ?? '',
+                            'href' => '/book' . $trip->slugs()?->first()?->slug,
+
+                            'type' => 'internal',
                         ],
-                    ],
-
-                    'thumbnail' => [
-                        'url' => $trip->thumbnail
-                            ? asset('uploads/thumbnails/'.$trip->thumbnail)
-                            : asset('theme-assets/assets/trip/1.jpg'),
-
-                        'alt' => $trip->trip_title ?? '',
-                    ],
-
-                    'cta' => [
-                        'label' => 'Book',
-
-                        'href' => '/book' . $trip->slugs()?->first()?->slug,
-
-                        'type' => 'internal',
-                    ],
-                ];
-            })
-            ->values()
-            ->toArray(),
-    ];
-}
+                    ];
+                })
+                ->values()
+                ->toArray(),
+        ];
+    }
 
     /*
     |--------------------------------------------------------------------------
@@ -291,10 +307,10 @@ class HomeService
     */
 
     private function why(): array
-{
-    // return $this->aboutPageService->getWhySection();
-    return [];
-}
+    {
+        // return $this->aboutPageService->getWhySection();
+        return [];
+    }
 
     /*
     |--------------------------------------------------------------------------
@@ -386,7 +402,7 @@ class HomeService
     |--------------------------------------------------------------------------
     */
 
-     private function blog(): array
+    private function blog(): array
     {
         return [
 
@@ -401,7 +417,7 @@ class HomeService
             ],
 
             // 👇 pulling reusable items from BlogPageService
-            'items' => $this->blogService->homeItems(),
+            'items' => [],
         ];
     }
 
