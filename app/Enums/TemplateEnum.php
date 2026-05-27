@@ -9,7 +9,7 @@ use App\Services\Team\TeamDetailService;
 use App\Services\Blog\BlogDetailService;
 use App\Services\Team\TeamListService;
 use App\Services\Trip\TripListService;
-use App\Services\AboutPageService;
+use App\Services\About\AboutPageService;
 use App\Services\Trip\TripDetailService;
 use App\Services\Trip\TripCategoryService;
 use App\Services\Templates\ActivityListService;

@@ -132,7 +132,7 @@
                                 Request::segment(2) == 'legal-documents' ||
                                 Request::segment(2) == 'blogs' ||
                                 Request::segment(2) == 'our-team' ||
-                                Request::segment(2) == 'about-us' ||
+                                Request::segment(2) == 'about' ||
                                 Request::segment(2) == 'who-we-are'
                             )
                             <a class="accordion-toggle menu-open">
@@ -246,7 +246,7 @@
                     </a>
                   </li>
                   </ul>
-              </li> 
+              </li>
                     <?php /*
                <!-- <li class="{{ (Request::segment(2) == 'teams')?'active':'' }}">-->
                <!--    <a href="{{ url('admin/teams') }}">-->

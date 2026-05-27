@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\About;
 
 use app\Models\PageSlug;
 use App\Http\Resources\AboutPageResource;
