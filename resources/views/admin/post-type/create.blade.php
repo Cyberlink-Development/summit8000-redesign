@@ -141,9 +141,10 @@
                     <label class="field select">
                         <select id="template" name="template" required>
                             <option value="" selected hidden>Select Template</option>
-                            <option value="blog">Blog</option>
+                            <option value="blog-list">Blog</option>
                             <option value="about">About</option>
                             <option value="gallery">Gallery</option>
+                            <option value="team-list">Team</option>
                         </select>
                         <i class="arrow"></i>
                     </label>

@@ -6,6 +6,7 @@ use App\Services\Blog\BlogService;
 use App\Services\Collections\TeamListCollectionService;
 use App\Services\Collections\TripCategoryCollectionService;
 use App\Services\Team\TeamDetailService;
+use App\Services\Blog\BlogDetailService;
 use App\Services\Team\TeamListService;
 use App\Services\Trip\TripListService;
 use App\Services\AboutPageService;
@@ -21,6 +22,7 @@ use App\Services\Collections\GalleryCollectionService;
 enum TemplateEnum: string
 {
     case BLOG_LIST = 'blog-list';
+    case BLOG_DETAIL = 'blog-detail';
     case TEAM_LIST = 'team-list';
     case TEAM_DETAIL = 'team-member';
     case TRIP_LIST = 'trip-list';
@@ -34,6 +36,7 @@ enum TemplateEnum: string
     {
         return match ($this) {
             self::BLOG_LIST => BlogService::class,
+            self::BLOG_DETAIL => BlogDetailService::class,
             self::TEAM_LIST => TeamListService::class,
             self::TEAM_DETAIL => TeamDetailService::class,
             self::TRIP_LIST => TripListService::class,

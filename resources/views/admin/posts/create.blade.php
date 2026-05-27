@@ -176,9 +176,8 @@
                 <div class="sid_bvijay mb10">
                     <label class="field select">
                         <select id="template" name="template">
-                            @foreach ($templates as $key => $template)
-                                <option value="{{ $key }}">{{ ucfirst($template) }}</option>
-                            @endforeach
+                            <option value="" >Select Template</option>
+                            <option value="blog-detail" >Blog</option>
                         </select>
                         <i class="arrow"></i>
                     </label>

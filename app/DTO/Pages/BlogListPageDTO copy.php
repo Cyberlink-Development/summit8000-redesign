@@ -138,7 +138,24 @@ class BlogListPageDTO
                 ],
             ],
 
-            'items' => BlogItemDTO::collect($posts->all()),
+            'items' => $posts->map(fn($post) => [
+                'uuid'         => (string) $post->id,
+                'href'         => $post->slugs()->first()->slug,
+                'title'        => $post->post_title,
+                'slug'         => $post->uri,
+                'category'     => $post->category?->category ?? null,
+                'excerpt'      => $post->post_excerpt,
+                'published_at' => $post->created_at?->toDateString(),
+                'reading_time' => $post->reading_time ?? '5 min read',
+
+                'thumbnail' => [
+                    'url' => $post->page_thumbnail
+                        ? asset('uploads/medium/' . $post->page_thumbnail)
+                        : asset('theme-assets/assets/trip/2.jpg'),
+
+                    'alt' => $post->post_title,
+                ],
+            ])->values()->toArray(),
         ];
     }
 
