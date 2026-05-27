@@ -7,13 +7,13 @@ use App\Http\Resources\AboutPageResource;
 use App\Http\Resources\GlobalCollection;
 use App\Models\Posts\PostModel;
 use App\Models\Settings\SettingModel;
-use App\Services\Team\TeamService;
+use App\Services\Team\TeamListService;
 use Illuminate\Http\Request;
 
 class AboutPageService
 {
     public function __construct(
-        
+        protected TeamListService $teamListService,
     ) {}
 
     public function handle(PageSlug $pageRoute, Request $request): GlobalCollection
@@ -41,14 +41,13 @@ class AboutPageService
             ->get();
 
         // ── Team data from TeamService ─────────────────────────────────────
-        $team = [];
+        // $team = $this->teamListService->aboutSection();
 
         return new GlobalCollection(
             resourceData: new AboutPageResource(
                 aboutSlug: $aboutSlug,
                 settings:  $settings,
                 sections:  $sections,
-                team:      $team,
             ),
         );
     }
