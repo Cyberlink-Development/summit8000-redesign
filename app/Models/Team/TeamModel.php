@@ -31,7 +31,8 @@ class TeamModel extends Model
         'experience',
         'languages',
         'certifications',
-        'specialisation'
+        'specialisation',
+        'template'
     ];
 
     /* The certificates that belongs to the team */

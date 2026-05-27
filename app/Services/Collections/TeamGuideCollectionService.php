@@ -5,7 +5,7 @@ namespace App\Services\Collections;
 use App\Http\Resources\GlobalCollection;
 use App\Models\PageSlug;
 use App\Models\Team\TeamModel;
-use App\DTO\Team\TeamMemberDTO;
+use App\DTO\Pages\TeamMemberDTO;
 use Illuminate\Http\Request;
 
 class TeamListCollectionService
