@@ -233,12 +233,12 @@
                   <span class="caret"></span>
                 </a>
                 <ul class="nav sub-nav">
-                     <li class="{{ (Request::segment(2) == 'teamcategory')?'active':'' }}">
+                     {{-- <li class="{{ (Request::segment(2) == 'teamcategory')?'active':'' }}">
                     <a href="{{ url('admin/teamcategory') }}">
                       <span class="fa fa fa-arrows-h"></span>
                       Team Category
                     </a>
-                  </li>
+                  </li> --}}
                     <li class="{{ (Request::segment(2) == 'teams')?'active':'' }}">
                     <a href="{{ url('admin/teams') }}">
                       <span class="fa fa fa-arrows-h"></span>

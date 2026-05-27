@@ -26,11 +26,12 @@ class TeamController extends Controller
      */
     public function index()
     {
+        $data = TeamCategory::orderBy('id', 'desc')->get();
         $bod = TeamModel::where('category', '1')->orderBy('id', 'desc')->get();
         $int = TeamModel::where('category', '2')->orderBy('id', 'desc')->get();
         $office = TeamModel::where('category', '3')->orderBy('id', 'desc')->get();
         $field = TeamModel::where('category', '4')->orderBy('id', 'desc')->get();
-        return view('admin.team.index', compact('bod', 'int', 'office', 'field'));
+        return view('admin.team.index', compact('bod', 'int', 'office', 'field','data'));
     }
 
     /**
@@ -124,6 +125,7 @@ class TeamController extends Controller
             $isChecked = $request->has('published');
             $data['published'] = ($isChecked) ? '1' : '0';
             $data['is_draft'] = $is_draft;
+            $data['template']='team-member';
             $result = TeamModel::create($data);
             $last_id = $result->id;
 
@@ -321,6 +323,7 @@ class TeamController extends Controller
             $isChecked = $request->has('status');
             $data->status = ($isChecked) ? '1' : '0';
             $data->is_draft = $is_draft;
+            $data->template='team-member';
             $_data = TeamModel::find($id);
 
             // Update Certificates
@@ -357,8 +360,8 @@ class TeamController extends Controller
                         if (isset($thumb_file[$key])) {
 
                             if ($certificateData->image) {
-                                if (file_exists(env('PUBLIC_PATH') . 'uploads/team/' . $certificateData->image)) {
-                                    unlink(env('PUBLIC_PATH') . 'uploads/team/' . $certificateData->image);
+                                if (file_exists(asset('uploads/team/' . $certificateData->image))) {
+                                    unlink(asset('uploads/team/' . $certificateData->image));
                                 }
                             }
 
@@ -440,22 +443,41 @@ class TeamController extends Controller
      */
     public function destroy($id)
     {
-
         $data = TeamModel::find($id);
-        if ($data->banner != NULL) {
-            if (file_exists(env('PUBLIC_PATH') . 'uploads/team/' . $data->banner)) {
-                unlink(env('PUBLIC_PATH') . 'uploads/team/' . $data->banner);
+
+        if ($data) {
+
+            // Delete banner
+            if ($data->banner) {
+
+                $bannerPath = public_path('uploads/team/' . $data->banner);
+
+                if (file_exists($bannerPath)) {
+                    unlink($bannerPath);
+                }
             }
-        }
-        if ($data->thumbnail != NULL) {
-            if (file_exists(env('PUBLIC_PATH') . 'uploads/team/' . $data->thumbnail)) {
-                unlink(env('PUBLIC_PATH') . 'uploads/team/' . $data->thumbnail);
+
+            // Delete thumbnail
+            if ($data->thumbnail) {
+
+                $thumbnailPath = public_path('uploads/team/' . $data->thumbnail);
+
+                if (file_exists($thumbnailPath)) {
+                    unlink($thumbnailPath);
+                }
             }
+
+            // Delete relations
+            $data->seo()->delete();
+            $data->certificates()->delete();
+
+            // Delete record
+            $data->delete();
         }
-        $data->seo()->delete();
-        $data->certificates()->delete();
-        $data->delete();
-        return 'Are you sure to delete?';
+
+        return response()->json([
+            'message' => 'Deleted successfully.'
+        ]);
     }
 
 
@@ -463,36 +485,59 @@ class TeamController extends Controller
     public function certificatesdestroy($team_id, $id)
     {
         $data = Certificates::find($id);
-        if ($data->image != NULL) {
-            unlink('uploads/team/' . $data->image);
+
+        if ($data && $data->image) {
+
+            $filePath = public_path('uploads/team/' . $data->image);
+
+            if (file_exists($filePath)) {
+                unlink($filePath);
+            }
         }
-        $data->delete();
-        return 'Are you sure to delete?';
+
+        if ($data) {
+            $data->delete();
+        }
+
+        return response()->json([
+            'message' => 'Deleted successfully.'
+        ]);
     }
 
     public function thumbdelete($id)
     {
         $data = TeamModel::find($id);
-        if ($data->thumbnail) {
-            if (file_exists(env('PUBLIC_PATH') . 'uploads/team/' . $data->thumbnail)) {
-                unlink(env('PUBLIC_PATH') . 'uploads/team/' . $data->thumbnail);
+
+        if ($data && $data->thumbnail) {
+
+            $filePath = public_path('uploads/team/' . $data->thumbnail);
+
+            if (file_exists($filePath)) {
+                unlink($filePath);
             }
+
+            $data->thumbnail = null;
+            $data->save();
         }
-        $data->thumbnail = NULL;
-        $data->save();
+
         return response('Delete Successful.');
     }
-
     public function bannerdelete($id)
     {
         $data = TeamModel::find($id);
-        if ($data->banner) {
-            if (file_exists(env('PUBLIC_PATH') . 'uploads/team/' . $data->banner)) {
-                unlink(env('PUBLIC_PATH') . 'uploads/team/' . $data->banner);
+
+        if ($data && $data->banner) {
+
+            $filePath = public_path('uploads/team/' . $data->banner);
+
+            if (file_exists($filePath)) {
+                unlink($filePath);
             }
+
+            $data->banner = null;
+            $data->save();
         }
-        $data->banner = NULL;
-        $data->save();
+
         return response('Delete Successful.');
     }
 }
