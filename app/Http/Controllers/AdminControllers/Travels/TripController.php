@@ -239,6 +239,7 @@ class TripController extends Controller
             $data['thumbnail'] = $thumbnail_name;
             $data['trip_map'] = $map_file_name;
             $data['trip_chart'] = $chart_file_name;
+            $data['template'] = 'trip-detail';
 
             $is_draft = '0';
             if ($request->submit == 'publish') {
@@ -754,6 +755,7 @@ class TripController extends Controller
             $data->banner_alt = $request->banner_alt;
             $data->thumbnail_alt = $request->thumbnail_alt;
             $data->tripmap_alt = $request->tripmap_alt;
+            $data->template = 'trip-detail';
 
             $_data = TripModel::find($id);
             $_data->destinations()->detach();

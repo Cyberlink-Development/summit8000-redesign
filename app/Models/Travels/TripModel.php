@@ -48,7 +48,8 @@ class TripModel extends Model
         'meals',
         'tripmap_alt',
         'thumbnail_alt',
-        'banner_alt'
+        'banner_alt',
+        'template'
     ];
 
     /* The destinations that belongs to the trip */
