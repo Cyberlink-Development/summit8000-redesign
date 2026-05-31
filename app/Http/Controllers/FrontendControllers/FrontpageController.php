@@ -321,7 +321,7 @@ class FrontpageController extends Controller
     }
     public function post_tripbooking(Request $request)
     {
-        dd($request->all());
+        // dd($request->all());
         if ($request->isMethod('post')) {
             $request->validate([
                 // Trip

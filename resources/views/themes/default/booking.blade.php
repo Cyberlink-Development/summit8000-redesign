@@ -236,7 +236,7 @@
                                     <div class="space-y-3">
                                         <label class="flex items-center gap-3 cursor-pointer">
                                             <input type="radio" id="insurance-yes" name="insurance" value="yes"
-                                                class="w-4 h-4 bg-neutral-secondary-medium text-brand-500 border border-default-medium focus:ring-brand-400">
+                                                class="w-4 h-4 bg-neutral-secondary-medium text-brand-500 border border-default-medium focus:ring-brand-400" required>
                                             <span class="text-sm font-semibold text-slate-700">I have full coverage of
                                                 Insurance</span>
                                         </label>
