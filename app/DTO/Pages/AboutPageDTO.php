@@ -250,6 +250,7 @@ class AboutPageDTO
             return [];
         }
 
+        // dd($post);
         // achievements: stored as JSON array or newline-delimited string
         $achievements = $post->post_content ?? [];
 
@@ -277,7 +278,7 @@ class AboutPageDTO
             'sub_title' => $post->sub_title   ?? '',
             'tag'       => $post->about_type  ?? '',
             'thumbnail' => [
-                'url' => $post->page_thumbnail ?? '',
+                'url' => $post->page_thumbnail ? asset('uploads/original/' . $post->page_thumbnail) : '',
                 'alt' => $post->post_title     ?? '',
             ],
             'badge'        => $badge,           // object: { icon, title, description }
