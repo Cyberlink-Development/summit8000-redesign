@@ -7,12 +7,17 @@ use App\Models\Travels\ActivityModel;
 use App\Models\Travels\TripModel;
 use App\Services\About\AboutPageService;
 use App\Services\Blog\BlogService;
+use App\Models\Settings\SettingModel;
+use App\Models\Posts\PostTypeModel;
+use App\Models\Posts\PostModel;
+use App\Model\TripReview;
+use App\Models\Travels\TripGearModel;
 
 class HomeService
 {
 
     public function __construct(
-        protected BlogService $blogService
+        protected BlogService $blogService,
     ) {}
     public function get(): array
     {
@@ -20,7 +25,7 @@ class HomeService
 
             'hero' => $this->hero(),
 
-            'story' => [],
+            'story' => $this->story(),
 
             'categories' => $this->categories(),
 
@@ -51,6 +56,17 @@ class HomeService
             ->latest('id')
             ->first();
 
+        $settings = SettingModel::select(
+            'text1_title',
+            'text1_sub_title',
+            'text2_title',
+            'text2_sub_title',
+            'text3_title',
+            'text3_sub_title',
+            'text4_title',
+            'text4_sub_title',
+        )->first();
+
         if (!$banner) {
             return [
                 'banner' => null,
@@ -73,7 +89,7 @@ class HomeService
 
         return [
             'banner' => [
-                'url' => asset('uploads/banners/'.$banner->picture),
+                'url' => asset('uploads/banners/' . $banner->picture),
                 'alt' => $banner->picture_alt ?? $banner->title,
             ],
 
@@ -97,23 +113,23 @@ class HomeService
 
             'stats' => [
                 [
-                    'value' => '847',
-                    'label' => 'Summits Achieved',
+                    'value' => $settings->text1_title ?? '1000+',
+                    'label' => $settings->text1_sub_title ?? "Summits Achieved",
                 ],
 
                 [
-                    'value' => '26yr',
-                    'label' => 'Of Excellence',
+                    'value' => $settings->text2_title ?? '26yr',
+                    'label' => $settings->text2_sub_title ?? "Of Excellence",
                 ],
 
                 [
-                    'value' => '14',
-                    'label' => 'Eight-Thousanders',
+                    'value' => $settings->text3_title ?? '14',
+                    'label' => $settings->text3_sub_title ?? "Eight-Thousanders",
                 ],
 
                 [
-                    'value' => '98%',
-                    'label' => 'Safety Record',
+                    'value' => $settings->text4_title ?? '98%',
+                    'label' => $settings->text4_sub_title ?? "Safety Record",
                 ],
             ],
         ];
@@ -127,10 +143,44 @@ class HomeService
 
     private function story(): array
     {
-        // $aboutPage = $this->aboutPageService->getStorySection();
-        $aboutPage = [];
+        $about = PostTypeModel::query()->where('template', 'about')->first();
+        $post = PostModel::where('post_type', $about->id)->where('about_type', 'story')->first();
 
-        return $aboutPage->story ?? [];
+        return [
+            'caption'     => $post->post_title  ?? '',
+            'title'       => $post->sub_title    ?? '',
+            'description' => $post->post_content ?? '',
+
+            // guides is an object with title, sub_title, and items array
+            'guides' => [
+                'title'     => $post->guides_title     ?? '',
+                'sub_title' => $post->guides_sub_title ?? '',
+                'items'     => collect($post->guides ?? [])
+                    ->map(fn($guide, $index) => [
+                        'slug'      => $guide->uri ?? ('sher-guide-' . ($index + 1)),
+                        'avatar'    => strtoupper(substr($guide->name ?? '', 0, 2)),
+                        'thumbnail' => [
+                            'url' => $guide->thumbnail ?? '',
+                            'alt' => $guide->name      ?? 'Sherpa Guide',
+                        ],
+                    ])
+                    ->values()
+                    ->toArray(),
+            ],
+
+            'gallery' => collect($post->images ?? [])
+                ->map(fn($image) => [
+                    'thumbnail' => [
+                        'url' => $image->file_name
+                            ? asset('uploads/medium/' . $image->file_name)
+                            : '',
+                        'alt' => $image->title ?? '',
+                    ],
+                    'caption' => $image->title ?? '',
+                ])
+                ->values()
+                ->toArray(),
+        ];
     }
 
     /*
@@ -163,13 +213,13 @@ class HomeService
 
                     return [
 
-                        'uuid' => $item->uuid ?? '',
+                        'slug' => $item->slugs()->first()->slug,
 
                         'caption' => $item->sub_title ?? '',
 
                         'title' => $item->title ?? '',
 
-                        'href' => $item->slugs()?->first()?->slug ,
+                        'href' => $item->slugs()?->first()?->uri,
 
                         'elevation' => $item->elevation ?? '',
 
@@ -216,7 +266,7 @@ class HomeService
 
             'cta' => [
                 'label' => 'View All Expeditions',
-                'href' => ActivityModel::query()->first()?->slugs()?->first()?->slug ,
+                'href' => ActivityModel::query()->first()?->slugs()?->first()?->slug,
                 'type' => 'internal',
             ],
 
@@ -229,7 +279,7 @@ class HomeService
 
                         'tag' => trim(
                             ($trip->max_altitude ?? '') .
-                            ($trip->best_season ? ' · ' . $trip->best_season : '')
+                                ($trip->best_season ? ' · ' . $trip->best_season : '')
                         ),
 
                         'title' => $trip->trip_title ?? '',
@@ -268,7 +318,7 @@ class HomeService
 
                         'thumbnail' => [
                             'url' => $trip->thumbnail
-                                ? asset('uploads/thumbnails/'.$trip->thumbnail)
+                                ? asset('uploads/thumbnails/' . $trip->thumbnail)
                                 : asset('theme-assets/assets/trip/1.jpg'),
 
                             'alt' => $trip->trip_title ?? '',
@@ -297,7 +347,28 @@ class HomeService
     private function testimonials(): array
     {
         // return $this->aboutPageService->getTestimonials();
-        return [];
+        $reviews = TripReview::latest()->take(6)->get();
+
+        return [
+            'caption'     => 'Client Stories',
+            'title'       => 'Words from the Summit',
+            'description' => 'Our greatest achievement is not the records we hold — it\'s the stories our clients carry home from the highest places on Earth.',
+            'items'       => $reviews->map(fn($review, $index) => [
+                'slug'      => 't' . ($index + 1),
+                'rating'    => (float) ($review->rating ?? 5),
+                'thumbnail' => [
+                    'url' => $review->image
+                        ? asset('uploads/reviews/' . $review->image)
+                        : '',
+                    'alt' => $review->full_name ?? '',
+                ],
+                'comment'     => $review->message    ?? '',
+                'tag'         => $review->trip_title ?? '',
+                'name'        => $review->full_name  ?? '',
+                'avatar'      => strtoupper(substr($review->full_name ?? '', 0, 2)),
+                'achievement' => $review->title       ?? '',
+            ])->values()->toArray(),
+        ];
     }
 
     /*
@@ -308,8 +379,51 @@ class HomeService
 
     private function why(): array
     {
-        // return $this->aboutPageService->getWhySection();
-        return [];
+        $about = PostTypeModel::query()->where('template', 'about')->first();
+        $post = PostModel::where('post_type', $about->id)->where('about_type', 'why')->first();
+        return [
+            'caption'     => $post->post_title  ?? '',
+            'title'       => $post->sub_title    ?? '',
+            'thumbnail' => [
+                'url' => $post->page_thumbnail
+                    ? asset('uploads/original/' . $post->page_thumbnail)
+                    : '',
+                'alt' => $post->post_title ?? '',
+            ],
+            'items'       => collect($post->associated_posts ?? [])
+                ->map(function ($item) {
+
+                    // bullets: stored as JSON array or newline-delimited string
+                    $bullets = $item->content ?? [];
+
+                    if (is_string($bullets)) {
+                        $decoded = json_decode($bullets, true);
+                        $bullets = is_array($decoded)
+                            ? $decoded
+                            : array_values(array_filter(explode("\n", strip_tags($bullets))));
+                    }
+
+                    $result = [
+                        'thumbnail' => [
+                            'url' => $item->thumbnail
+                                ? asset('uploads/associated/' . $item->thumbnail)
+                                : '',
+                            'alt' => $item->title ?? '',
+                        ],
+                        'title'       => $item->title ?? '',
+                        'description' => $item->brief  ?? '',
+                    ];
+
+                    // only include bullets key when there is data
+                    if (! empty($bullets)) {
+                        $result['bullets'] = $bullets;
+                    }
+
+                    return $result;
+                })
+                ->values()
+                ->toArray(),
+        ];
     }
 
     /*
@@ -363,6 +477,7 @@ class HomeService
 
     private function gallery(): array
     {
+    $photos = TripGearModel::where('thumbnail', '!=', 'NULL')->orderBy('ordering', 'desc')->take(7)->get();
         return [
             'caption' => 'Expedition Gallery',
 
@@ -374,25 +489,19 @@ class HomeService
                 'type' => 'internal',
             ],
 
-            'items' => [
-                [
-                    'slug' => 'gallery-1',
+            'items' => collect($photos)
+                ->map(function ($item) {
 
-                    'thumbnail' => [
-                        'url' => asset('/images/placeholder-thumbnail.webp'),
-                        'alt' => 'Everest Summit',
-                    ],
-                ],
+                    return [
+                        'slug' => $item->thumbnail ? asset('/uploads/original/' . $item->thumbnail) : asset('theme-assets/assets/trip/8000.jpg'),
 
-                [
-                    'slug' => 'gallery-2',
-
-                    'thumbnail' => [
-                        'url' => asset('/images/placeholder-thumbnail.webp'),
-                        'alt' => 'Lhotse Face',
-                    ],
-                ],
-            ],
+                        'thumbnail' => [
+                            'url' => $item->thumbnail ? asset('/uploads/original/' . $item->thumbnail) : asset('theme-assets/assets/trip/8000.jpg') 
+                                ,
+                            'alt' => $item->title ?? '',
+                        ],
+                    ];
+                })
         ];
     }
 
@@ -404,6 +513,8 @@ class HomeService
 
     private function blog(): array
     {
+        $data = PostModel::query()
+            ->where('post_type', 33)->get();
         return [
 
             'caption' => 'Inspiration & Knowledge',
@@ -416,8 +527,27 @@ class HomeService
                 'type' => 'internal',
             ],
 
-            // 👇 pulling reusable items from BlogPageService
-            'items' => [],
+            'items' => collect($data)
+                ->map(function ($item) {
+
+                    return [
+                        'slug'          => $item->slugs()->first()->slug,
+                        'category'      => $item->category?->category ?? '',
+                        'title'         => $item->post_title,
+                        "author" => "By Ang Dorji Sherpa · 12 min read · March 2025",
+                        'href'          => $item->href,
+                        'published_at'  => $item->created_at?->toDateString(),
+                        'reading_time'  => $item->reading_time,
+                        'thumbnail' => [
+                            'url' => $item->page_thumbnail
+                                ? asset('uploads/original/' . $item->page_thumbnail)
+                                : '',
+                            'alt' => $item->post_title ?? '',
+                        ],
+                    ];
+                })
+                ->values()
+                ->toArray(),
         ];
     }
 
@@ -443,6 +573,4 @@ class HomeService
                 : 'internal',
         ];
     }
-
-
 }

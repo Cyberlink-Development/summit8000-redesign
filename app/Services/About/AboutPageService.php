@@ -39,7 +39,6 @@ class AboutPageService
             ->where('post_type', $aboutSlug->id)
             ->where('status', 1)
             ->get();
-
         // ── Team data from TeamService ─────────────────────────────────────
         // $team = $this->teamListService->aboutSection();
 
