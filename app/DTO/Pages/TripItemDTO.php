@@ -23,6 +23,7 @@ class TripItemDTO
 
     public static function fromModel($trip): self
     {
+        // dd($trip);
         return new self(
             template: $trip->template,
             slug: $trip->slug ?? null,
@@ -48,9 +49,9 @@ class TripItemDTO
 
             thumbnail: [
                 'url' => $trip->thumbnail
-                    ? asset('uploads/original/' . $trip->thumbnail)
+                    ? asset('uploads/thumbnails/' . $trip->thumbnail)
                     : asset('images/placeholder-thumbnail.webp'),
-                'alt' => $trip->title ?? '',
+                'alt' => $trip->thumbnail_alt ?? $trip->title,
             ],
 
             cta: [

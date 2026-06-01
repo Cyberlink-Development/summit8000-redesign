@@ -22,7 +22,7 @@ class TripCategoryItemDTO
     public static function fromModel(
         $tripType,
     ): self {
-        // dd($tripType->slugs()->first()->slug);
+        // dd($tripType->slugs()->first()->slug,$tripType);
         return new self(
             template: $tripType->template,
 
@@ -35,11 +35,11 @@ class TripCategoryItemDTO
             caption : $tripType->sub_title ?? null,
             description : $tripType->content ?? null,
             thumbnail : [
-                'url' => $tripType->banner
-                    ? asset('uploads/original/' . $tripType->banner)
+                'url' => $tripType->thumbnail
+                    ? asset('uploads/icon/' . $tripType->thumbnail)
                     : asset('theme-assets/assets/trip/8000.jpg'),
 
-                'alt' => $tripType->banner_alt ?? ($tripType->title ?? null),
+                'alt' => $tripType->thumbnail_alt ?? ($tripType->title ?? null),
             ],
         );
     }

@@ -20,5 +20,11 @@ class TeamCategory extends Model
     {
         return $this->morphMany(PageSlug::class, 'sluggable');
     }
+    protected static function booted()
+    {
+        static::deleting(function ($model) {
+            $model->slugs()->delete();
+        });
+    }
 
 }
