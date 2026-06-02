@@ -3,7 +3,8 @@
 use App\Http\Controllers\Api\CollectionController;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Api\SettingsController;
-use App\Http\Controllers\Api\AboutController;
+use App\Http\Controllers\Api\BookingController;
+use App\Http\Controllers\Api\CustomizeTripController;
 use App\Http\Controllers\Api\TripController;
 use App\Http\Controllers\Api\SlugResolverController;
 
@@ -18,6 +19,16 @@ Route::get('/blog/{slug}', [App\Http\Controllers\Api\BlogController::class, 'sho
 Route::middleware('throttle:60,1')->get('/settings', [SettingsController::class, 'index']);
 Route::get('/page', [SlugResolverController::class, 'resolve']);
 Route::get('/collection', [CollectionController::class, 'index']);
+
+Route::prefix('book')->group(function () {
+    Route::get('/{slug}', [BookingController::class, 'index']);
+    Route::post('/', [BookingController::class, 'store']);
+});
+
+Route::prefix('plan-expedition')->group(function () {
+    Route::get('/', [CustomizeTripController::class, 'index']);
+    Route::post('/', [CustomizeTripController::class, 'store']);
+});
 
 //Temporary route for vercel to deploy changes
 Route::get('/customize-trip', function () {
