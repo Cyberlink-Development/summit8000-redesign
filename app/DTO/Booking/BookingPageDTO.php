@@ -3,43 +3,59 @@
 namespace App\DTO\Booking;
 
 use App\DTO\Common\SeoDTO;
+use App\Models\Travels\TripModel;
 
 class BookingPageDTO
 {
     public function __construct(
-        protected $trip
-    ) {
+        public readonly array $hero,
+        public readonly array $detail,
+        public readonly array $steps,
+        public readonly array $form_blocks,
+        public readonly array $countries,
+        public readonly array $payment_options,
+        public readonly array $hbl_notice,
+        public readonly array $settings,
+        public readonly array $card_logos,
+        public readonly array $trust_items,
+        public readonly ?SeoDTO $seo,
+    ) {}
+
+    public static function fromModel(TripModel $trip): self
+    {
+        return new self(
+            hero:            self::hero($trip),
+            detail:          self::tripinfo($trip),
+            steps:           self::steps(),
+            form_blocks:     self::formBlocks(),
+            countries:       self::countries(),
+            payment_options: self::paymentOptions(),
+            hbl_notice:      self::hblNotice(),
+            settings:        self::settings(),
+            card_logos:      self::cardLogos(),
+            trust_items:     self::trustItems(),
+            seo:             SeoDTO::fromModel($trip),
+        );
     }
 
     public function toArray(): array
     {
         return [
-
-            'hero' => $this->hero($this->trip),
-
-            'detail' => $this->tripinfo($this->trip),
-
-            'steps' => $this->steps(),
-
-            'form_blocks' => $this->formBlocks(),
-
-            'countries' => $this->countries(),
-
-            'payment_options' => $this->paymentOptions(),
-
-            'hbl_notice' => $this->hblNotice(),
-
-            ...$this->settings(),
-
-            'card_logos' => $this->cardLogos(),
-
-            'trust_items' => $this->trustItems(),
-
-            'seo' => SeoDTO::fromModel($this->trip),
+            'hero'            => $this->hero,
+            'detail'          => $this->detail,
+            'steps'           => $this->steps,
+            'form_blocks'     => $this->form_blocks,
+            'countries'       => $this->countries,
+            'payment_options' => $this->payment_options,
+            'hbl_notice'      => $this->hbl_notice,
+            ...$this->settings,
+            'card_logos'      => $this->card_logos,
+            'trust_items'     => $this->trust_items,
+            'seo'             => $this->seo,
         ];
     }
 
-    protected function hero($trip): array
+    private static function hero($trip): array
     {
         return [
             'breadcrumb' => [
@@ -61,7 +77,7 @@ class BookingPageDTO
             'title_em' => 'Summit',
         ];
     }
-    protected function tripInfo($trip): array
+    private static function tripInfo($trip): array
     {
         return [
 
@@ -81,7 +97,7 @@ class BookingPageDTO
         ];
     }
 
-    protected function steps(): array
+    private static function steps(): array
     {
         return [
             [
@@ -107,7 +123,7 @@ class BookingPageDTO
         ];
     }
 
-    protected function formBlocks(): array
+    private static function formBlocks(): array
     {
         return [
             [
@@ -131,12 +147,12 @@ class BookingPageDTO
         ];
     }
 
-    protected function countries(): array
+    private static function countries(): array
     {
         return config('countries', []);
     }
 
-    protected function paymentOptions(): array
+    private static function paymentOptions(): array
     {
         return [
             [
@@ -156,7 +172,7 @@ class BookingPageDTO
         ];
     }
 
-    protected function hblNotice(): array
+    private static function hblNotice(): array
     {
         return [
             'logo_text' => 'HBL',
@@ -165,7 +181,7 @@ class BookingPageDTO
         ];
     }
 
-    protected function settings(): array
+    private static function settings(): array
     {
         return [
 
@@ -185,7 +201,7 @@ class BookingPageDTO
         ];
     }
 
-    protected function cardLogos(): array
+    private static function cardLogos(): array
     {
         return [
             'VISA',
@@ -195,7 +211,7 @@ class BookingPageDTO
         ];
     }
 
-    protected function trustItems(): array
+    private static function trustItems(): array
     {
         return [
             [
