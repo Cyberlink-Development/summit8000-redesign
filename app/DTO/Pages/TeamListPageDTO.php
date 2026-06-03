@@ -61,8 +61,8 @@ class TeamListPageDTO
                 'title'       => 'Passionate About Mountains?',
                 'description' => 'We\'re always looking for experienced guides.',
                 'cta' => [
-                    'label' => 'Explore Careers',
-                    'href'  => '/careers',
+                    'label' => 'Explore More',
+                    'href'  => '/about',
                     'type'  => 'internal',
                 ],
             ],
