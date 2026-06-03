@@ -163,7 +163,7 @@ class TeamDetailPageDTO
             'description' => 'Ready to experience the Himalayas with one of Nepal\'s most respected guides?',
             'primary'     => [
                 'label' => 'Send an Inquiry',
-                'href'  => '/contact',
+                'href'  => '/plan-expedition',
                 'type'  => 'internal',
             ],
         ];

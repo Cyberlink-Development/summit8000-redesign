@@ -480,7 +480,7 @@ class HomeService
     private function gallery(): array
     {
         $photos = TripGearModel::where('thumbnail', '!=', 'NULL')->orderBy('ordering', 'desc')->take(7)->get();
-        $gallery=PosttypeModel::where('id',54)->first();
+        $gallery = PosttypeModel::where('id', 54)->first();
         return [
             'caption' => 'Expedition Gallery',
 
@@ -516,7 +516,7 @@ class HomeService
     private function blog(): array
     {
         $data = PostModel::query()
-            ->where('post_type', 33)->get();
+            ->where('post_type', 33)->take(3)->get();
         $blog = PosttypeModel::where('id', 33)->first();
         return [
 
@@ -537,14 +537,14 @@ class HomeService
                         'slug'          => $item->slugs()->first()->slug,
                         'category'      => $item->category?->category ?? '',
                         'title'         => $item->post_title,
-                        "author" => "By Ang Dorji Sherpa · 12 min read · March 2025",
-                        'href'          => $item->href,
-                        'published_at'  => $item->created_at?->toDateString(),
+                        "author" => "By {$item->author} {$item->reading_time}",
+                        'href'          => $item->slugs()->first()->slug,
+                        'published_at'  => \Carbon\Carbon::parse($item->created_at)->format('F Y'),
                         'reading_time'  => $item->reading_time,
                         'thumbnail' => [
                             'url' => $item->page_thumbnail
                                 ? asset('uploads/original/' . $item->page_thumbnail)
-                                :asset('theme-assets/assets/trip/8000.jpg') ,
+                                : asset('theme-assets/assets/trip/8000.jpg'),
                             'alt' => $item->post_title ?? '',
                         ],
                     ];

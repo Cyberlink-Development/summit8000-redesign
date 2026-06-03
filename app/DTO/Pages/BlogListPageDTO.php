@@ -65,7 +65,7 @@ class BlogListPageDTO
             'item'  => [
                 'uuid'         => (string) $post->id,
                 'title'        => $post->post_title,
-                'slug'         => $post->uri,
+                'slug'         => $post->slugs()->first()->slug,
                 'category'     => $post->category?->category ?? null,
                 'excerpt'      => $post->post_excerpt,
                 'published_at' => $post->created_at?->toDateString(),
@@ -83,7 +83,7 @@ class BlogListPageDTO
                 ],
                 'cta' => [
                     'label' => 'Read Story',
-                    'href'  => '/blog/' . $post->uri,
+                    'href'  => $post->slugs()->first()->slug,
                     'type'  => 'internal',
                 ],
             ],
