@@ -159,7 +159,7 @@ class BannerController extends Controller
         $data->secondary_cta = $request->secondary_cta;
         $data->primary_cta_link = $request->primary_cta_link;
         $data->secondary_cta_link = $request->secondary_cta_link;
-        $data->status = $request->status;
+        // $data->status = $request->status;
         $data->save();
         if ($data->save()) {
             return redirect()->back()->with('success', 'Update Successful.');

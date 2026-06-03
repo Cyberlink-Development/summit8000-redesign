@@ -74,7 +74,7 @@ class BlogListPageDTO
                 'thumbnail'    => [
                     'url' => $post->page_thumbnail
                         ? asset('uploads/medium/' . $post->page_thumbnail)
-                        : asset('theme-assets/assets/trip/2.jpg'),
+                        : asset('theme-assets/assets/trip/8000.jpg'),
                     'alt' => $post->post_title,
                 ],
                 'highlight' => [
