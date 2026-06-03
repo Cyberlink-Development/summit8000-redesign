@@ -3,14 +3,17 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreBookingRequest;
 use App\Services\Booking\BookingService;
 use App\Traits\ApiResponse;
+use Exception;
 use Throwable;
 use Illuminate\Http\Request;
 use App\Mail\BookTrip;
 use App\Mail\AdminBookingMail;
 use Illuminate\Support\Facades\Mail;
 use App\Models\PageSlug;
+use Log;
 
 class BookingController extends Controller
 {
@@ -40,24 +43,11 @@ class BookingController extends Controller
         }
     }
 
-    public function store(Request $request)
+    public function store(StoreBookingRequest $request)
     {
         try {
-            $validated = $request->validate([
-                'slug' => 'required|string',
-                'title' => 'required|string',
-                'price' => 'required',
-                'full_name' => 'required|string|max:255',
-                'email' => 'required|email|max:255',
-                'country' => 'required|string|max:255',
-                'phone' => 'required|string|max:50',
-                'total_travellers' => 'required|integer|min:1',
-                'message' => 'nullable|string',
-                'payment_type' => 'nullable|string',
-                'trip_start_date' => 'nullable|date',
-                'agree_terms' => 'required|accepted',
-            ]);
-            $slug = '/' . ltrim($validated['slug'], '/');
+            $validated = $request->validated();
+            $slug = '/' . ltrim($validated['trip_slug'], '/');
             $trip = PageSlug::with('sluggable')->where('slug', $slug)->first()?->sluggable;
             if (!$trip || !$trip instanceof TripModel) {
 
@@ -88,7 +78,9 @@ class BookingController extends Controller
                 'Booking submitted successfully'
             );
 
-        } catch (Throwable $e) {
+        } catch (Exception $e) {
+
+            Log::error($e);
 
             return $this->errorResponse(
                 $e->getMessage(),
