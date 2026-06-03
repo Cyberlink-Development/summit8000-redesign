@@ -64,7 +64,7 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="inputStandard" class="col-lg-3 control-label"> Is Things To Know? </label>
+                        <label for="inputStandard" class="col-lg-3 control-label"> Is Footer? </label>
                         <div class="col-lg-8">
                             <div class="bs-component">
                                 <select name="is_footer" class="form-control input-sm">
@@ -162,7 +162,7 @@
                             <option value="team-list" {{ old('template', $data->template) == 'team-list' ? 'selected' : '' }}>
                                 Team
                             </option>
-                            <option value="terms-conditions" {{ old('template', $data->template) == 'terms-conditions' ? 'selected' : '' }}>
+                            <option value="terms" {{ old('template', $data->template) == 'terms' ? 'selected' : '' }}>
                                 Terms & Condition
                             </option>
                         </select>

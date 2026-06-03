@@ -30,7 +30,7 @@ enum TemplateEnum: string
     case GALLERY = 'gallery';
     case ABOUT = 'about';
     case TRIP_CATEGORY = 'category';
-    case TERMS = 'terms-conditions';
+    case TERMS = 'terms';
 
     public function service(): string
     {

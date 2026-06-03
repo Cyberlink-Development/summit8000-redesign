@@ -17,7 +17,7 @@
                                         <th class="">SN</th>
                                         <th class="">Post Type</th>
                                         <th class="">Is Header? </th>
-                                        <th class="">Is Things To Know? </th>
+                                        <th class="">Is Footer? </th>
                                         <th class=""> Ordering </th>
                                         <th class="">Date</th>
                                         <th class="text-left">Action</th>

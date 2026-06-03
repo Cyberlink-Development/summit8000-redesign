@@ -9,6 +9,8 @@ use App\Http\Resources\HeaderResource;
 use App\Http\Resources\FooterResource;
 use Illuminate\Support\Facades\Cache;
 use App\DTO\Common\SeoDTO;
+use App\Models\Travels\ActivityModel;
+
 class SettingsController extends Controller
 {
     public function index()
@@ -20,12 +22,19 @@ class SettingsController extends Controller
             ->orderBy('ordering')
             ->get();
 
-        $pages = PostTypeModel::where('status', 1)
-            ->where('is_footer', 1)
+        $pages = PostTypeModel::query()
+            ->withoutGlobalScopes()
+            ->where('status', 1)
+            ->where('is_footer', '1')
             ->orderBy('ordering')
             ->get();
 
-        // dd($menus,$pages);
+        $expeditions = ActivityModel::where('status', '1')
+            ->where('activity_parent' , 'expedition')
+            ->orderBy('ordering', 'asc')
+            ->get();
+
+        // dd($expeditions);
         $data = [
             'data' => [
                 'site_name' => $settings->site_name,
@@ -67,6 +76,7 @@ class SettingsController extends Controller
                 'footer' => (new FooterResource([
                     'settings' => $settings,
                     'pages'    => $pages,
+                    'expeditions' => $expeditions,
                 ]))->resolve(),
 
                 'seo' => SeoDTO::fromModel($settings),
