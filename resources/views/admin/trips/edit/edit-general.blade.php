@@ -591,31 +591,32 @@
             </div>
 
             <!-- trip chart -->
-            <!--<div class="sid_bvijay mb10">-->
-            <!--    <h4> Altitude Chart </h4>-->
-            <!--    <div class="hd_show_con">-->
-            <!--        <div class="bs-component">-->
-            <!--            <label class="field prepend-icon append-button file mb20">-->
-            <!--                <span class="button btn btn-primary">{{ $data->trip_chart ? 'Change' : 'Choose File' }}</span>-->
-            <!--                <input type="file" class="gui-file" name="trip_chart" id="file2"-->
-            <!--                    onChange="document.getElementById('trip_chart').value = this.value;">-->
-            <!--                <input type="text" class="gui-input" id="trip_chart"-->
-            <!--                    placeholder="Please select a photo">-->
-            <!--                <label class="field-icon">-->
-            <!--                    <i class="fa fa-upload"></i>-->
-            <!--                </label>-->
-            <!--            </label>-->
-            <!--        </div>-->
-            <!--        @if ($data->trip_chart)-->
-            <!--            <div class="delete-fe-image chart_id{{ $data->id }}">-->
-            <!--                <img src="{{ asset(env('PUBLIC_PATH') . 'uploads/original/' . $data->trip_chart) }}"-->
-            <!--                    width="200px" />-->
-            <!--                <a href="#{{ $data->id }}" class="chartdelete">X</a>-->
-            <!--            </div>-->
-            <!--        @endif-->
-            <!--        <small> (Width: 1500px Height: 1500px) </small>-->
-            <!--    </div>-->
-            <!--</div>-->
+            <div class="sid_bvijay mb10">
+               <h4> Altitude Chart </h4>
+               <div class="hd_show_con">
+                   <div class="bs-component">
+                       <label class="field prepend-icon append-button file mb20">
+                           <span class="button btn btn-primary">{{ $data->trip_chart ? 'Change' : 'Choose File' }}</span>
+                           <input type="file" class="gui-file" name="trip_chart" id="file2"
+                               onChange="document.getElementById('trip_chart').value = this.value;">
+                           <input type="text" class="gui-input" id="trip_chart"
+                               placeholder="Please select a photo">
+                           <label class="field-icon">
+                               <i class="fa fa-upload"></i>
+                           </label>
+                       </label>
+                   </div>
+                   @if ($data->trip_chart)
+                       <div class="delete-fe-image chart_id{{ $data->id }}">
+                           <img src="{{ asset(env('PUBLIC_PATH') . 'uploads/original/' . $data->trip_chart) }}"
+                               width="200px" />
+                           <a href="#{{ $data->id }}" class="chartdelete">X</a>
+                       </div>
+                   @endif
+                   <small> (Width: 1500px Height: 1500px) </small>
+               </div>
+            </div>
+
             <!-- trip banner -->
             <div class="sid_bvijay mb10">
                 <h4> Trip Banner </h4>

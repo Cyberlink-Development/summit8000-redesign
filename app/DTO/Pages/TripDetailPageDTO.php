@@ -351,7 +351,7 @@ class TripDetailPageDTO
             'description' => 'Have questions or need trip planning help? Contact us anytime — our travel experts are here to assist you!',
             'cta'         => [
                 'label' => 'Customize Trip',
-                'href'  => '/customize-trip',
+                'href'  => '/plan-expedition',
                 'type'  => 'internal',
             ],
         ];
@@ -373,14 +373,19 @@ class TripDetailPageDTO
             'title'       => 'Route Map & Elevation',
             'description' => 'A visual guide to your journey through the legendary Khumbu region.',
             'thumbnail'   => [
-                'url' => $trip->route_map
-                    ? asset('uploads/original/' . $trip->route_map)
+                'url' => $trip->trip_map
+                    ? asset('uploads/original/' . $trip->trip_map)
                     : null,
                 'alt' => $trip->tripmap_alt ?: $trip->trip_title . ' Route Map',
             ],
             'altitude_chart' => [
-                'title'     => '',
-                'thumbnail' => [],
+                'title'     => $trip->trip_title,
+                'thumbnail' => [
+                    'url' => $trip->trip_chart
+                        ? asset('uploads/original/' . $trip->trip_chart)
+                        : null,
+                    'alt' => $trip->trip_title . ' Altitude Chart',
+                ],
             ],
         ];
     }
@@ -487,7 +492,7 @@ class TripDetailPageDTO
     private static function buildComparison(TripModel $trip, Collection $relatedTrips): array
     {
         $items = [[
-            'label'         => $trip->trip_title . ' ★ You Are Here',
+            'label'         => '★' . $trip->trip_title ,
             'duration'      => $trip->duration ? $trip->duration . ' Days' : null,
             'max_altitude'  => $trip->max_altitude,
             'difficulty'    => grade_message_trek($trip->trip_grade),
