@@ -3,12 +3,14 @@
 namespace App\Services\Booking;
 
 use App\DTO\Booking\BookingPageDTO;
+use App\Http\Resources\BookingPageResource;
+use App\Http\Resources\GlobalCollection;
 use App\Models\PageSlug;
 use App\Models\Inquiry\BookingModel;
 
 class BookingService
 {
-    public function getBookingPage(string $slug): array
+    public function getBookingPage(string $slug): GlobalCollection
     {
         $path = '/' . ltrim($slug, '/');
 
@@ -16,11 +18,16 @@ class BookingService
         // dd($trip);
 
         if (!$trip) {
-        abort(404, 'Trip not found');
+            abort(404, 'Trip not found');
         }
 
 
-        return (new BookingPageDTO($trip))->toArray();
+        // return (new BookingPageDTO($trip))->toArray();
+        return new GlobalCollection(
+            resourceData: new BookingPageResource(
+                trip: $trip,
+            ),
+        );
     }
 
     public function store(array $data): BookingModel
