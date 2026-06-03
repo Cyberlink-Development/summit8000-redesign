@@ -10,6 +10,7 @@ class GalleryResource extends JsonResource
 {
     public function __construct(
         public mixed $page,
+        public mixed $items,
     ) {
         parent::__construct($page);
     }
@@ -17,7 +18,8 @@ class GalleryResource extends JsonResource
     public function toArray(Request $request): array
     {
         return GalleryPageDTO::fromModel(
-        page: $this->page,
+            page: $this->page,
+            items: $this->items
         )->toArray();
       
     }

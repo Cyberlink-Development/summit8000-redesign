@@ -3,7 +3,7 @@
 namespace App\Enums;
 
 use App\Services\Blog\BlogService;
-use App\Services\Collections\TeamListCollectionService;
+use App\Services\Collections\TeamGuideCollectionService;
 use App\Services\Collections\TripCategoryCollectionService;
 use App\Services\Team\TeamDetailService;
 use App\Services\Blog\BlogDetailService;
@@ -16,6 +16,7 @@ use App\Services\Trip\TripCategoryService;
 use App\Services\Home\GalleryService;
 use App\Services\Collections\BlogCollectionService;
 use App\Services\Collections\TripCollectionService;
+use App\Services\Collections\GalleryCollectionService;
 
 
 enum TemplateEnum: string
@@ -53,11 +54,11 @@ enum TemplateEnum: string
     {
         return match ($this) {
             self::BLOG_LIST     => BlogCollectionService::class,
-            self::TEAM_LIST => TeamListCollectionService::class,
+            self::TEAM_LIST => TeamGuideCollectionService::class,
             self::TRIP_LIST     => TripCollectionService::class,
-            self::TRIP_CATEGORY => TripCategoryCollectionService::class
+            self::TRIP_CATEGORY => TripCategoryCollectionService::class,
             // self::ACTIVITY_LIST => ActivityCollectionService::class,
-            // self::GALLERY       => GalleryCollectionService::class,
+            self::GALLERY       => GalleryCollectionService::class,
         };
     }
 }

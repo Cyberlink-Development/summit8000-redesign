@@ -4,6 +4,7 @@ namespace App\DTO\Pages;
 
 use App\DTO\Common\SeoDTO;
 use App\Models\Travels\TripGearModel;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class GalleryPageDTO
 {
@@ -15,7 +16,8 @@ class GalleryPageDTO
     ) {}
 
     public static function fromModel(
-        $page
+        $page,
+        LengthAwarePaginator $items
     ): self {
 
     // dd($page);
@@ -25,7 +27,7 @@ class GalleryPageDTO
 
             hero: self::hero($page),
 
-            items: self::items(),
+            items: GalleryItemDTO::collect($items->items()),
 
             seo: SeoDTO::fromModel($page),
         );
@@ -62,27 +64,6 @@ class GalleryPageDTO
                 ],
             ],
         ];
-    }
-
-    protected static function items(): array
-    {
-        $items = TripGearModel::where('thumbnail', '!=', 'NULL')->orderBy('ordering', 'desc')->take(50)->get();
-        return collect($items)
-
-            ->map(fn ($item) => [
-
-                'slug' => $item->slug,
-
-                'caption' => $item->title,
-
-                'label' => $item->title ?? $item->name,
-
-                'thumbnail' => self::thumbnail($item),
-            ])
-
-            ->values()
-
-            ->toArray();
     }
 
     protected static function thumbnail($item): array
