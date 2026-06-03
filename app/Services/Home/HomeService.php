@@ -53,7 +53,7 @@ class HomeService
     {
         $banner = BannerModel::query()
             ->where('status', 1)
-            ->latest('id')
+            ->latest('created_at')
             ->first();
 
         $settings = SettingModel::select(
@@ -100,15 +100,17 @@ class HomeService
             'description' => $banner->description,
 
             'cta' => [
-                'primary' => $this->cta(
-                    $banner->link_label ?? 'Explore Expeditions',
-                    $banner->link
-                ),
+                'primary' => [
+                    'label' => $banner->primary_cta ?? 'Explore Expeditions',
+                    'href'  => $banner->primary_cta_link ?? '/expeditions',
+                    'type'  => 'internal',
+                ],
 
-                'secondary' => $this->cta(
-                    $banner->link_secondary_label ?? 'Our Story',
-                    $banner->link_secondary
-                ),
+                'secondary' => [
+                    'label' => $banner->secondary_cta ?? 'Our Story',
+                    'href'  => $banner->secondary_cta_link ?? '/about',
+                    'type'  => 'internal',
+                ],
             ],
 
             'stats' => [
@@ -477,7 +479,7 @@ class HomeService
 
     private function gallery(): array
     {
-    $photos = TripGearModel::where('thumbnail', '!=', 'NULL')->orderBy('ordering', 'desc')->take(7)->get();
+        $photos = TripGearModel::where('thumbnail', '!=', 'NULL')->orderBy('ordering', 'desc')->take(7)->get();
         return [
             'caption' => 'Expedition Gallery',
 
@@ -496,8 +498,7 @@ class HomeService
                         'slug' => $item->thumbnail ? asset('/uploads/original/' . $item->thumbnail) : asset('theme-assets/assets/trip/8000.jpg'),
 
                         'thumbnail' => [
-                            'url' => $item->thumbnail ? asset('/uploads/original/' . $item->thumbnail) : asset('theme-assets/assets/trip/8000.jpg') 
-                                ,
+                            'url' => $item->thumbnail ? asset('/uploads/original/' . $item->thumbnail) : asset('theme-assets/assets/trip/8000.jpg'),
                             'alt' => $item->title ?? '',
                         ],
                     ];
@@ -557,20 +558,4 @@ class HomeService
     |--------------------------------------------------------------------------
     */
 
-    private function cta(?string $label, ?string $href): ?array
-    {
-        if (!$label || !$href) {
-            return null;
-        }
-
-        return [
-            'label' => $label,
-
-            'href' => $href,
-
-            'type' => str_starts_with($href, 'http')
-                ? 'external'
-                : 'internal',
-        ];
-    }
 }

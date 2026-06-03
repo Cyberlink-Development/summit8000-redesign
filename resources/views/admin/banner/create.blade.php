@@ -73,7 +73,7 @@
                     </div> --}}
 
 
-                    <div class="form-group">
+                    {{-- <div class="form-group">
                         <label class="col-lg-2 control-label" for="link">Button Link</label>
                         <div class="col-lg-6">
                             <div class="bs-component">
@@ -81,7 +81,58 @@
                                 <br />
                             </div>
                         </div>
+                    </div> --}}
+                      <div class="form-group">
+                        <label class="col-lg-2 control-label" for="link">Primary Button Text</label>
+                        <div class="col-lg-6">
+                            <div class="bs-component">
+                                <input type="text" class="form-control" name="primary_cta" placeholder="Primary Button Text" />
+                                <br />
+                            </div>
+                        </div>
                     </div>
+
+                        <div class="form-group">
+                        <label class="col-lg-2 control-label" for="link">Primary Link</label>
+                        <div class="col-lg-6">
+                            <div class="bs-component">
+                                <input type="text" class="form-control" name="primary_cta_link" placeholder="http://www.google.com" />
+                                <br />
+                            </div>
+                        </div>
+                    </div>
+
+                         <div class="form-group">
+                        <label class="col-lg-2 control-label" for="link">Secondary Button Text</label>
+                        <div class="col-lg-6">
+                            <div class="bs-component">
+                                <input type="text" class="form-control" name="secondary_cta" placeholder="Secondary Button Text" />
+                                <br />
+                            </div>
+                        </div>
+                    </div>
+
+                        <div class="form-group">
+                        <label class="col-lg-2 control-label" for="link">Secondary Link</label>
+                        <div class="col-lg-6">
+                            <div class="bs-component">
+                                <input type="text" class="form-control" name="secondary_cta_link" placeholder="http://www.google.com" />
+                                <br />
+                            </div>
+                        </div>
+                    </div>
+
+                        {{-- <div class="form-group">
+                        <label class="col-lg-2 control-label" for="link">Status </label>
+                        <div class="col-lg-6">
+                            <div class="bs-component">
+                                <select name="status" class="form-control input-sm">
+                                    <option value="0"> Hide </option>
+                                    <option value="1"> Show </option>
+                                </select>
+                            </div>
+                        </div>
+                    </div> --}}
 
                     <div class="form-group">
                         <label class="col-lg-2 control-label" for=""></label>

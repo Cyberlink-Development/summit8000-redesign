@@ -155,6 +155,11 @@ class BannerController extends Controller
         $data->caption = $request->caption;
         $data->link = $request->link;
         $data->youtube_link = $request->youtube_link;
+        $data->primary_cta = $request->primary_cta;
+        $data->secondary_cta = $request->secondary_cta;
+        $data->primary_cta_link = $request->primary_cta_link;
+        $data->secondary_cta_link = $request->secondary_cta_link;
+        $data->status = $request->status;
         $data->save();
         if ($data->save()) {
             return redirect()->back()->with('success', 'Update Successful.');
