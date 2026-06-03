@@ -29,9 +29,10 @@ class TripDetailService
             'slugs',
         ])
         ->where('status', '1')
-        ->where('id', $tripSlug->id) 
+        ->where('id', $tripSlug->id)
         ->firstOrFail();
 
+        // dd($trip);
         $relatedTrips = $this->resolveRelatedTrips($trip);
 
         return new GlobalCollection(
