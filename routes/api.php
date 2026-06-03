@@ -30,10 +30,4 @@ Route::prefix('plan-expedition')->group(function () {
     Route::post('/', [CustomizeTripController::class, 'store']);
 });
 
-//Temporary route for vercel to deploy changes
-Route::get('/customize-trip', function () {
-    return response()->json([
-        'status' => 'ok',
-        'data' => []
-    ]);
-});
+Route::get('trips', [CustomizeTripController::class, 'getTrips']);

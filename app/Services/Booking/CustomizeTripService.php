@@ -3,9 +3,11 @@
 namespace App\Services\Booking;
 
 use App\DTO\Booking\CustomizeTripDTO;
+use App\Http\Resources\CustomizeTripListResource;
 use App\Models\Inquiry\CustomizeModel;
 use App\Models\Settings\SettingModel;
 use App\Models\Travels\TripModel;
+use Illuminate\Http\Request;
 
 class CustomizeTripService
 {
@@ -19,6 +21,38 @@ class CustomizeTripService
             setting: $setting,
             trips: $trips
         ))->toArray();
+    }
+
+    public function getTripsList(Request $request)
+    {
+        $search = trim($request->input('search', ''));
+
+        $trips = TripModel::with('slugs')
+            ->where('status', 1)
+            ->whereHas('slugs')
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where('trip_title', 'LIKE', "%{$search}%");
+            })
+            ->paginate(8);
+        // return CustomizeTripListResource::collection($trips);
+        $nextPageUrl = $trips->hasMorePages()
+            ? "/trips?page=" . ($trips->currentPage() + 1) . ($search !== '' ? "&search=" . urlencode($search) : '')
+            : null;
+        return [
+            'data' => CustomizeTripListResource::collection($trips),
+            'meta' => [
+                'current_page' => $trips->currentPage(),
+                'per_page' => $trips->perPage(),
+                'total' => $trips->total(),
+                'last_page' => $trips->lastPage(),
+                'from' => $trips->firstItem(),
+                'to' => $trips->lastItem(),
+                'has_more' => $trips->hasMorePages(),
+            ],
+            'links' => [
+                'next' => $nextPageUrl,
+            ],
+        ];
     }
 
    public function store(array $data): CustomizeModel

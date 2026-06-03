@@ -49,11 +49,12 @@ class BookingController extends Controller
             $validated = $request->validated();
             $slug = '/' . ltrim($validated['trip_slug'], '/');
             $trip = PageSlug::with('sluggable')->where('slug', $slug)->first()?->sluggable;
-            if (!$trip || !$trip instanceof TripModel) {
+            if (!$trip) {
 
                 return $this->errorResponse(
                     'Trip not found',
-                    404
+                    404,
+                    $trip
                 );
             }
 
@@ -80,7 +81,7 @@ class BookingController extends Controller
 
         } catch (Exception $e) {
 
-            Log::error($e);
+            Log::error($e->getMessage());
 
             return $this->errorResponse(
                 $e->getMessage(),

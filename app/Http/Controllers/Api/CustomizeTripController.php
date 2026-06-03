@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use Illuminate\Http\JsonResponse;
 use Throwable;
 use Illuminate\Http\Request;
 use App\Traits\ApiResponse;
@@ -11,6 +12,8 @@ use App\Services\Booking\CustomizeTripService;
 use App\Mail\AdminCustomizeTrip;
 use App\Mail\UserCustomizeTrip;
 use App\Models\PageSlug;
+use Exception;
+use Log;
 
 class CustomizeTripController extends Controller
 {
@@ -39,13 +42,12 @@ class CustomizeTripController extends Controller
             );
         }
     }
-
     public function store(Request $request)
     {
         try {
 
             $validated = $request->validate([
-                'slug' => 'required|string',
+                'trip_slug' => 'required|string',
                 'title' => 'required|string|max:255',
                 'full_name' => 'required|string|max:255',
                 'email' => 'required|email|max:255',
@@ -101,5 +103,30 @@ class CustomizeTripController extends Controller
                 500
             );
         }
+    }
+
+    public function getTrips(Request $request): JsonResponse
+    {
+        try{
+            return $this->successResponse(
+                $this->customizeTripService->getTripsList($request),
+                'Successfully fetched trips list'
+            );
+        } catch(Exception $e){
+            Log::error('Failed to fetch data: ', [
+                'error' => $e->getMessage(),
+                'context' => [
+                    'search item' => $request->search ?? null,
+                ],
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return $this->errorResponse(
+                'Failed to fetch data',
+                500,
+                ['error' => config('app.debug') ? $e->getMessage() : 'Internal server error'],
+            );
+        }
+        
     }
 }
