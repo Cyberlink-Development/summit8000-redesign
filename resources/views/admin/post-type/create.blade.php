@@ -145,6 +145,7 @@
                             <option value="about">About</option>
                             <option value="gallery">Gallery</option>
                             <option value="team-list">Team</option>
+                            <option value="terms-conditions">Terms & Condition</option>
                         </select>
                         <i class="arrow"></i>
                     </label>

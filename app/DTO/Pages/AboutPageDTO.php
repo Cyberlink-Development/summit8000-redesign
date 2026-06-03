@@ -2,6 +2,7 @@
 
 namespace App\DTO\Pages;
 
+use App\DTO\Common\SeoDTO;
 use App\Model\TripReview;
 use App\Models\Posts\PostTypeModel;
 use Illuminate\Support\Collection;
@@ -20,6 +21,7 @@ class AboutPageDTO
         public readonly array  $testimonials,
         public readonly array  $certifications,
         public readonly array  $cta,
+        public readonly ?SeoDTO $seo,
     ) {}
 
     public static function fromModel(
@@ -46,6 +48,8 @@ class AboutPageDTO
                                 $sections->firstWhere('about_type', 'certifications')
                             ),
             cta:            self::buildCta($settings),
+
+            seo: SeoDTO::fromModel($aboutSlug),
         );
     }
 
@@ -62,6 +66,7 @@ class AboutPageDTO
             'testimonials'   => $this->testimonials,
             'certifications' => $this->certifications,
             'cta'            => $this->cta,
+            'seo'            => $this->seo,
         ];
     }
 

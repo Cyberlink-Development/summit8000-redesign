@@ -133,7 +133,7 @@
                                 Request::segment(2) == 'blogs' ||
                                 Request::segment(2) == 'our-team' ||
                                 Request::segment(2) == 'about' ||
-                                Request::segment(2) == 'who-we-are'
+                                Request::segment(2) == 'terms-and-conditions'
                             )
                             <a class="accordion-toggle menu-open">
                         @else
