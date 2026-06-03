@@ -10,6 +10,7 @@ use App\Services\Blog\BlogDetailService;
 use App\Services\Team\TeamListService;
 use App\Services\Trip\TripListService;
 use App\Services\About\AboutPageService;
+use App\Services\Terms\TermsPageService;
 use App\Services\Trip\TripDetailService;
 use App\Services\Trip\TripCategoryService;
 use App\Services\Home\GalleryService;
@@ -29,6 +30,7 @@ enum TemplateEnum: string
     case GALLERY = 'gallery';
     case ABOUT = 'about';
     case TRIP_CATEGORY = 'category';
+    case TERMS = 'terms-conditions';
 
     public function service(): string
     {
@@ -43,6 +45,7 @@ enum TemplateEnum: string
             // self::ACTIVITY_LIST => ActivityListService::class,
             self::GALLERY => GalleryService::class,
             self::ABOUT => AboutPageService::class,
+            self::TERMS => TermsPageService::class,
         };
     }
 

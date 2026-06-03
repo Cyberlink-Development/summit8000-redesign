@@ -162,6 +162,9 @@
                             <option value="team-list" {{ old('template', $data->template) == 'team-list' ? 'selected' : '' }}>
                                 Team
                             </option>
+                            <option value="terms-conditions" {{ old('template', $data->template) == 'terms-conditions' ? 'selected' : '' }}>
+                                Terms & Condition
+                            </option>
                         </select>
                         <i class="arrow"></i>
                     </label>

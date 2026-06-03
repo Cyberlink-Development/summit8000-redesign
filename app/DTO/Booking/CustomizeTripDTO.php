@@ -16,23 +16,25 @@ class CustomizeTripDTO
     public function toArray(): array
     {
         return [
-            'caption' => 'Plan Your Ascent',
+            'data' => [
+                'caption' => 'Plan Your Ascent',
 
-            'heading' => 'Customize Your',
+                'heading' => 'Customize Your',
 
-            'heading_em' => 'Expedition',
+                'heading_em' => 'Expedition',
 
-            'description' => 'Every summit is personal. Tell us your ambitions and our expert Sherpa team will craft a bespoke Himalayan journey tailored precisely to your experience, timeline, and goals.',
+                'description' => 'Every summit is personal. Tell us your ambitions and our expert Sherpa team will craft a bespoke Himalayan journey tailored precisely to your experience, timeline, and goals.',
 
-            'response_badge' => 'Responds within 24 hours',
+                'response_badge' => 'Responds within 24 hours',
 
-            'trust_items' => $this->trustItems(),
+                'trust_items' => $this->trustItems(),
 
-            'form' => $this->form(),
+                'form' => $this->form(),
 
-            'success_state' => $this->successState(),
+                'success_state' => $this->successState(),
 
-            'seo' => $this->setting ? SeoDTO::fromModel($this->setting) : null,
+                'seo' => $this->setting ? SeoDTO::fromModel($this->setting) : null,
+            ]
         ];
     }
 
