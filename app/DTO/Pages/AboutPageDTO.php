@@ -476,13 +476,13 @@ class AboutPageDTO
                 'href'  => '/plan-expedition',
                 'type'  => 'internal',
             ],
-            'secondary' => [
-                'label' => 'Speak to a Guide',
-                'href'  => $settings?->whatsapp_phone
-                    ? 'https://wa.me/' . preg_replace('/[^0-9]/', '', $settings->whatsapp_phone)
-                    : '/contact',
-                'type'  => $settings?->whatsapp_phone ? 'external' : 'internal',
-            ],
+            // 'secondary' => [
+            //     'label' => 'Speak to a Guide',
+            //     'href'  => $settings?->whatsapp_phone
+            //         ? 'https://wa.me/' . preg_replace('/[^0-9]/', '', $settings->whatsapp_phone)
+            //         : '/contact',
+            //     'type'  => $settings?->whatsapp_phone ? 'external' : 'internal',
+            // ],
             'contacts' => [
                 [
                     'label' => 'address',

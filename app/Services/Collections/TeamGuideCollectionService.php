@@ -8,7 +8,7 @@ use App\Models\Team\TeamModel;
 use App\DTO\Pages\TeamMemberDTO;
 use Illuminate\Http\Request;
 
-class TeamListCollectionService
+class TeamGuideCollectionService
 {
     public function handle(PageSlug $pageRoute, Request $request)
     {
