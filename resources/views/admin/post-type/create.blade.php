@@ -61,7 +61,7 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="inputStandard" class="col-lg-3 control-label"> Is Things To Know? ? </label>
+                        <label for="inputStandard" class="col-lg-3 control-label"> Is Footer ? </label>
                         <div class="col-lg-8">
                             <div class="bs-component">
                                 <select name="is_footer" class="form-control input-sm">
@@ -145,7 +145,7 @@
                             <option value="about">About</option>
                             <option value="gallery">Gallery</option>
                             <option value="team-list">Team</option>
-                            <option value="terms-conditions">Terms & Condition</option>
+                            <option value="terms">Terms & Condition</option>
                         </select>
                         <i class="arrow"></i>
                     </label>
