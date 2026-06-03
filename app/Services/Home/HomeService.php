@@ -221,7 +221,7 @@ class HomeService
 
                         'title' => $item->title ?? '',
 
-                        'href' => $item->slugs()?->first()?->uri,
+                        'href' => $item->slugs()?->first()?->slug,
 
                         'elevation' => $item->elevation ?? '',
 
@@ -230,11 +230,11 @@ class HomeService
                         'count' => (int) ($item->total_trips ?? 0),
 
                         'thumbnail' => [
-                            'url' => $item->banner
-                                ? asset('uploads/activity/' . $item->banner)
-                                : '',
+                            'url' => $item->thumbnail
+                                ? asset('uploads/icon/' . $item->thumbnail)
+                                : asset('theme-assets/assets/trip/8000.jpg'),
 
-                            'alt' => $item->activity ?? '',
+                            'alt' => $item->thumbnail_alt ?? ($item->title ?? null),
                         ],
                     ];
                 })
@@ -327,9 +327,9 @@ class HomeService
                         ],
 
                         'cta' => [
-                            'label' => 'Book',
+                            'label' => 'Explore More',
 
-                            'href' => '/book' . $trip->slugs()?->first()?->slug,
+                            'href' => $trip->slugs()?->first()?->slug,
 
                             'type' => 'internal',
                         ],
@@ -455,7 +455,7 @@ class HomeService
 
                     'cta' => [
                         'label' => 'Get Started',
-                        'href' => '/packages/base-camp',
+                        'href' => '/expedition',
                         'type' => 'internal',
                     ],
 
@@ -480,6 +480,7 @@ class HomeService
     private function gallery(): array
     {
         $photos = TripGearModel::where('thumbnail', '!=', 'NULL')->orderBy('ordering', 'desc')->take(7)->get();
+        $gallery=PosttypeModel::where('id',54)->first();
         return [
             'caption' => 'Expedition Gallery',
 
@@ -487,7 +488,7 @@ class HomeService
 
             'cta' => [
                 'label' => 'View More',
-                'href' => '/gallery',
+                'href' => $gallery->slugs->first()->slug,
                 'type' => 'internal',
             ],
 
@@ -516,6 +517,7 @@ class HomeService
     {
         $data = PostModel::query()
             ->where('post_type', 33)->get();
+        $blog = PosttypeModel::where('id', 33)->first();
         return [
 
             'caption' => 'Inspiration & Knowledge',
@@ -524,7 +526,7 @@ class HomeService
 
             'cta' => [
                 'label' => 'View All Blogs',
-                'href' => '/blog',
+                'href' => $blog->slugs->first()->slug,
                 'type' => 'internal',
             ],
 
@@ -542,7 +544,7 @@ class HomeService
                         'thumbnail' => [
                             'url' => $item->page_thumbnail
                                 ? asset('uploads/original/' . $item->page_thumbnail)
-                                : '',
+                                :asset('theme-assets/assets/trip/8000.jpg') ,
                             'alt' => $item->post_title ?? '',
                         ],
                     ];
@@ -557,5 +559,4 @@ class HomeService
     | Helpers
     |--------------------------------------------------------------------------
     */
-
 }

@@ -43,7 +43,7 @@ class GalleryPageDTO
                 'alt' => $page?->post_type,
             ],
 
-            'caption' => $page?->caption,
+            'caption' => $page?->associated_title,
 
             'title' => $page?->post_type,
 
@@ -66,7 +66,7 @@ class GalleryPageDTO
 
     protected static function items(): array
     {
-        $items = TripGearModel::where('thumbnail', '!=', 'NULL')->orderBy('ordering', 'desc')->get();
+        $items = TripGearModel::where('thumbnail', '!=', 'NULL')->orderBy('ordering', 'desc')->take(50)->get();
         return collect($items)
 
             ->map(fn ($item) => [
