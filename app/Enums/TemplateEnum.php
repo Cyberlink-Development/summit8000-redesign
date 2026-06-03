@@ -12,12 +12,10 @@ use App\Services\Trip\TripListService;
 use App\Services\About\AboutPageService;
 use App\Services\Trip\TripDetailService;
 use App\Services\Trip\TripCategoryService;
-use App\Services\Templates\ActivityListService;
-use App\Services\Templates\GalleryService;
+use App\Services\Home\GalleryService;
 use App\Services\Collections\BlogCollectionService;
 use App\Services\Collections\TripCollectionService;
-use App\Services\Collections\ActivityCollectionService;
-use App\Services\Collections\GalleryCollectionService;
+
 
 enum TemplateEnum: string
 {
@@ -43,7 +41,7 @@ enum TemplateEnum: string
             self::TRIP_DETAIL => TripDetailService::class,
             self::TRIP_CATEGORY => TripCategoryService::class,
             // self::ACTIVITY_LIST => ActivityListService::class,
-            // self::GALLERY => GalleryService::class,
+            self::GALLERY => GalleryService::class,
             self::ABOUT => AboutPageService::class,
         };
     }

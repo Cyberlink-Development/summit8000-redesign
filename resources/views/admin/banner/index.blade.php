@@ -16,7 +16,7 @@
 							<tr class="bg-light">
 								<th class="">SN</th>
 								<th class="">Title</th>
-								{{-- <th class="">Show in Home</th>  --}}
+								<th class="">Show in Home</th> 
 								<th class="">Image/ Video</th>
 								<th class="">Created at</th>                            
 								<th class="text-center">Action</th>
@@ -28,7 +28,7 @@
 							<tr class="id{{$row->id}}">
 								<td class="">{{$loop->iteration}}</td>
 								<td class="">{{ ucfirst($row->title) }}</td>
-								{{-- <td class="">
+								<td class="">
 								    <form action="{{route('banner.isdefault',$row->id)}}" method="POST">
 										@csrf	
 										 @if(($row->status)==0)
@@ -42,7 +42,7 @@
                                	   @endif								 									
 									
 									</form>
-								</td> --}}
+								</td>
 								<td class="">
 							    @if($row->video)
 								<video uk-video uk-cover preload="auto" width="200" height="auto" loop playsinline

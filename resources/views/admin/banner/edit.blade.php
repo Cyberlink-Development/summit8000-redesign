@@ -106,7 +106,7 @@
                         </div>
                     </div> --}}
 
-                    <div class="form-group">
+                    {{-- <div class="form-group">
                         <label class="col-lg-2 control-label" for="link">Button Link</label>
                         <div class="col-lg-6">
                             <div class="bs-component">
@@ -115,7 +115,59 @@
 
                             </div>
                         </div>
+                    </div> --}}
+
+                        <div class="form-group">
+                        <label class="col-lg-2 control-label" for="link">Primary Button Text</label>
+                        <div class="col-lg-6">
+                            <div class="bs-component">
+                                <input type="text" class="form-control" name="primary_cta" value="{{ $data->primary_cta }}" />
+                                <br />
+                            </div>
+                        </div>
                     </div>
+
+                     <div class="form-group">
+                        <label class="col-lg-2 control-label" for="link">Primary Link</label>
+                        <div class="col-lg-6">
+                            <div class="bs-component">
+                                <input type="text" class="form-control" name="primary_cta_link" value="{{ $data->primary_cta_link }}" />
+                                <br />
+                            </div>
+                        </div>
+                    </div>
+
+                          <div class="form-group">
+                        <label class="col-lg-2 control-label" for="link">Secondary Button Text</label>
+                        <div class="col-lg-6">
+                            <div class="bs-component">
+                                <input type="text" class="form-control" name="secondary_cta" value="{{ $data->secondary_cta }}" />
+                                <br />
+                            </div>
+                        </div>
+                    </div>
+
+                        <div class="form-group">
+                        <label class="col-lg-2 control-label" for="link">Secondary Link</label>
+                        <div class="col-lg-6">
+                            <div class="bs-component">
+                                <input type="text" class="form-control" name="secondary_cta_link" value="{{ $data->secondary_cta_link }}" />
+                                <br />
+                            </div>
+                        </div>
+                    </div>
+
+                         {{-- <div class="form-group">
+                        <label for="inputStandard" class="col-lg-2 control-label"> Status? </label>
+                        <div class="col-lg-6">
+                            <div class="bs-component">
+                                <select name="status" class="form-control input-sm">
+                                    <option value="0" {{($data->status == '0') ? 'selected' : ''}}> Hide </option>
+                                    <option value="1" {{($data->status == '1') ? 'selected' : ''}}> Show </option>
+                                </select>
+                            </div>
+                        </div>
+                    </div> --}}
 
                     <div class="form-group">
                         <label class="col-lg-2 control-label" for=""></label>
