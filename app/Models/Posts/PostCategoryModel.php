@@ -2,11 +2,14 @@
 
 namespace App\Models\Posts;
 
+use App\Traits\HasSitemapUrl;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\PageSlug;
 
 class PostCategoryModel extends Model
 {
+    use HasSitemapUrl;
+
     protected $table = 'cl_post_categories';
     protected $fillable = [
     	'post_type','category','category_caption','category_content','uri','ordering','thumbnail'

@@ -2,12 +2,15 @@
 
 namespace App\Models\Posts;
 
+use App\Traits\HasSitemapUrl;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\SeoMeta;
 use App\Models\PageSlug;
 
 class PostModel extends Model
 {
+    use HasSitemapUrl;
+
     protected $table = 'cl_posts';
     protected $fillable = [
         'post_date', 'post_author', 'template', 'template', 'post_title', 'sub_title', 'post_content','reading_time',

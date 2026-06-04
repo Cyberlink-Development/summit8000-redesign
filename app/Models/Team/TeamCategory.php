@@ -2,11 +2,14 @@
 
 namespace App\Models\Team;
 
+use App\Traits\HasSitemapUrl;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\PageSlug;
 
 class TeamCategory extends Model
 {
+    use HasSitemapUrl;
+    
    protected $table = 'team_categories';
     protected $fillable = [
         'category','picture','ordering','content','caption','uri','team_parent','status'
