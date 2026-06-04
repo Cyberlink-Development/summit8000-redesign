@@ -2,11 +2,14 @@
 
 namespace App\Models\Destinations;
 
+use App\Traits\HasSitemapUrl;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\SeoMeta;
 use App\Models\PageSlug;
 class DestinationModel extends Model
 {
+    use HasSitemapUrl;
+    
     protected $table = 'cl_trip_destinations';
     protected $fillable = ['title', 'uri', 'content', 'thumbnail', 'ordering', 'status','banner','video','brief'];
 

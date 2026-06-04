@@ -1,11 +1,11 @@
 <?php
 
 use App\Http\Controllers\Api\CollectionController;
+use App\Http\Controllers\Api\SitemapController;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Api\SettingsController;
 use App\Http\Controllers\Api\BookingController;
 use App\Http\Controllers\Api\CustomizeTripController;
-use App\Http\Controllers\Api\TripController;
 use App\Http\Controllers\Api\SlugResolverController;
 
 
@@ -31,3 +31,5 @@ Route::prefix('plan-expedition')->group(function () {
 });
 
 Route::get('trips', [CustomizeTripController::class, 'getTrips']);
+
+Route::get('/sitemap', [SitemapController::class, 'sitemapGenerator']);

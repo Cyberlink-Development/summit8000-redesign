@@ -3,11 +3,14 @@
 namespace App\Models\Team;
 
 use App\Models\SeoMeta;
+use App\Traits\HasSitemapUrl;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\PageSlug;
 
 class TeamModel extends Model
 {
+    use HasSitemapUrl;
+    
     protected $table = 'cl_team';
     protected $fillable = [
         'name',

@@ -2,6 +2,7 @@
 
 namespace App\Models\Travels;
 
+use App\Traits\HasSitemapUrl;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\SeoMeta;
 use App\Models\PageSlug;
@@ -9,6 +10,8 @@ use App\Models\Posts\PostModel;
 
 class TripModel extends Model
 {
+    use HasSitemapUrl;
+    
     protected $table = 'cl_trip_details';
     protected $fillable = [
         'trip_title',

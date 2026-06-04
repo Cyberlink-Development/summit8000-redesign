@@ -2,11 +2,14 @@
 
 namespace App\Models\Travels;
 
+use App\Traits\HasSitemapUrl;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\PageSlug;
 
 class TripGroupModel extends Model
 {
+    use HasSitemapUrl;
+
     protected $table = 'cl_trip_groups';
     protected $fillable = ['title','sub_title','uri','thumbnail','banner','excerpt','content','meta_keyword','meta_description','ordering','status'];
 
