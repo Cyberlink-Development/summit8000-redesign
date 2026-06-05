@@ -182,7 +182,7 @@ class TripDetailPageDTO
     private static function buildNavItems(TripModel $trip, Collection $relatedTrips): array
     {
         return [
-            'overview'           => $trip->trip_excerpt,
+            'overview'           => $trip->trip_content,
             'trip_facts'         => self::buildTripFacts($trip),
             'highlights'         => self::buildHighlights($trip),
             'guides'             => self::buildGuides($trip),
@@ -226,11 +226,13 @@ class TripDetailPageDTO
         return [
             'title'       => 'Highlights',
             'items'       => [],
-            'description' => $trip->trip_content,
-            'extra'       => self::col($trip->highlight_extras)->map(fn($item) => [
-                'heading' => $item->heading,
-                'body'    => $item->body,
-            ])->values()->toArray(),
+            'description' => $trip->trip_excerpt,
+            'extra'       => [
+                [
+                    'heading' => 'Gears List',
+                    'body'    => $trip->trip_highlight,
+                ]
+            ],
         ];
     }
 
