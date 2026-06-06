@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\Travels\TripScheduleModel;
 use App\Models\Faqs\FaqModel;
 use App\Services\Slug\SlugService;
+use App\Models\Travels\AddonModel;
 
 
 class TripController extends Controller
@@ -526,6 +527,15 @@ class TripController extends Controller
             $trip_type = TripTypeModel::where('trip_type', 'Package')->get();
             return view('admin.training-package.edit', compact('trek', 'all_trips', 'data', 'trip_type', 'destinations', 'regions', 'activities', 'trip_groups', 'checked_destinations', 'checked_regions', 'checked_activities', 'checked_tripgroups', 'schedules', 'itineraries', 'gears', 'costincludes', 'costexcludes', 'grades', 'banner', 'expeditions', 'trekking', 'availability', 'faqs', 'activity', 'packages'));
         }
+
+        $addons = AddonModel::where('status', 1)
+            ->orderBy('ordering', 'asc')
+            ->get();
+
+        $checked_addons = $data->addons
+            ->pluck('id')
+            ->toArray();
+
         return view('admin.trips.edit', compact(
             'trek',
             'all_trips',
@@ -551,7 +561,9 @@ class TripController extends Controller
             'availability',
             'faqs',
             'activity',
-            'packages'
+            'packages',
+            'addons',
+            'checked_addons'
         ));
     }
 
@@ -768,6 +780,10 @@ class TripController extends Controller
             $_data->tripgroups()->attach($request->tripgroup);
             $_data->relatedtrips()->detach();
             $_data->relatedtrips()->attach($request->related_trips);
+            $_data->addons()->detach();
+            if ($request->has('addons')) {
+                $_data->addons()->attach($request->addons);
+            }
 
             // Update Schedule
             if (isset($request->schedule_ordering)) {

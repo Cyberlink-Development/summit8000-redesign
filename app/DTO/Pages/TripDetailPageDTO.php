@@ -396,15 +396,25 @@ class TripDetailPageDTO
     {
         return [
             'title'       => 'Optional Add-Ons',
+
             'description' => 'Customise your adventure with these handpicked enhancements.',
+
             'items'       => self::col($trip->addons)->map(fn($item) => [
-                'thumbnail'   => [
-                    'url' => $item->thumbnail,
-                    'alt' => $item->title,
+
+                'thumbnail' => [
+                    'url' => $item->thumbnail
+                        ? asset('uploads/thumbnails/' . $item->thumbnail)
+                        : null,
+
+                    'alt' => $item->thumbnail_alt ?: $item->title,
                 ],
+
                 'title'       => $item->title,
+
                 'description' => $item->description,
+
                 'price'       => $item->price,
+
             ])->values()->toArray(),
         ];
     }

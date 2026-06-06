@@ -7,11 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\SeoMeta;
 use App\Models\PageSlug;
 use App\Models\Posts\PostModel;
+use App\Models\Travels\AddonModel;
 
 class TripModel extends Model
 {
     use HasSitemapUrl;
-    
+
     protected $table = 'cl_trip_details';
     protected $fillable = [
         'trip_title',
@@ -136,4 +137,13 @@ class TripModel extends Model
         return $this->hasMany(PostModel::class, 'trip');
     }
 
+    public function addons()
+    {
+        return $this->belongsToMany(
+            AddonModel::class,
+            'cl_trip_addon_rel',
+            'trip_id',
+            'addon_id'
+        );
+    }
 }
