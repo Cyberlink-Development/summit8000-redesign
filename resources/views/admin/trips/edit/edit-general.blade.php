@@ -243,6 +243,45 @@
             </div>
         </div>
 
+        <div class="sid_bvijay mb10">
+
+            <h4> Trip Addons </h4>
+
+            <div class="hd_show_con">
+
+                @if ($addons->count() > 0)
+
+                    <ul class="ctgor" style="list-style:none; padding-left:0;">
+
+                        @foreach ($addons as $row)
+
+                            <li style="margin-bottom:10px;">
+
+                                <label style="display:flex; align-items:center; gap:10px; font-weight:normal;">
+
+                                    <input type="checkbox"
+                                        name="addons[]"
+                                        value="{{ $row->id }}"
+                                        {{ in_array($row->id, $checked_addons)
+                                                ? 'checked'
+                                                : '' }}>
+
+                                    <span>{{ $row->title }}</span>
+
+                                </label>
+
+                            </li>
+
+                        @endforeach
+
+                    </ul>
+
+                @endif
+
+            </div>
+
+        </div>
+
         <div class="panel">
             <div class="panel-heading">
                 <span class="panel-title">Related Trips</span>

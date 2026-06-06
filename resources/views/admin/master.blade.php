@@ -183,7 +183,8 @@
                                 Request::segment(2) == 'activity' ||
                                 Request::segment(2) == 'trip' ||
                                 Request::segment(2) == 'training-list' ||
-                                Request::segment(2) == 'tripgroup'
+                                Request::segment(2) == 'tripgroup' ||
+                                Request::segment(2) == 'addon'
                             )
                             <a class="accordion-toggle menu-open">
                         @else
@@ -211,6 +212,14 @@
                                     <a href="{{ url('admin/trip') }}">
                                         <span class="fa fa fa-arrows-h"></span>
                                         <span class="sidebar-title"> Trip List </span>
+                                    </a>
+                                </li>
+                                <li class="{{ Request::segment(2) == 'addon' ? 'active' : '' }}">
+                                    <a href="{{ url('admin/addon') }}">
+                                        <span class="fa fa fa-arrows-h"></span>
+                                        <span class="sidebar-title">
+                                            Trip Addons
+                                        </span>
                                     </a>
                                 </li>
                                 {{-- <li class="{{ Request::segment(2) == 'training-list' ? 'active' : '' }}">

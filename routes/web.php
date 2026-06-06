@@ -122,8 +122,13 @@ Route::middleware(['auth'])->group(function () {
         'training-enrollment' => 'AdminControllers\Inquiry\EnrollmentController',
         'contact-us' => 'AdminControllers\Inquiry\TripBookingController',
         'admin.faq' => 'AdminControllers\Faqs\FaqController',
+        'admin/addon' => 'AdminControllers\Travels\AddonController',
 
     ]);
+    Route::delete(
+        'admin/addon/delete-thumbnail/{id}',
+        'AdminControllers\Travels\AddonController@delete_thumbnail'
+    );
     // For all trips Only for Developer
     Route::get('admin/alltrips','AdminControllers\Travels\TripController@alltrips')->name('admin.trip.all');
     // Upto here
