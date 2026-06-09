@@ -295,7 +295,7 @@ class HomeService
                         'attributes' => [
 
                             [
-                                'label' => '📅',
+                                'label' => 'duration',
 
                                 'text' => $trip->duration
                                     ? $trip->duration . ' days'
@@ -303,7 +303,7 @@ class HomeService
                             ],
 
                             [
-                                'label' => '👥',
+                                'label' => 'group',
 
                                 'text' => $trip->group_size
                                     ? $trip->group_size . ' climbers max'
@@ -311,7 +311,7 @@ class HomeService
                             ],
 
                             [
-                                'label' => '⚠',
+                                'label' => 'level',
 
                                 'text' => $trip->difficulty
                                     ?? '',
@@ -534,7 +534,7 @@ class HomeService
                 ->map(function ($item) {
 
                     return [
-                        'slug'          => $item->slugs()->first()->slug,
+                        'slug'          => slug_formatter($item->slugs()->first()->slug),
                         'category'      => $item->category?->category ?? '',
                         'title'         => $item->post_title,
                         "author" => "By {$item->author} {$item->reading_time}",
@@ -547,6 +547,11 @@ class HomeService
                                 : asset('theme-assets/assets/trip/8000.jpg'),
                             'alt' => $item->post_title ?? '',
                         ],
+                        "cta" => [
+                            "href" => $item->slugs()->first()->slug,
+                            "label" => "Read More",
+                            "type" => "internal"
+                        ]
                     ];
                 })
                 ->values()
