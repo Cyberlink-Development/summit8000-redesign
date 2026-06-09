@@ -133,6 +133,11 @@ class BlogDetailPageDTO
                     ],
                 ],
             ],
+            'cta' => [
+                'label' => 'Read More',
+                'href' => $author?->slugs()?->first()?->slug ?? null,
+                'type'  => 'internal',
+            ]
         ];
     }
 
