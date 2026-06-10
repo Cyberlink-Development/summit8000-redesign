@@ -73,8 +73,8 @@
                 <label for="inputStandard" class="col-lg-2 control-label">Category</label>
                 <div class="col-lg-8">
                     <div class="bs-component">
-                        <select name="category" class="form-control team-select">
-                            <option value="0"> Select Category </option>
+                        <select name="category" class="form-control team-select" required>
+                            <option value="" hidden selected> Select Category </option>
                             @if ($category)
                                 @foreach ($category as $row)
                                     <option value="{{ $row->id }}"> {{ $row->category }}</option>
@@ -106,7 +106,7 @@
                     </div>
                 </div>
             </div>
-            {{-- 
+            {{--
             <div class="form-group">
                 <label for="inputStandard" class="col-lg-2 control-label">HighLights</label>
                 <div class="col-lg-9">
