@@ -24,6 +24,75 @@ class FooterResource extends JsonResource
             'partner_links' => $this->partnerLinks(),
 
             'social_links' => $this->socialLinks(),
+
+            'additions' => $this->buildAdditionalData()
+        ];
+    }
+
+    protected function buildAdditionalData(): array
+    {
+        return [
+            'we_accept' => [
+                'label' => 'We Accept',
+                'thumbnail' => [
+                    'url' => '/images/placeholder-visa.webp',
+                    'alt' => 'Accepted payment methods',
+                ],
+            ],
+
+            'we_associated_with' => [
+                'label' => 'We are associated with',
+                'items' => [
+                    [
+                        'slug' => 'certi-1',
+                        'thumbnail' => [
+                            'url' => asset('theme-assets/assets/associated/himalayan-rescue-association.webp'),
+                            'alt' => 'HRA',
+                        ],
+                        'title' => 'Nepal Mountaineering Association Licensed',
+                    ],
+
+                    [
+                        'slug' => 'certi-2',
+                        'thumbnail' => [
+                            'url' => asset('/theme-assets/assets/associated/keep.webp'),
+                            'alt' => 'KEEP',
+                        ],
+                        'title' => 'UIAA Mountain Medicine Certified',
+                    ],
+
+                    [
+                        'slug' => 'certi-3',
+                        'thumbnail' => [
+                            'url' => asset('/theme-assets/assets/associated/nepal-gov.webp'),
+                            'alt' => 'Nepal Gov',
+                        ],
+                        'title' => 'Nepal Tourism Board Excellence Award',
+                    ],
+
+                    [
+                        'slug' => 'certi-4',
+                        'thumbnail' => [
+                            'url' => asset('/theme-assets/assets/associated/nma.webp'),
+                            'alt' => 'NMA',
+                        ],
+                        'title' => 'Himalayan Mountaineering Institute Graduates',
+                    ],
+
+                    [
+                        'slug' => 'certi-5',
+                        'thumbnail' => [
+                            'url' => asset('/theme-assets/assets/associated/taan.webp'),
+                            'alt' => 'TAAN',
+                        ],
+                        'title' => 'Leave No Trace Certified Operator',
+                    ],
+                ],
+            ],
+
+            'connect_us' => [
+                'label' => 'Connect with us',
+            ],
         ];
     }
 

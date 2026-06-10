@@ -354,7 +354,21 @@ class HomeService
         return [
             'caption'     => 'Client Stories',
             'title'       => 'Words from the Summit',
-            'description' => 'Our greatest achievement is not the records we hold � it\'s the stories our clients carry home from the highest places on Earth.',
+            'description' => 'Our greatest achievement is not the records we hold — it\'s the stories our clients carry home from the highest places on Earth.',
+            'rating' => [
+                [
+                    'label' => 'Trip Advisor',
+                    'href'  => 'https://www.tripadvisor.com',
+                    'type'  => 'external',
+                    'stars' => 4.5,
+                ],
+                [
+                    'label' => 'Google',
+                    'href'  => 'https://www.google.com',
+                    'type'  => 'external',
+                    'stars' => 3,
+                ],
+            ],
             'items'       => $reviews->map(fn($review, $index) => [
                 'slug'      => 't' . ($index + 1),
                 'rating'    => (float) ($review->rating ?? 5),
