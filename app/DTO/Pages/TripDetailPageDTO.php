@@ -3,6 +3,7 @@
 namespace App\DTO\Pages;
 
 use App\DTO\Common\SeoDTO;
+use App\Models\Team\TeamModel;
 use App\Models\Travels\TripModel;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
@@ -182,7 +183,7 @@ class TripDetailPageDTO
     private static function buildNavItems(TripModel $trip, Collection $relatedTrips): array
     {
         return [
-            'overview'           => $trip->trip_content,
+            'overview'           => $trip->trip_overview,
             'trip_facts'         => self::buildTripFacts($trip),
             'highlights'         => self::buildHighlights($trip),
             'guides'             => self::buildGuides($trip),
@@ -226,7 +227,7 @@ class TripDetailPageDTO
         return [
             'title'       => 'Highlights',
             'items'       => [],
-            'description' => $trip->trip_excerpt,
+            'description' => $trip->trip_content,
             'extra'       => [
                 [
                     'heading' => 'Gears List',
@@ -238,24 +239,45 @@ class TripDetailPageDTO
 
     private static function buildGuides(TripModel $trip): array
     {
+        $guides = TeamModel::where('category', 3)
+            ->where('status', 1)
+            ->inRandomOrder()
+            ->take(3)
+            ->get();
+            // dd($guides);
+
         return [
             'caption'     => 'Your Team',
             'title'       => 'Meet Your Expert Guides',
             'description' => 'Every guide is certified, experienced, and passionate about sharing the magic of the Himalayas.',
-            'items'       => self::col($trip->guides)->map(fn($guide) => [
+            'items'       => $guides->map(fn($guide) => [
                 'slug'        => $guide->uri,
                 'title'       => $guide->name,
-                'href'        => '/team/' . $guide->uri,
-                'sub_title'   => $guide->sub_title,
-                'description' => $guide->bio,
-                'thumbnail'   => [
-                    'url' => $guide->thumbnail,
+                'href'        => $guide->uri,
+                'sub_title'   => $guide->position,
+                'description' => $guide->brief,
+                'thumbnail' => [
+                    'url' => asset('uploads/team/' . $guide->thumbnail),
                     'alt' => $guide->name,
                 ],
-                'stats' => self::col($guide->stats)->map(fn($stat) => [
-                    'value' => $stat->value,
-                    'label' => $stat->label,
-                ])->values()->toArray(),
+
+                // Optional stats section
+                'stats' => array_filter([
+                    $guide->experience ? [
+                        'value' => $guide->experience,
+                        'label' => 'Experience'
+                    ] : null,
+
+                    $guide->languages ? [
+                        'value' => $guide->languages,
+                        'label' => 'Languages'
+                    ] : null,
+
+                    $guide->certifications ? [
+                        'value' => $guide->certifications,
+                        'label' => 'Certifications'
+                    ] : null,
+                ]),
             ])->values()->toArray(),
         ];
     }
@@ -274,14 +296,18 @@ class TripDetailPageDTO
                 ],
                 'caption' => $item->title,
             ])->values()->toArray(),
-            'video' => $gallery->filter(fn($item) => !empty($item->video))->take(1)->map(fn($item) => [
-                'slug'      => 'gallery-video-' . $item->id,
-                'thumbnail' => [
-                    'url' => asset('uploads/original/' . $item->thumbnail),
-                    'alt' => $item->title,
-                ],
-                'video_url' => $item->video,
-            ])->values()->toArray(),
+            'video' => $trip->trip_video ? [
+                [
+                    'slug' => 'gallery-video-' . $trip->id,
+
+                    'thumbnail' => [
+                        'url' => asset('uploads/thumbnails/' . $trip->thumbnail),
+                        'alt' => $trip->thumbnail_alt ,
+                    ],
+
+                    'video_url' => 'https://www.youtube.com/embed/' . $trip->trip_video,
+                ]
+            ] : [],
         ];
     }
 
@@ -491,6 +517,7 @@ class TripDetailPageDTO
         return [
             'caption' => 'Detailed Information',
             'title'   => 'Everything You Need to Know',
+            'description' => $trip->trip_excerpt,
             'items'   => self::col($trip->info_sections)->map(fn($section) => [
                 'question' => $section->question,
                 'answer'   => self::col($section->answers)->map(fn($ans) => [

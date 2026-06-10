@@ -25,6 +25,7 @@ class TripModel extends Model
         'accommodation',
         'route',
         'trip_highlight',
+        'trip_overview',
         'peak_name',
         'trip_type',
         'starting_price',

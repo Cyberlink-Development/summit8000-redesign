@@ -75,8 +75,8 @@
                 <label for="inputStandard" class="col-lg-2 control-label">Category</label>
                 <div class="col-lg-8">
                     <div class="bs-component">
-                        <select name="category" class="form-control team-select">
-                            <option value="0"> Select Category </option>
+                        <select name="category" class="form-control team-select" required>
+                            <option value="" hidden selected> Select Category </option>
                             @if ($category)
                                 @foreach ($category as $row)
                                     <option value="{{ $row->id }}"
@@ -197,22 +197,22 @@
         </div> --}}
         {{-- <div class="sid_bvijay mb10">
    <label class="field text">
-     <input type="text" id="" name="fb_url" class="form-control" placeholder="Facebook Link" value="{{$data->fb_url}}" />   
+     <input type="text" id="" name="fb_url" class="form-control" placeholder="Facebook Link" value="{{$data->fb_url}}" />
     </label>
   </div>
   <div class="sid_bvijay mb10">
    <label class="field text">
-     <input type="text" id="" name="instagram_url" class="form-control" placeholder="Instagram Link" value="{{$data->instagram_url}}" />   
+     <input type="text" id="" name="instagram_url" class="form-control" placeholder="Instagram Link" value="{{$data->instagram_url}}" />
     </label>
   </div>
   <div class="sid_bvijay mb10">
    <label class="field text">
-     <input type="text" id="" name="twitter_url" class="form-control" placeholder="Twitter Link" value="{{$data->twitter_url}}" />   
+     <input type="text" id="" name="twitter_url" class="form-control" placeholder="Twitter Link" value="{{$data->twitter_url}}" />
     </label>
   </div>
   <div class="sid_bvijay mb10">
    <label class="field text">
-     <input type="text" id="" name="linkedin_url" class="form-control" placeholder="Linkedin Link" value="{{$data->linkedin_url}}" />   
+     <input type="text" id="" name="linkedin_url" class="form-control" placeholder="Linkedin Link" value="{{$data->linkedin_url}}" />
     </label>
   </div> --}}
 
@@ -235,7 +235,7 @@
 
         {{-- <div class="sid_bvijay mb10">
     <h4> Banner </h4>
-      <h4>  <input type="checkbox" name="published" value="{{ $data->published }}" {{ ($data->published == 1)?'checked':'' }} />   Blur </h4> 
+      <h4>  <input type="checkbox" name="published" value="{{ $data->published }}" {{ ($data->published == 1)?'checked':'' }} />   Blur </h4>
     <div class="hd_show_con">
       <div id="xedit-demo">
           @if ($data->banner)
@@ -243,9 +243,9 @@
                 <a href="#{{$data->id}}" class="bannerdelete">X</a>
                 <img src="{{ asset(env('PUBLIC_PATH').'uploads/team/' . $data->banner) }}" width="150" />
                 </span>
-                <hr> 
-                @endif     
-      <input type="file" name="banner" /> 
+                <hr>
+                @endif
+      <input type="file" name="banner" />
      </div>
    </div>
   </div> --}}

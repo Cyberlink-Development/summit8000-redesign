@@ -208,7 +208,7 @@ class HomeService
 
             'title' => 'Choose Your Summit',
 
-            'description' => 'From high-altitude 8000m challenges to scenic Himalayan treks — an adventure calibrated for every ambition.',
+            'description' => 'From high-altitude 8000m challenges to scenic Himalayan treks � an adventure calibrated for every ambition.',
 
             'items' => collect($expeditions)
                 ->map(function ($item) {
@@ -281,7 +281,7 @@ class HomeService
 
                         'tag' => trim(
                             ($trip->max_altitude ?? '') .
-                                ($trip->best_season ? ' · ' . $trip->best_season : '')
+                                ($trip->best_season ? ' � ' . $trip->best_season : '')
                         ),
 
                         'title' => $trip->trip_title ?? '',
@@ -354,7 +354,7 @@ class HomeService
         return [
             'caption'     => 'Client Stories',
             'title'       => 'Words from the Summit',
-            'description' => 'Our greatest achievement is not the records we hold — it\'s the stories our clients carry home from the highest places on Earth.',
+            'description' => 'Our greatest achievement is not the records we hold � it\'s the stories our clients carry home from the highest places on Earth.',
             'items'       => $reviews->map(fn($review, $index) => [
                 'slug'      => 't' . ($index + 1),
                 'rating'    => (float) ($review->rating ?? 5),
