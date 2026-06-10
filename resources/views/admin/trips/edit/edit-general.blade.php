@@ -199,6 +199,21 @@
 
         <div class="panel">
             <div class="panel-heading">
+                <span class="panel-title">Trip Overview</span>
+            </div>
+            <div class="panel-body">
+                <div class="form-group">
+                    <div class="col-lg-12">
+                        <div class="bs-component">
+                            <textarea class="my-editor form-control" name="trip_overview" id="trip_overview" placeholder="Trip Overview" rows="9">{{ $data->trip_overview }}</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="panel">
+            <div class="panel-heading">
                 <span class="panel-title">Trip Content</span>
             </div>
             <div class="panel-body">

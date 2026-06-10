@@ -751,6 +751,7 @@ class TripController extends Controller
             $data->trip_video = $request->trip_video;
             $data->trip_excerpt = $request->trip_excerpt;
             $data->trip_content = $request->trip_content;
+            $data->trip_overview = $request->trip_overview;
             $data->trip_grade = $request->trip_grade ? $request->trip_grade : '';
             $data->status_text = $request->status_text;
             $data->uri = Str::slug($request->uri);
