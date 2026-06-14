@@ -414,6 +414,11 @@ class TripDetailPageDTO
                         : null,
                     'alt' => $trip->trip_title . ' Altitude Chart',
                 ],
+                'items'  => self::col($trip->itineraries)->map(fn($item) => [
+                    'slug'        => 'detail-day-' . $item->id,
+                    'days'         => $item->days,
+                    'altitude'       => $item->max_altitude,
+                ])->values()->toArray(),
             ],
         ];
     }
