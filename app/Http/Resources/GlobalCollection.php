@@ -25,13 +25,15 @@ class GlobalCollection extends JsonResource
             ];
         }
 
-        $path     = $request->query('path', '/');
+        $path     = $request->query('path');
+        $keyword  = $request->query('keyword');
         $perPage  = $this->paginator->perPage();
         $lastPage = $this->paginator->lastPage();
         $current  = $this->paginator->currentPage();
 
-        $buildUrl = fn(int $page) =>
-            "/collection?path={$path}&per_page={$perPage}&page={$page}";
+        $buildUrl = fn(int $page) => $path !== null
+            ? "/collection?path={$path}&per_page={$perPage}&page={$page}"
+            : "/search?keyword={$keyword}&per_page={$perPage}&page={$page}";
 
         return [
             'data' => $this->resourceData,

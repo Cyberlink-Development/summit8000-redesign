@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\CollectionController;
+use App\Http\Controllers\Api\SearchController;
 use App\Http\Controllers\Api\SitemapController;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Api\SettingsController;
@@ -33,3 +34,5 @@ Route::prefix('plan-expedition')->group(function () {
 Route::get('trips', [CustomizeTripController::class, 'getTrips']);
 
 Route::get('/sitemap', [SitemapController::class, 'sitemapGenerator']);
+
+Route::get('/search', [SearchController::class, 'index']);
