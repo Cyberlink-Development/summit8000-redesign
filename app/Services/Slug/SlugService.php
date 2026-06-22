@@ -50,20 +50,26 @@ class SlugService
     /**
      * Generate globally unique slug
      */
-    protected function generateUniqueSlug($slug, $model = null)
+     protected function generateUniqueSlug($slug, $model = null)
     {
-        $slug = '/' . ltrim(Str::slug($slug), '/');
-        $slug = preg_replace('#/+#', '/', $slug);
-        
+        // Preserve slashes
+        $segments = explode('/', trim($slug, '/'));
+
+        $segments = array_map(function ($segment) {
+            return Str::slug($segment);
+        }, $segments);
+
+        $slug = '/' . implode('/', $segments);
+
         $originalSlug = $slug;
         $count = 1;
-        
+
         while (
             PageSlug::where('slug', $slug)
                 ->when($model, function ($query) use ($model) {
                     return $query->where(function ($q) use ($model) {
                         $q->where('sluggable_id', '!=', $model->id)
-                        ->orWhere('sluggable_type', '!=', get_class($model));
+                          ->orWhere('sluggable_type', '!=', get_class($model));
                     });
                 })
                 ->exists()
@@ -71,7 +77,31 @@ class SlugService
             $slug = $originalSlug . '-' . $count;
             $count++;
         }
-        
+
         return $slug;
     }
+    // protected function generateUniqueSlug($slug, $model = null)
+    // {
+    //     $slug = '/' . ltrim(Str::slug($slug), '/');
+    //     $slug = preg_replace('#/+#', '/', $slug);
+
+    //     $originalSlug = $slug;
+    //     $count = 1;
+
+    //     while (
+    //         PageSlug::where('slug', $slug)
+    //             ->when($model, function ($query) use ($model) {
+    //                 return $query->where(function ($q) use ($model) {
+    //                     $q->where('sluggable_id', '!=', $model->id)
+    //                     ->orWhere('sluggable_type', '!=', get_class($model));
+    //                 });
+    //             })
+    //             ->exists()
+    //     ) {
+    //         $slug = $originalSlug . '-' . $count;
+    //         $count++;
+    //     }
+
+    //     return $slug;
+    // }
 }
