@@ -235,7 +235,13 @@ class TripController extends Controller
                 $data['trip_code'] = rand() . '-' . time();
             }
 
-            $data['uri'] = Str::slug($request->uri);
+            // $data['uri'] = Str::slug($request->uri);
+            $data['uri'] = implode('/', array_map(
+                function ($segment) {
+                    return Str::slug($segment);
+                },
+                explode('/', trim($request->uri, '/'))
+            ));
             $data['banner'] = $banner_name;
             $data['thumbnail'] = $thumbnail_name;
             $data['trip_map'] = $map_file_name;
@@ -754,7 +760,13 @@ class TripController extends Controller
             $data->trip_overview = $request->trip_overview;
             $data->trip_grade = $request->trip_grade ? $request->trip_grade : '';
             $data->status_text = $request->status_text;
-            $data->uri = Str::slug($request->uri);
+            // $data->uri = Str::slug($request->uri);
+            $data['uri'] = implode('/', array_map(
+                function ($segment) {
+                    return Str::slug($segment);
+                },
+                explode('/', trim($request->uri, '/'))
+            ));
             $data->ordering = $request->ordering;
             $data->trip_code = $request->trip_code;
             $data->meta_key = $request->meta_key;
