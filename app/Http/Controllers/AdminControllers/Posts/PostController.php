@@ -199,7 +199,14 @@ class PostController extends Controller
         $posttypeId = $this->getPostTypeId($request->post_type);
         $data['post_type'] = $posttypeId->id;
         // $data['uri'] = Str::slug($request->uri);
-        $data['uri'] = generate_unique_uri('App\Models\Posts\PostModel', Str::slug($request->uri));
+        // $data['uri'] = generate_unique_uri('App\Models\Posts\PostModel', Str::slug($request->uri));
+
+        $data['uri'] = implode('/', array_map(
+            function ($segment) {
+                return Str::slug($segment);
+            },
+            explode('/', trim($request->uri, '/'))
+        ));
         $data['page_thumbnail'] = $page_thumbnail;
         $isChecked = $request->has('show_in_home');
         $data['show_in_home'] = ($isChecked) ? '1' : '0';
@@ -433,7 +440,14 @@ class PostController extends Controller
         $data->trip = $request->trip;
         $isChecked = $request->has('show_in_home');
         $data->show_in_home = ($isChecked) ? '1' : '0';
-        $data['uri'] = Str::slug($request->uri);
+        // $data['uri'] = Str::slug($request->uri);
+
+        $data['uri'] = implode('/', array_map(
+            function ($segment) {
+                return Str::slug($segment);
+            },
+            explode('/', trim($request->uri, '/'))
+        ));
         $data->save();
 
         // Slug
