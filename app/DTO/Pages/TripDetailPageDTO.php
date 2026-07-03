@@ -105,6 +105,32 @@ class TripDetailPageDTO
             'save_badge'    => $trip->save_badge,
             'current_price' => 'US$' . number_format((float) $trip->price),
             'old_price'     => 'US$' . number_format((float) $trip->old_price),
+            'ratings' => [
+                [
+                    'value' => 1530,
+                    'stars' => 5,
+                    'label' => 'TripAdvisor',
+                    'href'  => 'https://www.tripadvisor.com',
+                    'type'  => 'external',
+                    'slug'  => 'trip-advisor',
+                ],
+                [
+                    'value' => 400,
+                    'stars' => 3,
+                    'label' => 'Google',
+                    'href'  => 'https://www.google.com',
+                    'type'  => 'external',
+                    'slug'  => 'google',
+                ],
+                [
+                    'value' => 106,
+                    'stars' => 4,
+                    'label' => 'TrustPilot',
+                    'href'  => 'https://www.trustpilot.com',
+                    'type'  => 'external',
+                    'slug'  => 'trust-pilot',
+                ],
+            ],
         ];
     }
 
