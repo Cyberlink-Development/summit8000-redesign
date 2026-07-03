@@ -111,7 +111,13 @@ class TeamController extends Controller
             /*****************************/
 
             $data['team_key'] = time() . rand(500000, 999999999);
-            $data['uri'] = Str::slug($request->uri);
+            // $data['uri'] = Str::slug($request->uri);
+            $data['uri'] = implode('/', array_map(
+                function ($segment) {
+                    return Str::slug($segment);
+                },
+                explode('/', trim($request->uri, '/'))
+            ));
             $data['banner'] = $banner_name;
             $data['thumbnail'] = $thumbnail_name;
 
@@ -317,7 +323,13 @@ class TeamController extends Controller
             $data->instagram_url = $request->instagram_url;
             $data->twitter_url = $request->twitter_url;
             $data->linkedin_url = $request->linkedin_url;
-            $data->uri = Str::slug($request->uri);
+            // $data->uri = Str::slug($request->uri);
+            $data['uri'] = implode('/', array_map(
+                function ($segment) {
+                    return Str::slug($segment);
+                },
+                explode('/', trim($request->uri, '/'))
+            ));
             $isChecked = $request->has('published');
             $data->published = ($isChecked) ? '1' : '0';
             $isChecked = $request->has('status');
