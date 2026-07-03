@@ -11,7 +11,15 @@
                     <div class="bs-component">
                         <input type="text" id="name" name="name" class="form-control" placeholder="Name"
                             value="{{ old('name') }}" required="" />
-                        <input type="hidden" id="uri" name="uri" value="" />
+                        {{-- <input type="hidden" id="uri" name="uri" value="" /> --}}
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputStandard" class="col-lg-2 control-label">Uri</label>
+                <div class="col-lg-8">
+                    <div class="bs-component">
+                        <input type="text"  class="form-control" id="uri" name="uri" value="" />
                     </div>
                 </div>
             </div>
